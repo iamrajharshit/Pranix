@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pranix"
+version = "0.1.0"
+description = "Pranix: deterministic Vedic chart engine and insight API"
+license = "AGPL-3.0-only"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "pyswisseph==2.10.3.2",
+  "PyYAML>=6.0",
+  "structlog>=24.1",
+  "tzdata>=2024.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "hypothesis>=6.100",
+  "httpx>=0.27",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "import-linter>=2.0",
+  "types-PyYAML",
+]
+
+[project.scripts]
+pranix-ctl = "pranix.config.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"pranix.rulesets" = ["*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "RUF"]
+ignore = ["S101", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+mypy_path = "src"
+packages = ["pranix"]
+
+[[tool.mypy.overrides]]
+module = ["swisseph"]
+ignore_missing_imports = true
+
+[tool.importlinter]
+root_package = "pranix"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Ephemeris is pure: no gateway, config or observability imports (ARCH-03, ARCH-05)"
+type = "forbidden"
+source_modules = ["pranix.ephemeris"]
+forbidden_modules = ["pranix.gateway", "pranix.config", "pranix.obs"]
+
+[[tool.importlinter.contracts]]
+name = "Gateway, config and observability never import pyswisseph"
+type = "forbidden"
+source_modules = ["pranix.gateway", "pranix.config", "pranix.obs"]
+forbidden_modules = ["swisseph"]
+allow_indirect_imports = true
