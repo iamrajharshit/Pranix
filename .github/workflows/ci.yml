@@ -55,8 +55,8 @@ jobs:
         run: docker build -f infra/Dockerfile -t pranix:ci .
       - name: Smoke test (/readyz runs the golden self-test)
         run: |
-          docker run -d --name p -p 8000:8000 pranix:ci
+          docker run -d --name pranix-smoke -p 8000:8000 pranix:ci
           for i in $(seq 1 30); do curl -fs localhost:8000/readyz && break; sleep 1; done
           curl -fs localhost:8000/readyz
           curl -fs localhost:8000/version
-          docker logs p
+          docker logs pranix-smoke
