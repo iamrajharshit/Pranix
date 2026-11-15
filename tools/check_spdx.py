@@ -7,7 +7,7 @@ import sys
 
 HEADER = "SPDX-License-Identifier: AGPL-3.0-only"
 SUFFIXES = {".py", ".ts", ".tsx", ".yaml", ".yml", ".sh", ".toml"}
-SKIP_DIRS = {".git", "node_modules", ".venv", "docs", "__pycache__", ".mypy_cache", ".ruff_cache", ".pytest_cache"}
+SKIP_DIRS = {".git", "node_modules", "dist", ".venv", "docs", "__pycache__", ".mypy_cache", ".ruff_cache", ".pytest_cache"}
 root = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ".")
 missing = [
     p for p in root.rglob("*")

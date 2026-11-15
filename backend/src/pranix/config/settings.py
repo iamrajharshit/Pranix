@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     ephe_path: str = "/app/data/ephe"
     geo_db_path: str = "/app/data/geonames.sqlite"
     fonts_dir: str = "/app/data/fonts"
+    web_dist: str = "/app/web"
     feature_chat: bool = False
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)

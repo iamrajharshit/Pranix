@@ -9,3 +9,4 @@ CLAUDE.md
 **/*.egg-info
 data/ephe/*.se1
 web/node_modules
+web/dist

@@ -47,9 +47,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
   docker:
     runs-on: ubuntu-latest
-    needs: backend
+    needs: [backend, web]
     steps:
       - uses: actions/checkout@v5
       - name: Build image
@@ -60,6 +77,9 @@ jobs:
           for i in $(seq 1 30); do curl -fs localhost:8000/readyz && break; sleep 1; done
           curl -fs localhost:8000/readyz
           curl -fs localhost:8000/version
+          curl -fs localhost:8000/ | grep -q '<div id="root">' && echo "smoke: app shell ok"
+          curl -fs localhost:8000/dashboard | grep -q '<div id="root">'
+          curl -fsI localhost:8000/ | grep -qi content-security-policy
           curl -fs "localhost:8000/v1/places?q=pune" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r[0]); assert r[0]['tz']=='Asia/Kolkata'"
           curl -fs "localhost:8000/v1/places/nearest?lat=18.55&lon=73.85"
           echo "smoke: places ok"
