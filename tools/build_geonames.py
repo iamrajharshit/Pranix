@@ -45,6 +45,7 @@ def main() -> int:
             c = line.split("\t")
             admin1[c[0]] = c[1]
 
+    args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.unlink(missing_ok=True)
     db = sqlite3.connect(args.out)
     db.executescript(
