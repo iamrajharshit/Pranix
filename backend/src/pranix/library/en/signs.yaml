@@ -1,0 +1,98 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# DRAFT library: twelve signs, worded for rising sign, Moon and Sun. Owner review pending (FR-LIB-04).
+Aries:
+  status: draft
+  rising: You tend to meet the world head on, with a quick spark and a wish to get things moving.
+  moon: Your feelings run fast and honest; you feel better once you can act on what you feel.
+  sun: Your core energy is pioneering. You come alive when you start something new.
+  strengths: [Courage to begin, Directness people can trust, Energy that lifts a room]
+  watch: [Rushing before the picture is clear, Impatience when others move slowly]
+  try: [Pause for one breath before you reply, Finish one small thing before starting the next]
+Taurus:
+  status: draft
+  rising: You come across as calm and grounded, someone who brings steadiness to a space.
+  moon: You feel safe through comfort, beauty and routine. Steady care settles you deeply.
+  sun: Your core energy is building. You shine when you create something lasting and real.
+  strengths: [Patience that sees things through, A strong sense of what feels good, Loyalty]
+  watch: [Holding on when change is needed, Comfort turning into avoidance]
+  try: [Notice one thing you enjoy with all your senses today, Make one small change on purpose]
+Gemini:
+  status: draft
+  rising: You meet people with curiosity and wit, quick to connect and ask questions.
+  moon: Your feelings settle when you can talk them through and make sense of them.
+  sun: Your core energy is curious. You thrive on ideas, learning and conversation.
+  strengths: [Adaptability, A gift for words, Seeing many sides of a question]
+  watch: [Scattering energy across too many things, Thinking about feelings instead of feeling them]
+  try: [Write your thoughts down to see which one matters most, Choose one topic to go deep on]
+Cancer:
+  status: draft
+  rising: You come across as caring and protective, someone who notices how others feel.
+  moon: Your feelings are deep and tender. Home and close bonds are your safe harbour.
+  sun: Your core energy is nurturing. You shine when you look after people and places you love.
+  strengths: [Emotional memory, Warmth, A strong instinct to protect]
+  watch: [Withdrawing when hurt, Carrying other people's moods as your own]
+  try: [Ask for care as freely as you give it, Make your space feel like home in one small way]
+Leo:
+  status: draft
+  rising: You meet the world warmly and visibly, with a natural presence people notice.
+  moon: You feel at ease when you are appreciated and free to express your heart.
+  sun: Your core energy is radiant. You shine when you create, lead and give generously.
+  strengths: [Generosity, Confidence, A gift for encouraging others]
+  watch: [Needing outside praise to feel steady, Pride getting in the way of asking for help]
+  try: [Praise someone else sincerely today, Do one creative thing just for joy]
+Virgo:
+  status: draft
+  rising: You come across as thoughtful and capable, someone who notices the details.
+  moon: You feel settled when life is in order and you can be genuinely useful.
+  sun: Your core energy is refining. You shine when you improve, heal and serve.
+  strengths: [Care with details, Practical help, Clear thinking]
+  watch: [Being hard on yourself, Worry about small things]
+  try: [Let one thing be good enough, Name something you did well today]
+Libra:
+  status: draft
+  rising: You meet people with grace and fairness, easing tension and seeking balance.
+  moon: You feel calm when your relationships are in harmony and things feel fair.
+  sun: Your core energy is relating. You shine in partnership, beauty and fair dealing.
+  strengths: [Diplomacy, A sense of beauty, Seeing the other person's side]
+  watch: [Avoiding conflict that needs to happen, Losing your own view to keep the peace]
+  try: [Say one honest preference out loud, Make a decision without polling everyone]
+Scorpio:
+  status: draft
+  rising: You come across as intense and perceptive, quietly reading what lies beneath.
+  moon: Your feelings run very deep. Trust is earned slowly and given completely.
+  sun: Your core energy is transforming. You shine when you go deep and renew yourself.
+  strengths: [Emotional depth, Loyalty, Resilience through change]
+  watch: [Holding on to hurt, Testing people before trusting them]
+  try: [Let one old grudge rest, Share something you usually keep private with someone safe]
+Sagittarius:
+  status: draft
+  rising: You meet the world with optimism and a sense of adventure, eager for meaning.
+  moon: You feel free and happy when there is room to explore and grow.
+  sun: Your core energy is seeking. You shine when you learn, travel and share wisdom.
+  strengths: [Optimism, Honesty, A big-picture view]
+  watch: [Overpromising, Restlessness with routine]
+  try: [Learn one new thing today, Keep one small promise to yourself]
+Capricorn:
+  status: draft
+  rising: You come across as composed and responsible, someone others rely on.
+  moon: You feel secure when you have a plan and are making steady progress.
+  sun: Your core energy is building over time. You shine through patient effort and integrity.
+  strengths: [Discipline, Reliability, Long-term vision]
+  watch: [Working past your limits, Hiding feelings behind duty]
+  try: [Rest without earning it first, Tell someone how you really are]
+Aquarius:
+  status: draft
+  rising: You meet the world as an original, friendly yet independent thinker.
+  moon: You feel at ease when you have freedom and friends who share your ideals.
+  sun: Your core energy is inventive. You shine when you think freely and help the group.
+  strengths: [Originality, Fairness, Friendship]
+  watch: [Detaching from feelings, Stubbornness about your ideas]
+  try: [Notice one feeling without analysing it, Share an idea with someone new]
+Pisces:
+  status: draft
+  rising: You come across as gentle and imaginative, open to others and their stories.
+  moon: Your feelings are wide and sensitive; quiet and creativity help you recharge.
+  sun: Your core energy is compassionate. You shine through imagination and kindness.
+  strengths: [Empathy, Imagination, Spiritual openness]
+  watch: [Absorbing others' moods, Escaping when things feel hard]
+  try: [Spend a few quiet minutes alone, Set one kind but clear boundary]

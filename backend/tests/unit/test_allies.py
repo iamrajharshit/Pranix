@@ -72,3 +72,10 @@ def test_naming_table_is_complete() -> None:
     assert len(rows) == 27 and all(len(r["syllables"]) == 4 for r in rows)
     assert all(s["deva"] and s["latin"] for r in rows for s in r["syllables"])
     assert [r["nakshatra"] for r in rows] == [n.name for n in RS.nakshatras]
+
+
+def test_single_planet_with_one_traditional_colour_is_not_padded() -> None:
+    # Lagna Aries, Moon in Scorpio, AK Mars: Mars has only Red and no variant (D65 open decision).
+    b = bodies(Moon=215.0, Mars=29.5)
+    assert allies.deciding_planets(RS, b, asc=10.0) == [("Mars", ["lagna_lord", "moon_sign_lord", "atmakaraka"])]
+    assert [s["name"] for s in allies.colors(RS, b, asc=10.0)["swatches"]] == ["Red"]

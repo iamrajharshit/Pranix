@@ -1,0 +1,265 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# APPROVED library batch 1 (owner, 14 Nov 2026): colours, weekdays and roles.
+colours:
+  Saffron:
+    status: approved
+    text: In Indian tradition saffron is the colour of the rising sun and of sacred fire, linked with courage, devotion and letting go of what no longer serves. It carries the Sun's warmth and invites you
+      to show up with a steady, generous light.
+    tags:
+    - warm
+    - devoted
+    - bright
+    ideas:
+    - A saffron scarf or stole on a day you want to feel steady and seen
+    - A small saffron object on your desk as a reminder of your own warmth
+    - Light a lamp in the evening and watch its glow for a quiet minute
+  Orange:
+    status: approved
+    text: Orange sits between the fire of red and the light of yellow, and tradition links it with enthusiasm and creative energy. It is a colour for beginnings, play and warm connection with others.
+    tags:
+    - lively
+    - creative
+    - friendly
+    ideas:
+    - An orange accent when you meet friends or start a project
+    - Orange flowers or fruit on the table to brighten a shared meal
+    - A notebook with an orange cover for new ideas
+  Gold:
+    status: approved
+    text: Gold is the colour of the Sun at its fullest and of Jupiter's wisdom, linked in tradition with dignity, generosity and inner worth. It reminds you that your value does not need to be proven loudly.
+    tags:
+    - radiant
+    - dignified
+    - generous
+    ideas:
+    - A touch of gold in jewellery or embroidery on an important day
+    - A gold-toned frame around something you are proud of
+    - Warm golden light in the corner where you read or rest
+  Red:
+    status: approved
+    text: Red is the colour of Mars and of life force, linked with courage, action and protection. In tradition it marks auspicious beginnings and the energy to stand up for what matters.
+    tags:
+    - bold
+    - courageous
+    - alive
+    ideas:
+    - A red accent on a day you need to speak up
+    - A red thread or bangle as a small reminder of your courage
+    - Mark one brave step in red in your planner
+  White:
+    status: approved
+    text: White is linked with the Moon and Venus, with calm, clarity and a fresh start. In tradition it stands for a pure intention and a mind that can rest.
+    tags:
+    - calm
+    - clear
+    - gentle
+    ideas:
+    - White or off-white clothing on a day you want to feel calm
+    - Clear a small white space on your desk before you begin work
+    - Fresh white flowers where you sleep or pray
+  Silver:
+    status: approved
+    text: Silver carries the cool light of the Moon and is linked with intuition, emotional balance and reflection. It invites you to listen inwardly before you act.
+    tags:
+    - reflective
+    - intuitive
+    - soothing
+    ideas:
+    - Silver jewellery on a day you want to stay composed
+    - A silver-toned object by your bed as a cue to rest your mind
+    - Step outside on a clear night and notice the moonlight
+  Light blue:
+    status: approved
+    text: Light blue is the colour of an open sky, linked in some traditions with the Moon's softer moods. It suggests room to breathe, gentle feelings and easy conversation.
+    tags:
+    - open
+    - gentle
+    - easy
+    ideas:
+    - Light blue for a conversation you want to keep gentle
+    - Light blue paper for a letter to someone you miss
+    - Look up at the sky for a few slow breaths
+  Green:
+    status: approved
+    text: Green is Mercury's colour and the colour of growing things, linked with learning, balance and fresh ideas. It invites curiosity and a light, flexible mind.
+    tags:
+    - fresh
+    - curious
+    - balanced
+    ideas:
+    - A green plant on your desk while you study or work
+    - Green on days you are learning something new
+    - A short walk among trees when your thoughts feel crowded
+  Yellow:
+    status: approved
+    text: Yellow is Jupiter's colour, linked in tradition with wisdom, learning and an open-hearted optimism. It is the colour of a teacher's warmth and of ripened grain.
+    tags:
+    - hopeful
+    - wise
+    - warm
+    ideas:
+    - Yellow on a day you teach, learn or give advice
+    - Yellow flowers to thank someone who guided you
+    - A yellow pen to mark ideas worth keeping
+  Pink:
+    status: approved
+    text: Pink is a softer, modern shade linked with Venus, with tenderness, affection and gentle beauty. It reminds you to be kind, including to yourself.
+    tags:
+    - tender
+    - affectionate
+    - kind
+    ideas:
+    - A pink accent on a day you reconnect with someone
+    - Pink flowers for a person who needs cheering
+    - A pink note in your wallet with one kind thing about yourself
+  Cream:
+    status: approved
+    text: Cream is a warm, softened white linked with Venus's love of comfort and grace. It suggests ease, nourishment and quiet elegance.
+    tags:
+    - soft
+    - graceful
+    - nourishing
+    ideas:
+    - Cream fabrics in the place where you rest
+    - Cream clothing for an unhurried day
+    - A candle in a cream holder for a calm evening
+  Black:
+    status: approved
+    text: Black is Saturn's colour, linked with depth, patience and the strength that comes from endurance. In tradition it is also a colour of protection and of the quiet discipline that builds things
+      slowly.
+    tags:
+    - grounded
+    - steady
+    - focused
+    ideas:
+    - Black on a day that needs focus and follow-through
+    - A black notebook for long-term goals
+    - A few minutes of stillness in a quiet, dim room
+  Dark blue:
+    status: approved
+    text: Dark blue is the deep night sky, linked with Saturn's patience and the steadiness of long effort. It suggests seriousness worn lightly and trust that grows over time.
+    tags:
+    - deep
+    - steady
+    - trustworthy
+    ideas:
+    - Dark blue on a day you want to feel composed
+    - A dark blue cover for the plans you are building slowly
+    - Look at the night sky before you sleep
+  Deep purple:
+    status: approved
+    text: Deep purple is a modern shade linked with Saturn's depth and with quiet, inward reflection. It suggests dignity, mystery and the wisdom of slowing down.
+    tags:
+    - reflective
+    - dignified
+    - deep
+    ideas:
+    - Deep purple when you sit down to journal
+    - A purple cushion in your quiet corner
+    - An evening walk at dusk when the sky turns violet
+weekdays:
+  Sunday:
+    status: approved
+    planet: Sun
+    text: Sunday belongs to the Sun, linked in tradition with vitality, confidence and a clear sense of purpose. It is a day to stand in your own light and remember what you care about most.
+    tags:
+    - bright
+    - confident
+    - purposeful
+    ideas:
+    - Start something that matters to you, even in a small way
+    - Spend a little time in the morning sunlight
+    - Write down one thing you are proud of
+  Monday:
+    status: approved
+    planet: Moon
+    text: Monday belongs to the Moon, linked with feelings, care and the comfort of home. It is a gentle day for looking after yourself and the people close to you.
+    tags:
+    - gentle
+    - caring
+    - intuitive
+    ideas:
+    - Call or visit someone you love
+    - Cook or share a comforting meal
+    - Notice your mood without judging it
+  Tuesday:
+    status: approved
+    planet: Mars
+    text: Tuesday belongs to Mars, linked with courage, energy and decisive action. It is a good day to take a step you have been putting off.
+    tags:
+    - bold
+    - energetic
+    - decisive
+    ideas:
+    - Do the hardest task of the day first
+    - Move your body in a way you enjoy
+    - Stand up, kindly, for something you believe in
+  Wednesday:
+    status: approved
+    planet: Mercury
+    text: Wednesday belongs to Mercury, linked with learning, conversation and clever problem-solving. It favours clear thinking and sharing ideas.
+    tags:
+    - curious
+    - quick
+    - communicative
+    ideas:
+    - Learn something new, however small
+    - Send the message you have been meaning to write
+    - Tidy your plans for the rest of the week
+  Thursday:
+    status: approved
+    planet: Jupiter
+    text: Thursday belongs to Jupiter, linked with wisdom, generosity and growth. It is a day for learning from teachers and for giving freely.
+    tags:
+    - wise
+    - generous
+    - expansive
+    ideas:
+    - Thank a teacher or mentor
+    - Read something that lifts your thinking
+    - Offer help without being asked
+  Friday:
+    status: approved
+    planet: Venus
+    text: Friday belongs to Venus, linked with love, beauty, harmony and enjoyment. It is a day to appreciate what is beautiful and to tend your relationships.
+    tags:
+    - warm
+    - harmonious
+    - joyful
+    ideas:
+    - Make or arrange something beautiful
+    - Spend unhurried time with someone you care about
+    - Brighten your space with flowers or music
+  Saturday:
+    status: approved
+    planet: Saturn
+    text: Saturday belongs to Saturn, linked with patience, discipline and steady effort. It is a day for careful work and for keeping your commitments.
+    tags:
+    - steady
+    - patient
+    - grounded
+    ideas:
+    - Finish something you left undone
+    - Simplify or organise one corner of your life
+    - Spend quiet time reflecting, or serve someone in a practical way
+roles:
+  lagna_lord:
+    status: approved
+    who: the lord of your rising sign
+    why: Your rising sign shows how you meet the world, so its lord colours your everyday presence.
+  moon_sign_lord:
+    status: approved
+    who: the lord of your Moon sign
+    why: Your Moon shows your feelings and needs, so its lord speaks to your inner comfort.
+  sun_sign_lord:
+    status: approved
+    who: the lord of your Sun sign
+    why: Your Sun shows your core vitality, so its lord speaks to your sense of self.
+  atmakaraka:
+    status: approved
+    who: your soul planet (Atmakaraka)
+    why: The soul planet points to your deepest motivation, so its colour or day connects you with what drives you.
+  fallback:
+    status: approved
+    who: an added shade of the same planet
+    why: Your chart pointed to one colour only, so we added another traditional shade of the same planet.

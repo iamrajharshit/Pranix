@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+from collections.abc import Iterator, Mapping
+from typing import Any
+
+import pytest
+
+from pranix.insight.library import Library, LibraryGap
+from pranix.insight.validators import check_text
+
+
+def strings(node: Any, path: str = "") -> Iterator[tuple[str, str]]:
+    if isinstance(node, Mapping):
+        for k, v in node.items():
+            if k != "status":
+                yield from strings(v, f"{path}/{k}")
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from strings(v, f"{path}[{i}]")
+    elif isinstance(node, str):
+        yield path, node
+
+
+def test_every_library_string_passes_the_guardrails() -> None:
+    lib = Library(allow_drafts=True)
+    checked = 0
+    for path, text in strings(lib.data):
+        check_text(path, text)
+        checked += 1
+    assert checked > 300
+
+
+def test_approved_batch_and_production_mode() -> None:
+    lib = Library(allow_drafts=False)
+    assert lib.stats()["approved"] == 26  # 14 colours, 7 weekdays, 5 roles (batch 1)
+    assert lib.get("allies", "colours", "Saffron")["status"] == "approved"
+    with pytest.raises(LibraryGap):
+        lib.get("signs", "Leo")  # draft: not served in production
+    with pytest.raises(LibraryGap):
+        lib.get("signs", "Ophiuchus")

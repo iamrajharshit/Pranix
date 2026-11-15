@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# DRAFT library: twenty-seven birth stars. Symbol and deity come from the approved table; this is the reading.
+Ashwini: {status: draft, essence: "A star of swift beginnings and healing. It favours quick help, fresh starts and lively energy.", strength: Quick to help, watch: Starting more than you finish}
+Bharani: {status: draft, essence: "A star of carrying and transformation. It holds strong feelings and the courage to see things through.", strength: Endurance under pressure, watch: Carrying too much alone}
+Krittika: {status: draft, essence: "A star of sharp, purifying fire. It gives clarity, honesty and the will to cut away what is false.", strength: Clear and honest, watch: Words that cut too sharply}
+Rohini: {status: draft, essence: "The star of growth and beauty. It favours patient, steady creation and a deep love of comfort and the senses.", strength: Makes things flourish, watch: Holding on to what is comfortable}
+Mrigashira: {status: draft, essence: "A star of gentle searching. It brings curiosity, a soft touch and a love of exploring.", strength: Curious and gentle, watch: Restless searching}
+Ardra: {status: draft, essence: "A star of storms that clear the air. It brings intensity, insight and renewal after hard times.", strength: Grows through challenge, watch: Stormy moods}
+Punarvasu: {status: draft, essence: "A star of return and renewal. It brings hope, generosity and the ability to begin again.", strength: Bounces back with grace, watch: Spreading kindness too thin}
+Pushya: {status: draft, essence: "A star of nourishment. It favours care, wisdom and steady support for others.", strength: Deeply nurturing, watch: Over-responsibility}
+Ashlesha: {status: draft, essence: "A star of coiled wisdom. It gives insight into people and a strong, protective intuition.", strength: Sharp intuition, watch: Guardedness}
+Magha: {status: draft, essence: "A star of heritage and dignity. It honours roots, tradition and a natural sense of leadership.", strength: Dignified presence, watch: Pride}
+Purva Phalguni: {status: draft, essence: "A star of rest and enjoyment. It favours warmth, creativity and the pleasure of good company.", strength: Joyful and warm, watch: Avoiding effort}
+Uttara Phalguni: {status: draft, essence: "A star of steady partnership. It brings loyalty, kindness and a wish to support others.", strength: Reliable friend, watch: Overcommitting}
+Hasta: {status: draft, essence: "A star of skilful hands. It brings craft, humour and practical cleverness.", strength: Skilled and resourceful, watch: Restless hands and mind}
+Chitra: {status: draft, essence: "A star of bright craftsmanship. It loves design, beauty and making things that shine.", strength: Creative eye, watch: Perfectionism}
+Swati: {status: draft, essence: "A star of independent growth. Like a sprout in the wind, it bends and grows on its own terms.", strength: Independent and adaptable, watch: Restlessness}
+Vishakha: {status: draft, essence: "A star of purpose and achievement. It brings focus and determination to reach a chosen goal.", strength: Determined, watch: Single-mindedness}
+Anuradha: {status: draft, essence: "A star of friendship and devotion. It builds lasting bonds and stays loyal through hard times.", strength: Devoted friend, watch: Hidden worry}
+Jyeshtha: {status: draft, essence: "A star of seniority and protection. It gives courage to take responsibility for others.", strength: Protective, watch: Feeling alone at the top}
+Mula: {status: draft, essence: "A star of roots and inquiry. It digs down to the truth beneath things.", strength: Seeks the root of things, watch: Uprooting too quickly}
+Purva Ashadha: {status: draft, essence: "A star of invigoration. It brings conviction, energy and the power to inspire.", strength: Inspiring, watch: Stubborn conviction}
+Uttara Ashadha: {status: draft, essence: "A star of lasting victory. It favours integrity, patience and wins that endure.", strength: Principled, watch: Being too serious}
+Shravana: {status: draft, essence: "A star of listening and learning. It gives a good ear, wisdom and the gift of connecting people.", strength: Listens deeply, watch: Over-sensitivity to what others say}
+Dhanishta: {status: draft, essence: "A star of rhythm and abundance. It brings music, generosity and a talent for working with groups.", strength: Generous and rhythmic, watch: Restless ambition}
+Shatabhisha: {status: draft, essence: "A star of healing and solitude. It brings independent thought and a quiet search for truth.", strength: Healing insight, watch: Withdrawing from others}
+Purva Bhadrapada: {status: draft, essence: "A star of fiery idealism. It brings passion for a cause and a wish to transform.", strength: Idealistic, watch: Extremes}
+Uttara Bhadrapada: {status: draft, essence: "A star of depth and calm. It brings wisdom, patience and a steady inner strength.", strength: Calm under pressure, watch: Holding feelings in}
+Revati: {status: draft, essence: "A star of safe journeys and kindness. It brings gentleness, care and a guiding light for others.", strength: Kind guide, watch: Being too trusting}

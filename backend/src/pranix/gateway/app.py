@@ -17,8 +17,11 @@ from ..ephemeris import selftest, swe
 from ..ephemeris.master import SCHEMA_VERSION
 from ..ephemeris.ruleset import load_ruleset
 from ..geo.index import GeoIndex
+from ..insight.library import Library
+from ..insight.pipeline import InsightService
+from ..llmgw.build import insights_chain
 from ..obs.logging import configure
-from . import routes_geo, routes_profiles
+from . import routes_geo, routes_insights, routes_profiles
 from .guest_store import GuestStore
 from .problems import install
 from .ratelimit import TokenBucket
@@ -46,6 +49,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             failures.append("geo_index_missing")
         app.state.ready, app.state.failures = not failures, failures
         log.info("selftest.result", ok=result.ok, failures=failures, ephemeris_mode=swe.mode())
+        log.info(
+            "insight.ready",
+            library=app.state.library.stats(),
+            drafts_served=settings.allow_drafts,
+            ai_providers=[f"{li.provider.name}:{li.provider.model}" for li in app.state.insights.chain.links],
+        )
         yield
 
     app = FastAPI(title="Pranix API", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
@@ -56,7 +65,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.limits = {
         "places": TokenBucket(settings.rate_places_per_min),
         "profiles": TokenBucket(settings.rate_profiles_per_min),
+        "insights": TokenBucket(settings.rate_insights_per_min),
     }
+    app.state.library = Library(allow_drafts=settings.allow_drafts)
+    app.state.insights = InsightService(app.state.library, insights_chain(settings))
     install(app)
 
     @app.middleware("http")
@@ -95,10 +107,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "ruleset": {"id": rs.id, "version": rs.version, "hash": rs.hash},
             "ephemeris_mode": swe.mode(),
             "feature_flags": {"chat": settings.feature_chat, "passkeys": settings.feature_passkeys},
+            "ai_providers": sorted(
+                {{"gemini": "Google Gemini", "groq": "Groq"}[li.provider.name] for li in app.state.insights.chain.links}
+            ),
         }
 
     app.include_router(routes_geo.router)
     app.include_router(routes_profiles.router)
+    app.include_router(routes_insights.router)
     return app
 
 

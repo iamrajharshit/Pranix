@@ -10,6 +10,9 @@ from hypothesis import strategies as st
 from pranix.ephemeris import angles, dasha
 from pranix.ephemeris.master import BirthInput, compute
 from pranix.ephemeris.ruleset import load_ruleset
+from pranix.insight import cards
+from pranix.insight.library import Library
+from pranix.insight.validators import check_card
 
 RS = load_ruleset()
 lon = st.floats(min_value=0, max_value=359.999999, allow_nan=False)
@@ -41,7 +44,7 @@ def test_dasha_contiguous_and_exact(moon: float, birth: int) -> None:
     assert sum((k.end - k.start for k in kids), Fraction(0)) == mahas[0].length
 
 
-@settings(max_examples=25, deadline=None)
+@settings(max_examples=60, deadline=None)
 @given(
     st.datetimes(min_value=datetime(1900, 1, 1), max_value=datetime(2020, 12, 31)),
     st.floats(min_value=-60, max_value=60),
@@ -55,7 +58,12 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
     if m["doshas"] is not None:
         assert sum(m["doshas"]["percent"].values()) == 100
     if m["colors"] is not None:
-        assert 2 <= len(m["colors"]["swatches"]) <= 3
+        sw = m["colors"]["swatches"]
+        # 2-3 colours, except when every deciding planet is Mars or Mercury, whose tradition gives only
+        # one colour and no variant: then one true colour, never an invented one (open decision D65).
+        assert 1 <= len(sw) <= 3
+        if len(sw) == 1:
+            assert sw[0]["planets"] in (["Mars"], ["Mercury"])
         assert len({s["name"] for s in m["colors"]["swatches"]}) == len(m["colors"]["swatches"])
     if m["days"] is not None:
         assert 1 <= len(m["days"]["items"]) <= 3
@@ -64,6 +72,9 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
         assert t["chart"] in ("d1", "d9", "none")
         if not known:
             assert t["kind"] not in ("house", "lagna") and t["chart"] == "none"
+    lib = Library(allow_drafts=True)
+    for module in cards.MODULES:  # no chart can make any card break a guardrail
+        check_card(cards.build(module, m, lib), m["facts"])
     if known:
         assert m["ishta_devta"]["main"] and len(m["ishta_devta"]["others"]) <= 2
         assert m["naming"]["syllables"][m["naming"]["pada"] - 1]["pada"] == m["naming"]["pada"]
