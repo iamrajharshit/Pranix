@@ -6,8 +6,16 @@ from pathlib import Path
 
 import pytest
 
-from pranix.config.settings import get_settings
+from pranix.config.settings import Settings, get_settings
 from pranix.ephemeris import swe
+
+# Tests are sealed off from the developer's machine: a real .env (API keys, peppers) and real
+# PRANIX_* secrets must never change a result or reach a real AI provider. Only the data-file
+# paths CI sets on purpose are kept.
+Settings.model_config["env_file"] = None
+_KEEP = {"PRANIX_EPHE_PATH", "PRANIX_FONTS_DIR", "PRANIX_GEO_DB_PATH"}
+for _k in [k for k in os.environ if k.upper().startswith("PRANIX_") and k.upper() not in _KEEP]:
+    del os.environ[_k]
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = Path(__file__).parent / "fixtures" / "geonames"
@@ -19,8 +27,11 @@ def _ephemeris() -> None:
     swe.init(os.environ.get("PRANIX_EPHE_PATH"))
 
 
-# Card-image fonts: CI fetches them into data/fonts (tools/fetch_fonts.sh); tests skip images without them.
+# Data files fetched into data/ (tools/fetch_*.sh) are used locally as in CI, without needing a .env.
+# Card-image tests skip without the fonts; without .se1 files the engine runs in Moshier mode.
 os.environ.setdefault("PRANIX_FONTS_DIR", str(ROOT / "data" / "fonts"))
+if any((ROOT / "data" / "ephe").glob("*.se1")):
+    os.environ.setdefault("PRANIX_EPHE_PATH", str(ROOT / "data" / "ephe"))
 
 
 @pytest.fixture(scope="session", autouse=True)

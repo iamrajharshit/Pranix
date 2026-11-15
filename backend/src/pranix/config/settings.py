@@ -7,7 +7,7 @@ import hashlib
 from functools import cache
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -49,6 +49,16 @@ class Settings(BaseSettings):
     log_pepper: SecretStr | None = None
     chart_key_pepper: SecretStr | None = None
 
+    @field_validator(
+        *("database_url", "gemini_api_key", "groq_api_key", "log_pepper", "chart_key_pepper"), mode="before"
+    )
+    @classmethod
+    def _blank_is_missing(cls, v: object) -> object:
+        # "PRANIX_GROQ_API_KEY=" in a .env means "not set", never an empty key or empty pepper.
+        if isinstance(v, SecretStr):
+            v = v.get_secret_value()
+        return None if isinstance(v, str) and not v.strip() else v
+
     def secret_fingerprints(self) -> dict[str, str]:
         """Names and 6-char fingerprints only; never the value."""
         out = {}
@@ -68,11 +78,19 @@ class Settings(BaseSettings):
         missing AI keys are allowed: insight cards then use curated library text (FR-LLM-16)."""
         if self.env != "prod":
             return []
-        return [f"{n} is required in prod" for n in REQUIRED_IN_PROD if getattr(self, n) is None]
+        out = []
+        for n in REQUIRED_IN_PROD:
+            v = getattr(self, n)
+            if v is None:
+                out.append(f"{n} is required in prod")
+            elif len(v.get_secret_value()) < MIN_PEPPER_CHARS:
+                out.append(f"{n} must be at least {MIN_PEPPER_CHARS} characters in prod")
+        return out
 
 
 SECRET_NAMES = ("database_url", "gemini_api_key", "groq_api_key", "log_pepper", "chart_key_pepper")
 REQUIRED_IN_PROD = ("log_pepper", "chart_key_pepper")
+MIN_PEPPER_CHARS = 32  # e.g. python -c "import secrets; print(secrets.token_hex(32))"
 
 
 @cache
