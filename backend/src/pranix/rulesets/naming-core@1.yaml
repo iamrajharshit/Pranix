@@ -1,0 +1,414 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# naming-core@1 — generated from Reference_tables_approved_v1 §8. Edit only with owner approval.
+id: naming-core
+version: 1
+status: VARIANT
+reviewed_by: owner
+reviewed_at: '2026-11-14'
+source_notes: Common North-Indian (Avakahada) table, 27 x 4. Devanagari is the source of truth. Abhijit not used. Approved D54.
+nakshatras:
+- number: 1
+  nakshatra: Ashwini
+  syllables:
+  - pada: 1
+    latin: Chu
+    deva: चू
+  - pada: 2
+    latin: Che
+    deva: चे
+  - pada: 3
+    latin: Cho
+    deva: चो
+  - pada: 4
+    latin: La
+    deva: ला
+- number: 2
+  nakshatra: Bharani
+  syllables:
+  - pada: 1
+    latin: Li
+    deva: ली
+  - pada: 2
+    latin: Lu
+    deva: लू
+  - pada: 3
+    latin: Le
+    deva: ले
+  - pada: 4
+    latin: Lo
+    deva: लो
+- number: 3
+  nakshatra: Krittika
+  syllables:
+  - pada: 1
+    latin: A
+    deva: अ
+  - pada: 2
+    latin: I
+    deva: इ
+  - pada: 3
+    latin: U
+    deva: उ
+  - pada: 4
+    latin: E
+    deva: ए
+- number: 4
+  nakshatra: Rohini
+  syllables:
+  - pada: 1
+    latin: O
+    deva: ओ
+  - pada: 2
+    latin: Va
+    deva: वा
+  - pada: 3
+    latin: Vi
+    deva: वी
+  - pada: 4
+    latin: Vu
+    deva: वू
+- number: 5
+  nakshatra: Mrigashira
+  syllables:
+  - pada: 1
+    latin: Ve
+    deva: वे
+  - pada: 2
+    latin: Vo
+    deva: वो
+  - pada: 3
+    latin: Ka
+    deva: का
+  - pada: 4
+    latin: Ki
+    deva: की
+- number: 6
+  nakshatra: Ardra
+  syllables:
+  - pada: 1
+    latin: Ku
+    deva: कू
+  - pada: 2
+    latin: Gha
+    deva: घ
+  - pada: 3
+    latin: Nga
+    deva: ङ
+  - pada: 4
+    latin: Chha
+    deva: छ
+- number: 7
+  nakshatra: Punarvasu
+  syllables:
+  - pada: 1
+    latin: Ke
+    deva: के
+  - pada: 2
+    latin: Ko
+    deva: को
+  - pada: 3
+    latin: Ha
+    deva: हा
+  - pada: 4
+    latin: Hi
+    deva: ही
+- number: 8
+  nakshatra: Pushya
+  syllables:
+  - pada: 1
+    latin: Hu
+    deva: हू
+  - pada: 2
+    latin: He
+    deva: हे
+  - pada: 3
+    latin: Ho
+    deva: हो
+  - pada: 4
+    latin: Da
+    deva: डा
+- number: 9
+  nakshatra: Ashlesha
+  syllables:
+  - pada: 1
+    latin: Di
+    deva: डी
+  - pada: 2
+    latin: Du
+    deva: डू
+  - pada: 3
+    latin: De
+    deva: डे
+  - pada: 4
+    latin: Do
+    deva: डो
+- number: 10
+  nakshatra: Magha
+  syllables:
+  - pada: 1
+    latin: Ma
+    deva: मा
+  - pada: 2
+    latin: Mi
+    deva: मी
+  - pada: 3
+    latin: Mu
+    deva: मू
+  - pada: 4
+    latin: Me
+    deva: मे
+- number: 11
+  nakshatra: Purva Phalguni
+  syllables:
+  - pada: 1
+    latin: Mo
+    deva: मो
+  - pada: 2
+    latin: Ta
+    deva: टा
+  - pada: 3
+    latin: Ti
+    deva: टी
+  - pada: 4
+    latin: Tu
+    deva: टू
+- number: 12
+  nakshatra: Uttara Phalguni
+  syllables:
+  - pada: 1
+    latin: Te
+    deva: टे
+  - pada: 2
+    latin: To
+    deva: टो
+  - pada: 3
+    latin: Pa
+    deva: पा
+  - pada: 4
+    latin: Pi
+    deva: पी
+- number: 13
+  nakshatra: Hasta
+  syllables:
+  - pada: 1
+    latin: Pu
+    deva: पू
+  - pada: 2
+    latin: Sha
+    deva: ष
+  - pada: 3
+    latin: Na
+    deva: ण
+  - pada: 4
+    latin: Tha
+    deva: ठ
+- number: 14
+  nakshatra: Chitra
+  syllables:
+  - pada: 1
+    latin: Pe
+    deva: पे
+  - pada: 2
+    latin: Po
+    deva: पो
+  - pada: 3
+    latin: Ra
+    deva: रा
+  - pada: 4
+    latin: Ri
+    deva: री
+- number: 15
+  nakshatra: Swati
+  syllables:
+  - pada: 1
+    latin: Ru
+    deva: रू
+  - pada: 2
+    latin: Re
+    deva: रे
+  - pada: 3
+    latin: Ro
+    deva: रो
+  - pada: 4
+    latin: Ta
+    deva: ता
+- number: 16
+  nakshatra: Vishakha
+  syllables:
+  - pada: 1
+    latin: Ti
+    deva: ती
+  - pada: 2
+    latin: Tu
+    deva: तू
+  - pada: 3
+    latin: Te
+    deva: ते
+  - pada: 4
+    latin: To
+    deva: तो
+- number: 17
+  nakshatra: Anuradha
+  syllables:
+  - pada: 1
+    latin: Na
+    deva: ना
+  - pada: 2
+    latin: Ni
+    deva: नी
+  - pada: 3
+    latin: Nu
+    deva: नू
+  - pada: 4
+    latin: Ne
+    deva: ने
+- number: 18
+  nakshatra: Jyeshtha
+  syllables:
+  - pada: 1
+    latin: 'No'
+    deva: नो
+  - pada: 2
+    latin: Ya
+    deva: या
+  - pada: 3
+    latin: Yi
+    deva: यी
+  - pada: 4
+    latin: Yu
+    deva: यू
+- number: 19
+  nakshatra: Mula
+  syllables:
+  - pada: 1
+    latin: Ye
+    deva: ये
+  - pada: 2
+    latin: Yo
+    deva: यो
+  - pada: 3
+    latin: Bha
+    deva: भा
+  - pada: 4
+    latin: Bhi
+    deva: भी
+- number: 20
+  nakshatra: Purva Ashadha
+  syllables:
+  - pada: 1
+    latin: Bhu
+    deva: भू
+  - pada: 2
+    latin: Dha
+    deva: धा
+  - pada: 3
+    latin: Pha
+    deva: फा
+  - pada: 4
+    latin: Dha
+    deva: ढा
+- number: 21
+  nakshatra: Uttara Ashadha
+  syllables:
+  - pada: 1
+    latin: Bhe
+    deva: भे
+  - pada: 2
+    latin: Bho
+    deva: भो
+  - pada: 3
+    latin: Ja
+    deva: जा
+  - pada: 4
+    latin: Ji
+    deva: जी
+- number: 22
+  nakshatra: Shravana
+  syllables:
+  - pada: 1
+    latin: Khi
+    deva: खी
+  - pada: 2
+    latin: Khu
+    deva: खू
+  - pada: 3
+    latin: Khe
+    deva: खे
+  - pada: 4
+    latin: Kho
+    deva: खो
+- number: 23
+  nakshatra: Dhanishta
+  syllables:
+  - pada: 1
+    latin: Ga
+    deva: गा
+  - pada: 2
+    latin: Gi
+    deva: गी
+  - pada: 3
+    latin: Gu
+    deva: गू
+  - pada: 4
+    latin: Ge
+    deva: गे
+- number: 24
+  nakshatra: Shatabhisha
+  syllables:
+  - pada: 1
+    latin: Go
+    deva: गो
+  - pada: 2
+    latin: Sa
+    deva: सा
+  - pada: 3
+    latin: Si
+    deva: सी
+  - pada: 4
+    latin: Su
+    deva: सू
+- number: 25
+  nakshatra: Purva Bhadrapada
+  syllables:
+  - pada: 1
+    latin: Se
+    deva: से
+  - pada: 2
+    latin: So
+    deva: सो
+  - pada: 3
+    latin: Da
+    deva: दा
+  - pada: 4
+    latin: Di
+    deva: दी
+- number: 26
+  nakshatra: Uttara Bhadrapada
+  syllables:
+  - pada: 1
+    latin: Du
+    deva: दू
+  - pada: 2
+    latin: Tha
+    deva: थ
+  - pada: 3
+    latin: Jha
+    deva: झ
+  - pada: 4
+    latin: Na
+    deva: ञ
+- number: 27
+  nakshatra: Revati
+  syllables:
+  - pada: 1
+    latin: De
+    deva: दे
+  - pada: 2
+    latin: Do
+    deva: दो
+  - pada: 3
+    latin: Cha
+    deva: चा
+  - pada: 4
+    latin: Chi
+    deva: ची

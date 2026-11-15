@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-"""Master JSON builder (P0 subset): meta, identity, nakshatra, d1, d9, purpose, elements,
-doshas, chakras, dasha, flags.
-
-Not yet here (next PR): ishta_devta, colors, days, naming, facts (E3-7/8/13/14/15).
+"""Master JSON builder: meta, identity, nakshatra, naming, d1, d9, purpose, ishta_devta, colors,
+days, elements, doshas, chakras, dasha, facts, flags.
 
 Unknown birth time follows the certain-only rule (D56): the chart is computed at the start
 (00:00:00) and end (23:59:59) of the local birth day; a value is published only when both
@@ -17,8 +15,8 @@ from datetime import UTC, date, datetime, time
 from typing import Any, Literal
 
 from .. import __version__
-from . import angles, charts, dasha, heuristics, swe
-from .ruleset import Ruleset, load_ruleset
+from . import allies, angles, charts, dasha, facts, heuristics, swe
+from .ruleset import Ruleset, load_ruleset, load_table
 from .timeconv import julian_day_ut, to_utc
 
 SCHEMA_VERSION = "1.0.0"
@@ -87,6 +85,10 @@ def _meta(rs: Ruleset, inp: BirthInput, snap: _Snapshot, mode: str) -> dict[str,
         "engine_version": __version__,
         "swisseph_version": swe.library_version(),
         "ruleset": {"id": rs.id, "version": rs.version, "hash": rs.hash},
+        "rulesets": [
+            {"id": t.id, "version": t.version, "hash": t.hash}
+            for t in (load_table(r) for r in (allies.ISHTA, allies.COLORS, allies.DAYS, allies.NAMING))
+        ],
         "ayanamsa": "lahiri",
         "ayanamsa_value": swe.ayanamsa(snap.jd),
         "node_type": "mean",
@@ -152,19 +154,30 @@ def _known(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, An
     rahu = _body(snap, "Rahu")
     lagna_sign = angles.sign_index(snap.asc)
     r_house = angles.whole_sign_house(angles.sign_index(rahu.longitude), lagna_sign)
-    return {
+    ishta = allies.ishta_devta(rs, snap.bodies)
+    # Deity depends on exact degrees: flag it if it differs at either end of the birth day (FR-CAL-05).
+    day = inp.local_datetime.date()
+    ends = [_snap(inp, datetime.combine(day, t)) for t in (time(0, 0, 0), time(23, 59, 59))]
+    ishta["time_sensitive"] = any(allies.ishta_devta(rs, e.bodies)["main"] != ishta["main"] for e in ends)
+    m = {
         "meta": _meta(rs, inp, snap, mode),
         "identity": _identity(rs, moon, sun, snap.asc),
         "nakshatra": _moon_nakshatra(rs, moon.longitude, True),
+        "naming": allies.naming(moon.longitude, True),
         "d1": charts.build_d1(rs, snap.bodies, snap.asc),
         "d9": charts.build_d9(rs, snap.bodies, snap.asc),
         "purpose": {"atmakaraka": ak, "rahu_ketu_axis": {"rahu_house": r_house, "ketu_house": (r_house + 5) % 12 + 1}},
+        "ishta_devta": ishta,
+        "colors": allies.colors(rs, snap.bodies, snap.asc),
+        "days": allies.days(rs, snap.bodies, snap.asc),
         "elements": heuristics.elements(rs, snap.bodies, snap.asc),
         "doshas": heuristics.doshas(rs, snap.bodies, snap.asc),
         "chakras": heuristics.chakras(rs, snap.bodies),
         "dasha": {"as_of": as_of.isoformat(), "active_chain": _chain(rs, snap, as_of, dasha.MAX_DEPTH)},
         "flags": {"near_boundary": _near(snap), "time_sensitive": []},
     }
+    m["facts"] = facts.build(m)
+    return m
 
 
 def _unknown(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, Any]:
@@ -222,7 +235,14 @@ def _unknown(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, 
 
     ident_a = _identity(rs, moon_a, _body(a, "Sun"), None)
     ident_b = _identity(rs, moon_b, _body(b, "Sun"), None)
-    return {
+
+    na, nb = angles.nakshatra_index(moon_a.longitude), angles.nakshatra_index(moon_b.longitude)
+    naming = allies.naming(moon_a.longitude, False)
+    if na != nb:  # star changes during the day: both rows, never a guess (D56)
+        naming["alternatives"] = [allies.naming_for(nb)]
+    col = same(allies.colors(rs, a.bodies, None), allies.colors(rs, b.bodies, None))
+    dys = same(allies.days(rs, a.bodies, None), allies.days(rs, b.bodies, None))
+    m = {
         "meta": _meta(rs, inp, noon, mode),
         "identity": {
             "lagna": None,
@@ -230,15 +250,21 @@ def _unknown(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, 
             "sun": same(ident_a["sun"], ident_b["sun"]),
         },
         "nakshatra": nak,
+        "naming": naming,
         "d1": {"lagna": None, "houses": None, "planets": planets},
         "d9": None,
         "purpose": {"atmakaraka": same(ak_a, ak_b), "rahu_ketu_axis": None},
+        "ishta_devta": None,  # needs D9, so a birth time (D56)
+        "colors": col,
+        "days": dys,
         "elements": same(heuristics.elements(rs, a.bodies, None), heuristics.elements(rs, b.bodies, None)),
         "doshas": same(heuristics.doshas(rs, a.bodies, None), heuristics.doshas(rs, b.bodies, None)),
         "chakras": same(heuristics.chakras(rs, a.bodies), heuristics.chakras(rs, b.bodies)),
         "dasha": {"as_of": as_of.isoformat(), "active_chain": _chain(rs, noon, as_of, 2) if lords_same else None},
         "flags": {"near_boundary": [], "time_sensitive": ts},
     }
+    m["facts"] = facts.build(m)
+    return m
 
 
 def canonical_json(master: dict[str, Any]) -> bytes:

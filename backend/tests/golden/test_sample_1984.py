@@ -69,6 +69,34 @@ def test_purpose_and_heuristics(master: dict) -> None:
     assert dominant == {"muladhara", "svadhisthana", "manipura", "ajna"}
 
 
+def test_allies(master: dict) -> None:
+    d = master["ishta_devta"]
+    assert (d["main"], d["others"], d["deciding_planet"]) == ("Gauri (Parvati)", ["Krishna", "Lalita"], "Moon")
+    assert d["working"]["karakamsa"] == "Gemini" and d["working"]["twelfth"] == "Taurus"
+    assert d["time_sensitive"] is True  # another time on the same day gives a different deity
+    assert [s["name"] for s in master["colors"]["swatches"]] == ["Saffron", "White", "Black"]
+    assert [s["hex"] for s in master["colors"]["swatches"]] == ["#F4A300", "#F5F3EC", "#121212"]
+    assert [x["weekday"] for x in master["days"]["items"]] == ["Sunday", "Friday", "Saturday"]
+    n = master["naming"]
+    assert (n["nakshatra"], n["pada"], n["syllables"][1]["latin"], n["syllables"][1]["deva"]) == (
+        "Rohini",
+        2,
+        "Va",
+        "वा",
+    )
+
+
+def test_facts(master: dict) -> None:
+    f = master["facts"]
+    assert f["moon.nakshatra"]["label"] == "Moon in Rohini"
+    assert f["rahu.house"] == {
+        "label": "Rahu in the 10th house",
+        "target": {"kind": "house", "ref": "10", "chart": "d1"},
+    }
+    assert f["naming.pada"]["target"]["ref"] == "pada:2"
+    assert f["dasha.maha"]["target"]["ref"] == "Ju" and f["colors.swatch_1"]["label"] == "Saffron"
+
+
 def _ist_date(iso: str) -> str:
     return datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(IST).strftime("%d %b %Y")
 
@@ -96,6 +124,11 @@ def test_unknown_time_is_certain_only() -> None:
     assert m["nakshatra"] is None
     assert m["dasha"]["active_chain"] is None  # chain changes during the day (D56)
     assert m["doshas"]["percent"] == {"Vata": 0, "Pitta": 24, "Kapha": 76}  # B5.2
+    assert m["ishta_devta"] is None
+    assert [s["name"] for s in m["colors"]["swatches"]] == ["White", "Red", "Black"]  # Moon-sign, Sun-sign lords, AK
+    assert m["naming"]["pada"] is None and [a["nakshatra"] for a in m["naming"]["alternatives"]] == ["Mrigashira"]
+    assert not any(k.endswith(".house") or k in ("lagna.sign", "moon.nakshatra", "naming.pada") for k in m["facts"])
+    assert all(v["target"]["chart"] == "none" for v in m["facts"].values())
 
 
 def test_unknown_time_ignores_the_entered_clock_time() -> None:
