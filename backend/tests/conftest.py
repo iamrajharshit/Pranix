@@ -19,6 +19,10 @@ def _ephemeris() -> None:
     swe.init(os.environ.get("PRANIX_EPHE_PATH"))
 
 
+# Card-image fonts: CI fetches them into data/fonts (tools/fetch_fonts.sh); tests skip images without them.
+os.environ.setdefault("PRANIX_FONTS_DIR", str(ROOT / "data" / "fonts"))
+
+
 @pytest.fixture(scope="session", autouse=True)
 def geo_db(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Build the fixture place index with the real build script (so the script is tested too)."""

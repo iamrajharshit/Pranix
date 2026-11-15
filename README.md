@@ -17,6 +17,7 @@ cd backend
 python -m venv .venv && . .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 ../tools/fetch_geonames.sh           # offline place index, about a minute
+../tools/fetch_fonts.sh              # fonts for card images (optional)
 export PRANIX_EPHE_PATH=../data/ephe             # or put both paths in the repo-root .env
 export PRANIX_GEO_DB_PATH=../data/geonames.sqlite
 pytest                               # unit, property and golden tests
@@ -24,6 +25,8 @@ pranix-ctl selftest                  # golden chart check
 uvicorn pranix.gateway.app:app --reload          # http://127.0.0.1:8000/v1/places?q=pune
 ```
 Same checks as CI: `ruff check . && ruff format --check . && mypy && lint-imports && pytest`.
+Card images need the Cairo library: present on Linux and macOS (`brew install cairo`); on Windows
+the image endpoint answers 503 unless Cairo is installed (for example via the GTK runtime). Everything else works.
 Docker: `docker build -f infra/Dockerfile -t pranix . && docker run -p 8000:8000 pranix`.
 
 ## Stack

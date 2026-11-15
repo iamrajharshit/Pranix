@@ -12,6 +12,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from .. import __version__
+from ..cardimg.render import CardImageUnavailable, Renderer
 from ..config.settings import Settings, get_settings
 from ..ephemeris import selftest, swe
 from ..ephemeris.master import SCHEMA_VERSION
@@ -21,7 +22,7 @@ from ..insight.library import Library
 from ..insight.pipeline import InsightService
 from ..llmgw.build import insights_chain
 from ..obs.logging import configure
-from . import routes_geo, routes_insights, routes_profiles
+from . import routes_charts, routes_geo, routes_insights, routes_profiles
 from .guest_store import GuestStore
 from .problems import install
 from .ratelimit import TokenBucket
@@ -47,6 +48,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             log.info("geo.ready", places=app.state.geo.count)
         except (FileNotFoundError, OSError):
             failures.append("geo_index_missing")
+        try:
+            app.state.renderer = Renderer(settings.fonts_dir)
+        except CardImageUnavailable as e:  # optional feature: the rest of the app works without it
+            log.warning("cardimg.unavailable", reason=str(e))
         app.state.ready, app.state.failures = not failures, failures
         log.info("selftest.result", ok=result.ok, failures=failures, ephemeris_mode=swe.mode())
         log.info(
@@ -66,7 +71,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         "places": TokenBucket(settings.rate_places_per_min),
         "profiles": TokenBucket(settings.rate_profiles_per_min),
         "insights": TokenBucket(settings.rate_insights_per_min),
+        "images": TokenBucket(settings.rate_images_per_min),
     }
+    app.state.renderer = None
+    app.state.image_cache = {}
     app.state.library = Library(allow_drafts=settings.allow_drafts)
     app.state.insights = InsightService(app.state.library, insights_chain(settings))
     install(app)
@@ -115,6 +123,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(routes_geo.router)
     app.include_router(routes_profiles.router)
     app.include_router(routes_insights.router)
+    app.include_router(routes_charts.router)
     return app
 
 
