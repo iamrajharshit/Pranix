@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      PRANIX_EPHE_PATH: ${{ github.workspace }}/data/ephe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/pyproject.toml
+      - name: Ephemeris data (verified checksums)
+        working-directory: .
+        run: tools/fetch_ephe.sh
+      - run: pip install -e ".[dev]"
+      - name: SPDX headers
+        working-directory: .
+        run: python tools/check_spdx.py .
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+      - run: lint-imports
+      - run: pytest
+      - name: Engine self-test
+        run: pranix-ctl selftest
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -f infra/Dockerfile -t pranix:ci .
+      - name: Smoke test (/readyz runs the golden self-test)
+        run: |
+          docker run -d --name pranix-smoke -p 8000:8000 pranix:ci
+          for i in $(seq 1 30); do curl -fs localhost:8000/readyz && break; sleep 1; done
+          curl -fs localhost:8000/readyz
+          curl -fs localhost:8000/version
+          docker logs pranix-smoke

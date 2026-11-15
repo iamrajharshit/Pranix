@@ -1,0 +1,10 @@
+Pranix
+Copyright (C) 2026 Harshit Raj and contributors
+Licensed under the GNU Affero General Public License v3.0 only (AGPL-3.0-only). See LICENSE.
+
+Third-party components
+- Swiss Ephemeris (pyswisseph and the .se1 data files), (c) Astrodienst AG, Zurich.
+  Used under the GNU Affero General Public License. https://www.astro.com/swisseph/
+- Planned: GeoNames cities data (CC BY 4.0, https://www.geonames.org/), OpenStreetMap tiles
+  ("(c) OpenStreetMap contributors", https://www.openstreetmap.org/copyright), fonts Cormorant
+  Garamond, Inter and Noto Sans Devanagari (SIL Open Font License 1.1).

@@ -1,0 +1,105 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# vedic-core@1 — calculation tables approved by the owner on 14 Nov 2026.
+# Any change: pull request with a golden-snapshot diff and owner approval (FR-REV-05).
+id: vedic-core
+version: 1
+reviewed_by: owner
+reviewed_at: "2026-11-14"
+source_notes: >
+  Nakshatra lords follow the Vimshottari order from Ashwini. Dignity is assigned by whole sign.
+  Friendship is natural friendship only (D38). Chakra classes from dignity (D39).
+
+conventions:
+  ayanamsa: lahiri
+  house_system: whole_sign
+  node_type: mean
+  karaka_scheme: 7
+  dasha_year_days: "365.25"
+
+signs: [Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces]
+sign_lords: [Mars, Venus, Mercury, Moon, Sun, Mercury, Venus, Mars, Jupiter, Saturn, Saturn, Jupiter]
+
+nakshatras:
+  - { name: Ashwini, lord: Ketu, deity: Ashwini Kumaras, symbol: "Horse's head" }
+  - { name: Bharani, lord: Venus, deity: Yama, symbol: Yoni (womb) }
+  - { name: Krittika, lord: Sun, deity: Agni, symbol: Razor or flame }
+  - { name: Rohini, lord: Moon, deity: Brahma (Prajapati), symbol: Chariot or ox-cart }
+  - { name: Mrigashira, lord: Mars, deity: Soma, symbol: "Deer's head" }
+  - { name: Ardra, lord: Rahu, deity: Rudra, symbol: Teardrop or gem }
+  - { name: Punarvasu, lord: Jupiter, deity: Aditi, symbol: Bow and quiver }
+  - { name: Pushya, lord: Saturn, deity: Brihaspati, symbol: "Cow's udder, flower" }
+  - { name: Ashlesha, lord: Mercury, deity: Nagas (Sarpa), symbol: Coiled serpent }
+  - { name: Magha, lord: Ketu, deity: Pitris (ancestors), symbol: Royal throne }
+  - { name: Purva Phalguni, lord: Venus, deity: Bhaga, symbol: Front legs of a bed }
+  - { name: Uttara Phalguni, lord: Sun, deity: Aryaman, symbol: Back legs of a bed }
+  - { name: Hasta, lord: Moon, deity: Savitar, symbol: Hand }
+  - { name: Chitra, lord: Mars, deity: Tvashtar (Vishvakarma), symbol: Bright jewel or pearl }
+  - { name: Swati, lord: Rahu, deity: Vayu, symbol: Young sprout in the wind }
+  - { name: Vishakha, lord: Jupiter, deity: Indra-Agni, symbol: Triumphal arch }
+  - { name: Anuradha, lord: Saturn, deity: Mitra, symbol: Lotus }
+  - { name: Jyeshtha, lord: Mercury, deity: Indra, symbol: Circular amulet or earring }
+  - { name: Mula, lord: Ketu, deity: Nirriti, symbol: Bunch of tied roots }
+  - { name: Purva Ashadha, lord: Venus, deity: Apas (waters), symbol: "Elephant tusk, fan" }
+  - { name: Uttara Ashadha, lord: Sun, deity: Vishvadevas, symbol: "Elephant tusk, small bed" }
+  - { name: Shravana, lord: Moon, deity: Vishnu, symbol: "Ear, three footprints" }
+  - { name: Dhanishta, lord: Mars, deity: Vasus, symbol: Drum }
+  - { name: Shatabhisha, lord: Rahu, deity: Varuna, symbol: Empty circle }
+  - { name: Purva Bhadrapada, lord: Jupiter, deity: Aja Ekapada, symbol: "Front legs of a cot, sword" }
+  - { name: Uttara Bhadrapada, lord: Saturn, deity: Ahir Budhnya, symbol: Back legs of a cot }
+  - { name: Revati, lord: Mercury, deity: Pushan, symbol: Fish or drum }
+
+# Sign indexes 0..11 (Aries = 0). Dignity by whole sign.
+dignity:
+  exalted:     { Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6 }
+  debilitated: { Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0 }
+  own:
+    Sun: [4]
+    Moon: [3]
+    Mars: [0, 7]
+    Mercury: [2, 5]
+    Jupiter: [8, 11]
+    Venus: [1, 6]
+    Saturn: [9, 10]
+
+friendship:
+  Sun:     { friends: [Moon, Mars, Jupiter], neutral: [Mercury], enemies: [Venus, Saturn] }
+  Moon:    { friends: [Sun, Mercury], neutral: [Mars, Jupiter, Venus, Saturn], enemies: [] }
+  Mars:    { friends: [Sun, Moon, Jupiter], neutral: [Venus, Saturn], enemies: [Mercury] }
+  Mercury: { friends: [Sun, Venus], neutral: [Mars, Jupiter, Saturn], enemies: [Moon] }
+  Jupiter: { friends: [Sun, Moon, Mars], neutral: [Saturn], enemies: [Mercury, Venus] }
+  Venus:   { friends: [Mercury, Saturn], neutral: [Mars, Jupiter], enemies: [Sun, Moon] }
+  Saturn:  { friends: [Mercury, Venus], neutral: [Jupiter], enemies: [Sun, Moon, Mars] }
+
+vimshottari:
+  order: [Ketu, Venus, Sun, Moon, Mars, Rahu, Jupiter, Saturn, Mercury]
+  years: { Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17 }
+
+# HEURISTIC (disclosed as ours): elements and doshas
+elements:
+  sign_element: [Fire, Earth, Air, Water]          # by sign index mod 4
+  planet_element: { Sun: Fire, Moon: Water, Mars: Fire, Mercury: Earth, Jupiter: Ether, Venus: Water, Saturn: Air }
+  weights: { lagna: 2, Moon: 2, default: 1 }
+  dignity_factor: { exalted: "1.25", own: "1.25", friend: "1", neutral: "1", enemy: "0.85", debilitated: "0.75" }
+
+doshas:
+  planet_dosha: { Sun: Pitta, Mars: Pitta, Ketu: Pitta, Moon: Kapha, Jupiter: Kapha, Venus: Kapha, Saturn: Vata, Rahu: Vata }
+  tridoshic: [Mercury]
+  sign_element_dosha:
+    Fire: { Pitta: "1" }
+    Earth: { Kapha: "1" }
+    Air: { Vata: "1" }
+    Water: { Kapha: "0.5", Pitta: "0.5" }
+  body_weights_known: { lagna: "0.4", Moon: "0.4", Sun: "0.2" }
+  body_weights_unknown: { Moon: "0.6", Sun: "0.4" }   # B5.2, D53
+  sign_lord_share: "0.25"
+  label: { mono_min: 50, mono_gap: 20 }
+
+chakras:
+  - { id: muladhara, planet: Saturn }
+  - { id: svadhisthana, planet: Jupiter }
+  - { id: manipura, planet: Mars }
+  - { id: anahata, planet: Venus }
+  - { id: vishuddha, planet: Mercury }
+  - { id: ajna, planet: Moon }
+  - { id: sahasrara, planet: Sun }
+chakra_class: { exalted: dominant, own: dominant, friend: balanced, neutral: balanced, enemy: low_activity, debilitated: low_activity }

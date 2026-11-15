@@ -1,0 +1,11 @@
+.git
+docs
+CLAUDE.md
+.claude
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/*.egg-info
+data/ephe/*.se1
+web/node_modules
