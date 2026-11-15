@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import logging
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
@@ -28,6 +30,7 @@ from .problems import install
 from .ratelimit import TokenBucket
 
 log = structlog.get_logger()
+access = structlog.get_logger("pranix.access")
 MAX_BODY_BYTES = 8_192
 
 
@@ -37,6 +40,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        # Uvicorn's own access log prints full URLs, i.e. typed place text and map coordinates
+        # (rule 3). Switch it off however the server was started; access_log below is the safe one.
+        logging.getLogger("uvicorn.access").disabled = True
         problems = settings.problems()
         if problems:  # prod only: refuse to start without required secrets (CFG-01)
             raise RuntimeError("; ".join(problems))
@@ -48,6 +54,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             log.info("geo.ready", places=app.state.geo.count)
         except (FileNotFoundError, OSError):
             failures.append("geo_index_missing")
+            log.warning("geo.missing", path=settings.geo_db_path, fix="run tools/fetch_geonames.sh")
         try:
             app.state.renderer = Renderer(settings.fonts_dir)
         except CardImageUnavailable as e:  # optional feature: the rest of the app works without it
@@ -78,6 +85,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.library = Library(allow_drafts=settings.allow_drafts)
     app.state.insights = InsightService(app.state.library, insights_chain(settings))
     install(app)
+
+    @app.middleware("http")
+    async def access_log(request: Request, call_next: Any) -> Any:
+        # Route pattern only (e.g. /v1/places/nearest): never the query string, ids or bodies.
+        start = time.perf_counter()
+        response = await call_next(request)
+        route = request.scope.get("route")
+        access.info(
+            "http.request",
+            method=request.method,
+            route=getattr(route, "path", "unmatched"),
+            status=response.status_code,
+            latency_ms=round((time.perf_counter() - start) * 1000, 1),
+        )
+        return response
 
     @app.middleware("http")
     async def limit_body(request: Request, call_next: Any) -> Any:
