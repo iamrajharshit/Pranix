@@ -58,7 +58,12 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
     if m["doshas"] is not None:
         assert sum(m["doshas"]["percent"].values()) == 100
     if m["colors"] is not None:
-        assert 2 <= len(m["colors"]["swatches"]) <= 3
+        sw = m["colors"]["swatches"]
+        # 2-3 colours, except when every deciding planet is Mars or Mercury, whose tradition gives only
+        # one colour and no variant: then one true colour, never an invented one (open decision D65).
+        assert 1 <= len(sw) <= 3
+        if len(sw) == 1:
+            assert sw[0]["planets"] in (["Mars"], ["Mercury"])
         assert len({s["name"] for s in m["colors"]["swatches"]}) == len(m["colors"]["swatches"])
     if m["days"] is not None:
         assert 1 <= len(m["days"]["items"]) <= 3
