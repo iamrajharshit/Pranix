@@ -20,4 +20,12 @@ def test_dotenv_file_is_read(tmp_path, monkeypatch) -> None:
     (tmp_path / ".env").write_text("PRANIX_FEATURE_CHAT=true\n")
     monkeypatch.chdir(tmp_path)
     monkeypatch.delenv("PRANIX_FEATURE_CHAT", raising=False)
-    assert Settings().feature_chat is True
+    # The app reads .env; tests switch that off globally (conftest), so opt back in here.
+    assert Settings(_env_file=("../.env", ".env")).feature_chat is True  # type: ignore[call-arg]
+
+
+def test_tests_ignore_a_local_env_file(tmp_path, monkeypatch) -> None:
+    # A developer's .env with real keys must not leak into tests (or into real AI calls).
+    (tmp_path / ".env").write_text("PRANIX_GROQ_API_KEY=real-looking-key\n")
+    monkeypatch.chdir(tmp_path)
+    assert Settings().secret_fingerprints()["groq_api_key"] == "missing"
