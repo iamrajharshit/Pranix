@@ -1,0 +1,5 @@
+#ISO	ISO3	ISO-Numeric	fips	Country
+IN	INX	0	IN	India
+FR	FRX	0	FR	France
+US	USX	0	US	United States
+CO	COX	0	CO	Colombia

@@ -59,4 +59,6 @@ jobs:
           for i in $(seq 1 30); do curl -fs localhost:8000/readyz && break; sleep 1; done
           curl -fs localhost:8000/readyz
           curl -fs localhost:8000/version
+          curl -fs "localhost:8000/v1/places?q=pune" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r[0]); assert r[0]['tz']=='Asia/Kolkata'"
+          curl -fs "localhost:8000/v1/places/nearest?lat=18.55&lon=73.85"
           docker logs pranix-smoke

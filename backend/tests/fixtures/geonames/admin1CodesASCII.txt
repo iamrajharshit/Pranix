@@ -1,0 +1,7 @@
+IN.16	Maharashtra	Maharashtra	1
+IN.07	Delhi	Delhi	2
+IN.13	Kerala	Kerala	3
+IN.25	Tamil Nadu	Tamil Nadu	4
+FR.11	Île-de-France	Ile-de-France	5
+US.NY	New York	New York	6
+CO.34	Bogotá D.C.	Bogota D.C.	7

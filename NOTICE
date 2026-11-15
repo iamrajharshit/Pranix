@@ -5,6 +5,9 @@ Licensed under the GNU Affero General Public License v3.0 only (AGPL-3.0-only). 
 Third-party components
 - Swiss Ephemeris (pyswisseph and the .se1 data files), (c) Astrodienst AG, Zurich.
   Used under the GNU Affero General Public License. https://www.astro.com/swisseph/
-- Planned: GeoNames cities data (CC BY 4.0, https://www.geonames.org/), OpenStreetMap tiles
+- GeoNames place data, CC BY 4.0, https://www.geonames.org/ (built into the image, not in git).
+- timezonefinder (MIT, (c) Jannik Kissinger) with time zone boundaries from timezone-boundary-builder
+  (c) Evan Siroky, Open Database License (ODbL) v1.0, https://github.com/evansiroky/timezone-boundary-builder
+- Planned: OpenStreetMap tiles
   ("(c) OpenStreetMap contributors", https://www.openstreetmap.org/copyright), fonts Cormorant
   Garamond, Inter and Noto Sans Devanagari (SIL Open Font License 1.1).
