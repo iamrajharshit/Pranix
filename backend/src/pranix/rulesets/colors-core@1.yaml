@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# colors-core@1 — generated from Reference_tables_approved_v1 §3, §3a.
+id: colors-core
+version: 1
+status: CONVENTION
+reviewed_by: owner
+reviewed_at: '2026-11-14'
+source_notes: "Planet colours \xA73, display hex \xA73a (hex is a display convention;\
+  \ the name is what the text uses). Selection rule D37/D54."
+hex:
+  Saffron: '#F4A300'
+  Orange: '#FF8A1F'
+  Gold: '#E2B13C'
+  Red: '#D93A3A'
+  White: '#F5F3EC'
+  Silver: '#C3C7D1'
+  Light blue: '#9CCBF0'
+  Green: '#2FA866'
+  Yellow: '#F5D33B'
+  Pink: '#F2A6C0'
+  Cream: '#F3E6C4'
+  Black: '#121212'
+  Dark blue: '#1E3A8A'
+  Deep purple: '#4B2A7B'
+planets:
+  Sun:
+    main:
+    - Saffron
+    - Orange
+    - Gold
+    variants:
+    - Red
+  Moon:
+    main:
+    - White
+    - Silver
+    variants:
+    - Light blue
+  Mars:
+    main:
+    - Red
+    variants: []
+  Mercury:
+    main:
+    - Green
+    variants: []
+  Jupiter:
+    main:
+    - Yellow
+    - Gold
+    variants:
+    - Orange
+  Venus:
+    main:
+    - White
+    variants:
+    - Pink
+    - Cream
+  Saturn:
+    main:
+    - Black
+    - Dark blue
+    variants:
+    - Deep purple
+dark:
+- Black
+- Dark blue
+- Deep purple
+deciding:
+  known:
+  - lagna_lord
+  - moon_sign_lord
+  - atmakaraka
+  unknown:
+  - moon_sign_lord
+  - sun_sign_lord
+  - atmakaraka
+min: 2
+max: 3

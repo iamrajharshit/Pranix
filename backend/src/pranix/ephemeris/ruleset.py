@@ -72,3 +72,26 @@ def load_ruleset(ref: str = "vedic-core@1") -> Ruleset:
         dasha_year_days=Fraction(str(raw["conventions"]["dasha_year_days"])),
         raw=_freeze(raw),
     )
+
+
+@dataclass(frozen=True)
+class Table:
+    """A secondary ruleset (ishta-core, colors-core, days-core, naming-core)."""
+
+    id: str
+    version: int
+    hash: str
+    data: Mapping[str, Any]
+
+    @property
+    def ref(self) -> str:
+        return f"{self.id}@{self.version}"
+
+
+@cache
+def load_table(ref: str) -> Table:
+    if "/" in ref or "\\" in ref or "@" not in ref:
+        raise ValueError("invalid ruleset reference")
+    raw = resources.files("pranix.rulesets").joinpath(f"{ref}.yaml").read_bytes()
+    data = yaml.safe_load(raw)
+    return Table(data["id"], int(data["version"]), hashlib.sha256(raw).hexdigest()[:16], _freeze(data))

@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# ishta-core@1 — Reference_tables_approved_v1 §2.
+id: ishta-core
+version: 1
+status: VARIANT
+reviewed_by: owner
+reviewed_at: '2026-11-14'
+source_notes: "Jaimini method: Atmakaraka -> D9 Karakamsa -> 12th sign -> occupants\
+  \ (strongest by D9 dignity, D34 tie order) else that sign's lord (D35). Mapping\
+  \ \xA72; one main + up to two other forms (D36)."
+deities:
+  Sun:
+    main: Shiva
+    others:
+    - Rama
+  Moon:
+    main: Gauri (Parvati)
+    others:
+    - Krishna
+    - Lalita
+    - Saraswati
+  Mars:
+    main: Skanda (Kartikeya)
+    others:
+    - Hanuman
+    - Narasimha
+    - Rudra
+  Mercury:
+    main: Vishnu
+    others:
+    - Narayana
+    - Buddha
+  Jupiter:
+    main: Sambasiva
+    others:
+    - Vishnu
+    - Dattatreya
+  Venus:
+    main: Lakshmi
+    others:
+    - Parvati
+  Saturn:
+    main: Vishnu
+    others:
+    - Shiva
+    - Narayana
+    - Brahma
+  Rahu:
+    main: Durga
+    others:
+    - Narasimha
+    - Varaha
+  Ketu:
+    main: Ganesha
+    others:
+    - Shiva
+    - Matsya
+others_shown: 2
+tie_order:
+- Ketu
+- Jupiter
+- Venus
+- Moon
+- Sun
+- Mars
+- Mercury
+- Saturn
+- Rahu
+dignity_rank:
+- exalted
+- own
+- friend
+- neutral
+- enemy
+- debilitated
+node_dignity: neutral

@@ -54,7 +54,19 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
         assert sum(m["elements"]["percent"].values()) == 100
     if m["doshas"] is not None:
         assert sum(m["doshas"]["percent"].values()) == 100
+    if m["colors"] is not None:
+        assert 2 <= len(m["colors"]["swatches"]) <= 3
+        assert len({s["name"] for s in m["colors"]["swatches"]}) == len(m["colors"]["swatches"])
+    if m["days"] is not None:
+        assert 1 <= len(m["days"]["items"]) <= 3
+    for v in m["facts"].values():  # every fact points at something that exists in this chart
+        t = v["target"]
+        assert t["chart"] in ("d1", "d9", "none")
+        if not known:
+            assert t["kind"] not in ("house", "lagna") and t["chart"] == "none"
     if known:
+        assert m["ishta_devta"]["main"] and len(m["ishta_devta"]["others"]) <= 2
+        assert m["naming"]["syllables"][m["naming"]["pada"] - 1]["pada"] == m["naming"]["pada"]
         assert len(m["d1"]["planets"]) == 9 and m["d9"] is not None
         assert sorted(p["house"] for p in m["d1"]["houses"]) == list(range(1, 13))
     else:

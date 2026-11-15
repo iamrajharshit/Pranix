@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# days-core@1 — Reference_tables_approved_v1 §4.
+id: days-core
+version: 1
+status: STANDARD
+reviewed_by: owner
+reviewed_at: '2026-11-14'
+source_notes: "Planet weekdays \xA74; calendar weekday (D40); same deciding planets\
+  \ as colours (D37); nodes never used."
+weekday:
+  Sun: Sunday
+  Moon: Monday
+  Mars: Tuesday
+  Mercury: Wednesday
+  Jupiter: Thursday
+  Venus: Friday
+  Saturn: Saturday

@@ -16,6 +16,9 @@ EXPECT = {
     "moon": ("Taurus", "Rohini", 2),
     "atmakaraka": "Saturn",
     "chain": ["Jupiter", "Venus", "Mercury", "Rahu"],
+    "deity": "Gauri (Parvati)",
+    "colors": ["Saffron", "White", "Black"],
+    "syllable": "Va",
 }
 
 
@@ -34,6 +37,9 @@ def run() -> SelfTestResult:
         "moon": (moon["sign"], moon["nakshatra"], moon["pada"]),
         "atmakaraka": m["purpose"]["atmakaraka"],
         "chain": [p["lord"] for p in m["dasha"]["active_chain"]][:4],
+        "deity": m["ishta_devta"]["main"],
+        "colors": [c["name"] for c in m["colors"]["swatches"]],
+        "syllable": m["naming"]["syllables"][m["naming"]["pada"] - 1]["latin"],
     }
     failures = [k for k, v in EXPECT.items() if got[k] != v]
     return SelfTestResult(ok=not failures, failures=failures)
