@@ -13,3 +13,10 @@ def test_secret_values_are_never_shown(monkeypatch) -> None:
 def test_prod_requires_secrets(monkeypatch) -> None:
     monkeypatch.setenv("PRANIX_ENV", "prod")
     assert any("database_url" in p for p in Settings().problems())
+
+
+def test_dotenv_file_is_read(tmp_path, monkeypatch) -> None:
+    (tmp_path / ".env").write_text("PRANIX_FEATURE_CHAT=true\n")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("PRANIX_FEATURE_CHAT", raising=False)
+    assert Settings().feature_chat is True

@@ -12,7 +12,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="PRANIX_", env_file=None, extra="ignore")
+    # Real environment variables win; a local .env (repo root or backend/) fills the rest.
+    # .env is git-ignored. On Render there is no .env: values come from its secret store.
+    model_config = SettingsConfigDict(env_prefix="PRANIX_", env_file=("../.env", ".env"), extra="ignore")
 
     env: Literal["dev", "test", "prod"] = "dev"
     service_mode: Literal["all", "distributed"] = "all"
