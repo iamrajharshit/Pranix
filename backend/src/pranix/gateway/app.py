@@ -22,7 +22,7 @@ from ..insight.library import Library
 from ..insight.pipeline import InsightService
 from ..llmgw.build import insights_chain
 from ..obs.logging import configure
-from . import routes_charts, routes_geo, routes_insights, routes_profiles
+from . import routes_charts, routes_geo, routes_insights, routes_profiles, web
 from .guest_store import GuestStore
 from .problems import install
 from .ratelimit import TokenBucket
@@ -124,6 +124,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(routes_profiles.router)
     app.include_router(routes_insights.router)
     app.include_router(routes_charts.router)
+    app.state.spa = web.install(app, settings.web_dist)  # after the API routes so they win
     return app
 
 
