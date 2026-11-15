@@ -18,6 +18,7 @@ dependencies = [
   "PyYAML>=6.0",
   "structlog>=24.1",
   "tzdata>=2024.1",
+  "timezonefinder>=8.0,<10",
 ]
 
 [project.optional-dependencies]
@@ -62,7 +63,7 @@ mypy_path = "src"
 packages = ["pranix"]
 
 [[tool.mypy.overrides]]
-module = ["swisseph"]
+module = ["swisseph", "timezonefinder"]
 ignore_missing_imports = true
 
 [tool.importlinter]
@@ -73,7 +74,13 @@ include_external_packages = true
 name = "Ephemeris is pure: no gateway, config or observability imports (ARCH-03, ARCH-05)"
 type = "forbidden"
 source_modules = ["pranix.ephemeris"]
-forbidden_modules = ["pranix.gateway", "pranix.config", "pranix.obs"]
+forbidden_modules = ["pranix.gateway", "pranix.config", "pranix.obs", "pranix.geo"]
+
+[[tool.importlinter.contracts]]
+name = "Geo is identity-agnostic and independent of the engine and gateway (ARCH-05)"
+type = "forbidden"
+source_modules = ["pranix.geo"]
+forbidden_modules = ["pranix.gateway", "pranix.config", "pranix.ephemeris"]
 
 [[tool.importlinter.contracts]]
 name = "Gateway, config and observability never import pyswisseph"

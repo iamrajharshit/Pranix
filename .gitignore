@@ -34,3 +34,4 @@ data/ephe/*.se1
 CLAUDE.md
 docs/
 .claude/
+data/geonames-src/

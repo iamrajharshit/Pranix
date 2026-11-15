@@ -12,6 +12,9 @@ RUN pip wheel --no-cache-dir --wheel-dir /wheels ./backend
 COPY tools/fetch_ephe.sh tools/fetch_ephe.sh
 COPY data/ephe/SHA256SUMS data/ephe/SHA256SUMS
 RUN tools/fetch_ephe.sh /ephe
+# Offline place index (GeoNames, CC BY 4.0); time zones computed from coordinates.
+COPY tools/fetch_geonames.sh tools/build_geonames.py tools/
+RUN pip install --no-cache-dir /wheels/*.whl && tools/fetch_geonames.sh /geo/geonames.sqlite
 
 FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -21,6 +24,7 @@ RUN useradd --system --uid 10001 --home /app pranix
 COPY --from=build /wheels /wheels
 RUN pip install --no-cache-dir /wheels/*.whl && rm -rf /wheels
 COPY --from=build --chown=root:root /ephe /app/data/ephe
+COPY --from=build --chown=root:root /geo/geonames.sqlite /app/data/geonames.sqlite
 WORKDIR /app
 USER pranix
 EXPOSE 8000

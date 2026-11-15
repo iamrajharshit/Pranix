@@ -1,0 +1,9 @@
+100001	Pune	Pune	Poona,Punya	18.5204	73.8567	P	PPL	IN		16				3124458			Asia/Kolkata	2024-01-01
+100002	Pimpri	Pimpri	Pimpri-Chinchwad	18.6298	73.7997	P	PPL	IN		16				1727692			Asia/Kolkata	2024-01-01
+100003	Mumbai	Mumbai	Bombay	19.076	72.8777	P	PPL	IN		16				12691836			Asia/Kolkata	2024-01-01
+100004	New Delhi	New Delhi	Delhi	28.6139	77.209	P	PPL	IN		07				317797			Asia/Kolkata	2024-01-01
+100005	Punalur	Punalur		9.017	76.926	P	PPL	IN		13				46702			Asia/Kolkata	2024-01-01
+100006	Chennai	Chennai	Madras	13.0827	80.2707	P	PPL	IN		25				4646732			Asia/Kolkata	2024-01-01
+100007	Paris	Paris	Lutetia	48.8566	2.3522	P	PPL	FR		11				2138551			Europe/Paris	2024-01-01
+100008	New York City	New York City	NYC	40.7128	-74.006	P	PPL	US		NY				8804190			America/New_York	2024-01-01
+100009	Bogotá	Bogota	Santa Fe de Bogota	4.711	-74.0721	P	PPL	CO		34				7674366			America/Bogota	2024-01-01

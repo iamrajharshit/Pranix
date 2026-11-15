@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     env: Literal["dev", "test", "prod"] = "dev"
     service_mode: Literal["all", "distributed"] = "all"
     ephe_path: str = "/app/data/ephe"
+    geo_db_path: str = "/app/data/geonames.sqlite"
     feature_chat: bool = False
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)
