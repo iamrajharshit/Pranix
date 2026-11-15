@@ -45,3 +45,26 @@ def test_prod_rejects_short_peppers(monkeypatch) -> None:
     monkeypatch.setenv("PRANIX_LOG_PEPPER", "short")
     monkeypatch.setenv("PRANIX_CHART_KEY_PEPPER", "x" * 64)
     assert Settings().problems() == ["log_pepper must be at least 32 characters in prod"]
+
+
+def test_data_paths_work_from_any_start_folder(tmp_path, monkeypatch) -> None:
+    from pranix.config import settings as st
+
+    repo = tmp_path / "repo"
+    (repo / "backend").mkdir(parents=True)
+    (repo / "data").mkdir()
+    (repo / "data" / "geonames.sqlite").write_bytes(b"x")
+    monkeypatch.setattr(st, "REPO_DIR", repo)
+    monkeypatch.setattr(st, "BACKEND_DIR", repo / "backend")
+    want = str((repo / "data" / "geonames.sqlite").resolve())
+    for cwd in (repo, repo / "backend", tmp_path):  # repo root, backend/, somewhere else
+        monkeypatch.chdir(cwd)
+        assert st._resolve("../data/geonames.sqlite", "/app/data/geonames.sqlite") == want
+        assert st._resolve("data/geonames.sqlite", "/app/data/geonames.sqlite") == want
+    # the Docker default falls back to the repo's data/ folder outside Docker
+    assert st._resolve("/app/data/geonames.sqlite", "/app/data/geonames.sqlite") == str(
+        repo / "data" / "geonames.sqlite"
+    )
+    # an explicit absolute path is never second-guessed, even if missing
+    assert st._resolve("/elsewhere/g.sqlite", "/app/data/geonames.sqlite") == "/elsewhere/g.sqlite"
+    assert st._resolve("missing.sqlite", "/app/data/geonames.sqlite") == "missing.sqlite"

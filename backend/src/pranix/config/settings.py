@@ -5,16 +5,44 @@ from __future__ import annotations
 
 import hashlib
 from functools import cache
+from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# In a source checkout: <repo>/backend/src/pranix/config/settings.py. In the Docker image these
+# paths do not exist and nothing below changes anything.
+BACKEND_DIR = Path(__file__).resolve().parents[3]
+REPO_DIR = BACKEND_DIR.parent
+PATH_FIELDS = ("ephe_path", "geo_db_path", "fonts_dir", "web_dist")
+
+
+def _resolve(value: str, default: str) -> str:
+    """Make a data path work whichever folder the server was started from.
+    Relative paths are tried against the working folder, backend/ and the repo root; the Docker
+    default (/app/data/...) falls back to the repo's data/ folder when it is not there."""
+    p = Path(value)
+    if value == default and not p.exists():  # checked first: "/app/..." has no drive on Windows
+        local = REPO_DIR / "data" / p.name if p.parent.name == "data" else REPO_DIR / "web" / "dist"
+        return str(local) if local.exists() else value
+    if p.is_absolute() or value.startswith(("/", "\\")):
+        return value
+    for base in (Path.cwd(), BACKEND_DIR, REPO_DIR):
+        if (base / p).exists():
+            return str((base / p).resolve())
+    return value
 
 
 class Settings(BaseSettings):
-    # Real environment variables win; a local .env (repo root or backend/) fills the rest.
+    # Real environment variables win; a local .env fills the rest. It is found next to the code
+    # (repo root or backend/) or in the working folder, so the start folder does not matter.
     # .env is git-ignored. On Render there is no .env: values come from its secret store.
-    model_config = SettingsConfigDict(env_prefix="PRANIX_", env_file=("../.env", ".env"), extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="PRANIX_",
+        env_file=(REPO_DIR / ".env", BACKEND_DIR / ".env", "../.env", ".env"),
+        extra="ignore",
+    )
 
     env: Literal["dev", "test", "prod"] = "dev"
     service_mode: Literal["all", "distributed"] = "all"
@@ -58,6 +86,12 @@ class Settings(BaseSettings):
         if isinstance(v, SecretStr):
             v = v.get_secret_value()
         return None if isinstance(v, str) and not v.strip() else v
+
+    @model_validator(mode="after")
+    def _resolve_paths(self) -> Settings:
+        for name in PATH_FIELDS:
+            setattr(self, name, _resolve(getattr(self, name), type(self).model_fields[name].default))
+        return self
 
     def secret_fingerprints(self) -> dict[str, str]:
         """Names and 6-char fingerprints only; never the value."""
