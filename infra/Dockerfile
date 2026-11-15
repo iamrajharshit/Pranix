@@ -2,6 +2,14 @@
 # Pranix single production image (Tier A). Build from the repo root:
 #   docker build -f infra/Dockerfile -t pranix .
 
+# The React app, built once and served same-origin by FastAPI (HOST-04).
+FROM node:22-slim AS web
+WORKDIR /web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY web/ ./
+RUN npm run build
+
 FROM python:3.12-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -31,6 +39,7 @@ RUN pip install --no-cache-dir /wheels/*.whl && rm -rf /wheels
 COPY --from=build --chown=root:root /ephe /app/data/ephe
 COPY --from=build --chown=root:root /geo/geonames.sqlite /app/data/geonames.sqlite
 COPY --from=build --chown=root:root /fonts /app/data/fonts
+COPY --from=web --chown=root:root /web/dist /app/web
 WORKDIR /app
 USER pranix
 EXPOSE 8000

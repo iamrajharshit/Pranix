@@ -1,0 +1,80 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Map pin (D64, FR-UI-12a). Leaflet + OpenStreetMap tiles load only when this opens. The tile
+// server sees which area is viewed, never birth details; the nearest town and time zone come from
+// our own server (/v1/places/nearest).
+import { useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { api, ApiError } from "../api/client";
+import type { Nearest } from "../api/types";
+import type { Draft } from "../lib/storage";
+
+const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+export default function MapPicker({ onUse, onClose }: { onUse(p: NonNullable<Draft["place"]>): void; onClose(): void }) {
+  const el = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const marker = useRef<L.CircleMarker | null>(null);
+  const [pin, setPin] = useState<{ lat: number; lon: number } | null>(null);
+  const [near, setNear] = useState<Nearest | null>(null);
+  const [msg, setMsg] = useState("No point yet. Tap the map, then fine-tune with the arrows.");
+
+  useEffect(() => {
+    if (!el.current) return;
+    const m = L.map(el.current, { center: [20.5, 78.9], zoom: 4, worldCopyJump: true });
+    L.tileLayer(TILES, { maxZoom: 18, attribution: "© OpenStreetMap contributors" }).addTo(m);
+    m.on("click", (e: L.LeafletMouseEvent) => place(e.latlng.lat, e.latlng.lng));
+    map.current = m;
+    return () => { m.remove(); map.current = null; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const place = (lat: number, lon: number) => {
+    const p = { lat: Math.round(Math.max(-90, Math.min(90, lat)) * 1e4) / 1e4, lon: Math.round((((lon + 540) % 360) - 180) * 1e4) / 1e4 };
+    setPin(p);
+    if (map.current) {
+      if (!marker.current) marker.current = L.circleMarker([p.lat, p.lon], { radius: 9, color: "#1A1226", weight: 2, fillColor: "#F4C566", fillOpacity: 1 }).addTo(map.current);
+      else marker.current.setLatLng([p.lat, p.lon]);
+    }
+    setMsg("Finding the nearest town…");
+    api.nearest(p.lat, p.lon).then((n) => {
+      setNear(n);
+      const c = `${Math.abs(p.lat).toFixed(4)}° ${p.lat >= 0 ? "N" : "S"}, ${Math.abs(p.lon).toFixed(4)}° ${p.lon >= 0 ? "E" : "W"}`;
+      setMsg(n.place ? `${c} · about ${n.distance_km} km from ${n.place.name}, ${[n.place.admin1, n.place.country].filter(Boolean).join(", ")} · time zone ${n.tz}`
+        : `${c} · no town within 50 km; we will use these exact coordinates · time zone ${n.tz}`);
+    }).catch((e: ApiError) => {
+      setNear(null);
+      setMsg(e.code === "OCEAN_OR_NO_TZ" ? "That point is at sea and has no land time zone. Pick a point on land." : "We could not look up that point just now. Try again.");
+    });
+  };
+  const nudge = (dl: number, dn: number) => pin && place(pin.lat + dl, pin.lon + dn);
+  const use = () => {
+    if (!pin || !near) return;
+    onUse({ name: near.place ? `Near ${near.place.name}` : `${pin.lat.toFixed(4)}, ${pin.lon.toFixed(4)}`,
+      where: near.place ? `${[near.place.admin1, near.place.country].filter(Boolean).join(", ")} · pin at ${pin.lat.toFixed(4)}, ${pin.lon.toFixed(4)}` : "pinned on the map",
+      tz: near.tz, lat: pin.lat, lon: pin.lon });
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, background: "#10102B", border: "1px solid rgba(244,197,102,.5)", borderRadius: 12, padding: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <strong style={{ fontSize: 16, color: "#fff" }}>Tap where you were born</strong>
+        <span className="hint">Zoom in for accuracy; a nearby spot in the right town is enough.</span>
+      </div>
+      <div ref={el} style={{ height: 360, borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,.15)", cursor: "crosshair" }} aria-label="Map. Search and coordinates are also available." />
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }} role="group" aria-label="Move the pin">
+        <span className="hint">Move pin:</span>
+        <button type="button" className="btn btn-ghost btn-sm" aria-label="Move pin north" onClick={() => nudge(0.01, 0)}>↑</button>
+        <button type="button" className="btn btn-ghost btn-sm" aria-label="Move pin south" onClick={() => nudge(-0.01, 0)}>↓</button>
+        <button type="button" className="btn btn-ghost btn-sm" aria-label="Move pin west" onClick={() => nudge(0, -0.01)}>←</button>
+        <button type="button" className="btn btn-ghost btn-sm" aria-label="Move pin east" onClick={() => nudge(0, 0.01)}>→</button>
+      </div>
+      <p role="status" aria-live="polite" style={{ margin: 0, fontSize: 15, lineHeight: 1.55 }}>{msg}</p>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <button type="button" className="btn btn-gold btn-sm" aria-disabled={!near} onClick={use}>Use this point</button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>Back to search</button>
+      </div>
+      <span className="hint">The map comes from OpenStreetMap and loads only now. The map provider sees which area you look at, never your birth details.</span>
+    </div>
+  );
+}
