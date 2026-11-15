@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-"""App factory: health, version and place endpoints. Chart and insight routes arrive in P1."""
+"""App factory (thin gateway, ARCH-04): health, version, places and guest charts."""
 
 from __future__ import annotations
 
@@ -8,49 +8,73 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import structlog
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from .. import __version__
-from ..config.settings import get_settings
+from ..config.settings import Settings, get_settings
 from ..ephemeris import selftest, swe
 from ..ephemeris.master import SCHEMA_VERSION
 from ..ephemeris.ruleset import load_ruleset
 from ..geo.index import GeoIndex
-from ..geo.tz import tz_at
 from ..obs.logging import configure
-from .problems import ProblemError, install
+from . import routes_geo, routes_profiles
+from .guest_store import GuestStore
+from .problems import install
+from .ratelimit import TokenBucket
 
 log = structlog.get_logger()
+MAX_BODY_BYTES = 8_192
 
 
-def create_app() -> FastAPI:
-    settings = get_settings()
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
     configure()
-    state: dict[str, Any] = {"ready": False, "failures": [], "geo": None}
 
     @asynccontextmanager
-    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        problems = settings.problems()
+        if problems:  # prod only: refuse to start without required secrets (CFG-01)
+            raise RuntimeError("; ".join(problems))
         swe.init(settings.ephe_path)
         result = selftest.run()
         failures = list(result.failures)
         try:
-            state["geo"] = GeoIndex(settings.geo_db_path)
-            log.info("geo.ready", places=state["geo"].count)
+            app.state.geo = GeoIndex(settings.geo_db_path)
+            log.info("geo.ready", places=app.state.geo.count)
         except (FileNotFoundError, OSError):
             failures.append("geo_index_missing")
-        state["ready"], state["failures"] = not failures, failures
+        app.state.ready, app.state.failures = not failures, failures
         log.info("selftest.result", ok=result.ok, failures=failures, ephemeris_mode=swe.mode())
         yield
 
     app = FastAPI(title="Pranix API", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
+    app.state.settings = settings
+    app.state.geo = None
+    app.state.ready, app.state.failures = False, []
+    app.state.guests = GuestStore(settings.guest_ttl_seconds, settings.guest_cache_max)
+    app.state.limits = {
+        "places": TokenBucket(settings.rate_places_per_min),
+        "profiles": TokenBucket(settings.rate_profiles_per_min),
+    }
     install(app)
 
-    def geo() -> GeoIndex:
-        g: GeoIndex | None = state["geo"]
-        if g is None:
-            raise ProblemError(503, "SERVICE_NOT_READY", "Place search is not available yet.", retry_after=30)
-        return g
+    @app.middleware("http")
+    async def limit_body(request: Request, call_next: Any) -> Any:
+        length = request.headers.get("content-length")
+        if length and length.isdigit() and int(length) > MAX_BODY_BYTES:
+            return JSONResponse(
+                {
+                    "code": "PAYLOAD_TOO_LARGE",
+                    "message": "Request is too large.",
+                    "retry_after": None,
+                    "reset_at": None,
+                    "request_id": "-",
+                },
+                status_code=413,
+                media_type="application/problem+json",
+            )
+        return await call_next(request)
 
     @app.get("/healthz", include_in_schema=False)
     def healthz() -> dict[str, str]:
@@ -58,11 +82,11 @@ def create_app() -> FastAPI:
 
     @app.get("/readyz", include_in_schema=False)
     def readyz() -> JSONResponse:
-        if state["ready"]:
+        if app.state.ready:
             return JSONResponse({"status": "ready"})
-        return JSONResponse({"status": "not_ready", "failures": state["failures"]}, status_code=503)
+        return JSONResponse({"status": "not_ready", "failures": app.state.failures}, status_code=503)
 
-    @app.get("/version")
+    @app.get("/version", tags=["ops"])
     def version() -> dict[str, Any]:
         rs = load_ruleset()
         return {
@@ -73,27 +97,8 @@ def create_app() -> FastAPI:
             "feature_flags": {"chat": settings.feature_chat, "passkeys": settings.feature_passkeys},
         }
 
-    @app.get("/v1/places", tags=["geo"])
-    def search_places(
-        q: str = Query(min_length=2, max_length=80), limit: int = Query(default=8, ge=1, le=10)
-    ) -> list[dict[str, Any]]:
-        """Offline autocomplete; [] when nothing matches (FR-GEO-01)."""
-        return [p.to_dict() for p in geo().search(q, limit)]
-
-    @app.get("/v1/places/nearest", tags=["geo"])
-    def nearest_place(lat: float = Query(ge=-90, le=90), lon: float = Query(ge=-180, le=180)) -> dict[str, Any]:
-        """Map pin (D64): nearest place within 50 km or null; tz always from the coordinates."""
-        lat, lon = round(lat, 4), round(lon, 4)
-        tz = tz_at(lat, lon)
-        if tz is None:
-            raise ProblemError(422, "OCEAN_OR_NO_TZ", "That point has no land time zone. Pick a point on land.")
-        hit = geo().nearest(lat, lon)
-        return {
-            "place": hit[0].to_dict() if hit else None,
-            "tz": tz,
-            "distance_km": round(hit[1]) if hit else None,
-        }
-
+    app.include_router(routes_geo.router)
+    app.include_router(routes_profiles.router)
     return app
 
 

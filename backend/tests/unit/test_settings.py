@@ -12,7 +12,8 @@ def test_secret_values_are_never_shown(monkeypatch) -> None:
 
 def test_prod_requires_secrets(monkeypatch) -> None:
     monkeypatch.setenv("PRANIX_ENV", "prod")
-    assert any("database_url" in p for p in Settings().problems())
+    problems = Settings().problems()
+    assert any("chart_key_pepper" in p for p in problems) and not any("database_url" in p for p in problems)
 
 
 def test_dotenv_file_is_read(tmp_path, monkeypatch) -> None:
