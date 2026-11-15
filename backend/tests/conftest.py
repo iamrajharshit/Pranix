@@ -27,8 +27,11 @@ def _ephemeris() -> None:
     swe.init(os.environ.get("PRANIX_EPHE_PATH"))
 
 
-# Card-image fonts: CI fetches them into data/fonts (tools/fetch_fonts.sh); tests skip images without them.
+# Data files fetched into data/ (tools/fetch_*.sh) are used locally as in CI, without needing a .env.
+# Card-image tests skip without the fonts; without .se1 files the engine runs in Moshier mode.
 os.environ.setdefault("PRANIX_FONTS_DIR", str(ROOT / "data" / "fonts"))
+if any((ROOT / "data" / "ephe").glob("*.se1")):
+    os.environ.setdefault("PRANIX_EPHE_PATH", str(ROOT / "data" / "ephe"))
 
 
 @pytest.fixture(scope="session", autouse=True)
