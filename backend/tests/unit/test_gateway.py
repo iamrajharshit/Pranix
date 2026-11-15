@@ -42,7 +42,11 @@ def test_invalid_query_is_a_problem_without_echo(c: TestClient) -> None:
     body = r.json()
     assert body["code"] == "INVALID_REQUEST" and "q" in body["message"] and body["request_id"]
     r = c.get("/v1/places/nearest", params={"lat": "18.987654", "lon": "999"})
-    assert r.status_code == 422 and "18.987654" not in r.text and "999" not in r.text
+    body = r.json()
+    # Submitted values never come back (request_id is random hex, so only the text fields are checked).
+    assert r.status_code == 422 and body["code"] == "INVALID_REQUEST"
+    assert "18.987654" not in body["message"] and "999" not in body["message"]
+    assert set(body) == {"code", "message", "retry_after", "reset_at", "request_id"}
 
 
 def test_nearest(c: TestClient) -> None:
