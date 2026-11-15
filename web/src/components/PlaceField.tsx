@@ -107,7 +107,7 @@ export default function PlaceField({ draft, error, set }: Props) {
           {matches.map((m, i) => (
             <li key={m.place_id} role="presentation">
               <button type="button" role="option" id={`pl-${i}`} aria-selected={i === active} className="opt" onClick={() => pick(m)}>
-                {m.name} <span style={{ color: "var(--muted)" }}>· {[m.admin1, m.country].filter(Boolean).join(", ")}</span>
+                {m.name}<span style={{ color: "var(--muted)" }}>{[m.admin1, m.country].filter(Boolean).map((x) => `, ${x}`).join("")}</span>
               </button>
             </li>
           ))}

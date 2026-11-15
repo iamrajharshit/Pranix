@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import logging
 import re
-import sys
 from collections.abc import MutableMapping
 from typing import Any
 
@@ -76,6 +75,7 @@ def configure(level: int = logging.INFO) -> None:
             structlog.processors.JSONRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(level),
-        logger_factory=structlog.PrintLoggerFactory(sys.stdout),
+        # No file argument: always print to the current sys.stdout (never a stream captured at startup).
+        logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=True,
     )
