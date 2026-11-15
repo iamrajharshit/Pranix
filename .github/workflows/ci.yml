@@ -63,5 +63,8 @@ jobs:
           curl -fs "localhost:8000/v1/places/nearest?lat=18.55&lon=73.85"
           curl -fs -X POST localhost:8000/v1/profiles -H "content-type: application/json" -H "X-Age-Confirmed: true" \
             -d '{"place":{"lat":18.5204,"lon":73.8567},"local_datetime":"1984-12-08T00:20:00","birth_time_known":true}' \
-            | python3 -c "import json,sys; m=json.load(sys.stdin)['master']; print(m['d1']['lagna']['sign'], m['nakshatra']['name']); assert m['d1']['lagna']['sign']=='Leo'"
+            | tee /tmp/p.json | python3 -c "import json,sys; m=json.load(sys.stdin)['master']; print(m['d1']['lagna']['sign'], m['nakshatra']['name']); assert m['d1']['lagna']['sign']=='Leo'"
+          pid=$(python3 -c "import json; print(json.load(open('/tmp/p.json'))['profile_id'])")
+          curl -fsN "localhost:8000/v1/profiles/$pid/insights" | tee /tmp/sse.txt | grep -c "^event: insight" | grep -qx 12
+          grep "^event: done" /tmp/sse.txt
           docker logs pranix-smoke

@@ -27,6 +27,14 @@ class Settings(BaseSettings):
     guest_cache_max: int = Field(default=2_000, ge=10, le=50_000)
     rate_profiles_per_min: int = Field(default=30, ge=1)
     rate_places_per_min: int = Field(default=60, ge=1)
+    rate_insights_per_min: int = Field(default=20, ge=1)
+    # Library: production serves approved entries only (FR-LIB-03); dev/test also serve drafts.
+    library_allow_drafts: bool | None = None
+    # AI providers (insights chain, FR-LLM). Model names change: verify against each console.
+    gemini_models: list[str] = ["gemini-flash-latest", "gemini-flash-lite-latest"]
+    gemini_rpm: int = Field(default=10, ge=1)
+    groq_model: str = "llama-3.3-70b-versatile"
+    groq_rpm: int = Field(default=30, ge=1)
     # Behind Render's proxy the client IP is the first X-Forwarded-For entry; never trust it elsewhere.
     trust_proxy: bool = False
     map_tile_url: str = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -47,6 +55,10 @@ class Settings(BaseSettings):
             elif name in SECRET_NAMES:
                 out[name] = "missing"
         return out
+
+    @property
+    def allow_drafts(self) -> bool:
+        return self.library_allow_drafts if self.library_allow_drafts is not None else self.env != "prod"
 
     def problems(self) -> list[str]:
         """Prod must have the peppers. The database becomes required with accounts (P1.5);
