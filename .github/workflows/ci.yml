@@ -14,6 +14,7 @@ jobs:
         working-directory: backend
     env:
       PRANIX_EPHE_PATH: ${{ github.workspace }}/data/ephe
+      PRANIX_FONTS_DIR: ${{ github.workspace }}/data/fonts
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -23,7 +24,7 @@ jobs:
           cache-dependency-path: backend/pyproject.toml
       - name: Ephemeris data (verified checksums)
         working-directory: .
-        run: tools/fetch_ephe.sh
+        run: tools/fetch_ephe.sh && tools/fetch_fonts.sh
       - run: pip install -e ".[dev]"
       - name: SPDX headers
         working-directory: .
@@ -61,10 +62,13 @@ jobs:
           curl -fs localhost:8000/version
           curl -fs "localhost:8000/v1/places?q=pune" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r[0]); assert r[0]['tz']=='Asia/Kolkata'"
           curl -fs "localhost:8000/v1/places/nearest?lat=18.55&lon=73.85"
+          echo "smoke: places ok"
           curl -fs -X POST localhost:8000/v1/profiles -H "content-type: application/json" -H "X-Age-Confirmed: true" \
             -d '{"place":{"lat":18.5204,"lon":73.8567},"local_datetime":"1984-12-08T00:20:00","birth_time_known":true}' \
             | tee /tmp/p.json | python3 -c "import json,sys; m=json.load(sys.stdin)['master']; print(m['d1']['lagna']['sign'], m['nakshatra']['name']); assert m['d1']['lagna']['sign']=='Leo'"
           pid=$(python3 -c "import json; print(json.load(open('/tmp/p.json'))['profile_id'])")
           curl -fsN "localhost:8000/v1/profiles/$pid/insights" | tee /tmp/sse.txt | grep -c "^event: insight" | grep -qx 12
           grep "^event: done" /tmp/sse.txt
+          curl -fs "localhost:8000/v1/profiles/$pid/dasha" | python3 -c "import json,sys; d=json.load(sys.stdin); assert len(d)==9; print('dasha', [p['lord'] for p in d])"
+          curl -fs -o /tmp/card.png -w "card image %{http_code} %{content_type} %{size_download} bytes\n" "localhost:8000/v1/profiles/$pid/cards/birthstar.png"
           docker logs pranix-smoke

@@ -111,6 +111,19 @@ class InsightService:
             return {**curated, "degraded": True}
         return {**curated, **hit, "badge": "ai", "prompt_version": PROMPT_ID}
 
+    def cached_card(self, module: str, master: Mapping[str, Any]) -> dict[str, Any]:
+        """Card for images: AI text only if already cached, otherwise curated. Never calls a provider (D64)."""
+        try:
+            curated = cards.build(module, master, self.lib)
+            check_card(curated, master["facts"])
+        except (LibraryGap, GuardrailError):
+            return cards.error_card(module)
+        if module in cards.SYNTHESIS and curated["state"] == "ready":
+            hit = self.cache.get(self._key(module, master))
+            if hit is not None:
+                return {**curated, **hit, "badge": "ai", "prompt_version": PROMPT_ID}
+        return curated
+
     def _key(self, module: str, master: Mapping[str, Any]) -> str:
         raw = json.dumps([module, PROMPT_ID, SCHEMA_VERSION, self.locale, nodes(module, master)], sort_keys=True)
         return hashlib.sha256(raw.encode()).hexdigest()

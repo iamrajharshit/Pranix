@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     service_mode: Literal["all", "distributed"] = "all"
     ephe_path: str = "/app/data/ephe"
     geo_db_path: str = "/app/data/geonames.sqlite"
+    fonts_dir: str = "/app/data/fonts"
     feature_chat: bool = False
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)
@@ -28,6 +29,7 @@ class Settings(BaseSettings):
     rate_profiles_per_min: int = Field(default=30, ge=1)
     rate_places_per_min: int = Field(default=60, ge=1)
     rate_insights_per_min: int = Field(default=20, ge=1)
+    rate_images_per_min: int = Field(default=10, ge=1)
     # Library: production serves approved entries only (FR-LIB-03); dev/test also serve drafts.
     library_allow_drafts: bool | None = None
     # AI providers (insights chain, FR-LLM). Model names change: verify against each console.

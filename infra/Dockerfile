@@ -15,16 +15,22 @@ RUN tools/fetch_ephe.sh /ephe
 # Offline place index (GeoNames, CC BY 4.0); time zones computed from coordinates.
 COPY tools/fetch_geonames.sh tools/build_geonames.py tools/
 RUN pip install --no-cache-dir /wheels/*.whl && tools/fetch_geonames.sh /geo/geonames.sqlite
+# OFL fonts for server-rendered card images (pinned, checksummed).
+COPY tools/fetch_fonts.sh tools/
+RUN tools/fetch_fonts.sh /fonts
 
 FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PRANIX_EPHE_PATH=/app/data/ephe
-RUN useradd --system --uid 10001 --home /app pranix
+# Cairo for card images (CairoSVG); nothing else from the OS.
+RUN apt-get update && apt-get install -y --no-install-recommends libcairo2 && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 --home /app pranix
 COPY --from=build /wheels /wheels
 RUN pip install --no-cache-dir /wheels/*.whl && rm -rf /wheels
 COPY --from=build --chown=root:root /ephe /app/data/ephe
 COPY --from=build --chown=root:root /geo/geonames.sqlite /app/data/geonames.sqlite
+COPY --from=build --chown=root:root /fonts /app/data/fonts
 WORKDIR /app
 USER pranix
 EXPOSE 8000

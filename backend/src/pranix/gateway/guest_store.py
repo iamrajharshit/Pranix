@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 """Guest charts in process memory with a TTL and an LRU bound (FR-GST-01).
 
-Only the derived Master JSON is kept, never the birth inputs. Nothing is written to disk.
+Only the derived Master JSON and a Dasha seed (Moon longitude, birth instant) are kept,
+never the date, place or name as entered. Nothing is written to disk or logged.
 Lost on restart: the browser re-POSTs from sessionStorage (410 CHART_EXPIRED handling).
 """
 
@@ -14,6 +15,7 @@ from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from fractions import Fraction
 from typing import Any
 
 
@@ -23,6 +25,7 @@ class GuestChart:
     master: dict[str, Any]
     expires_at: float
     chart_key: str
+    seed: tuple[float, Fraction] | None = None  # (Moon longitude, birth instant) for the Dasha timeline
 
     @property
     def expires_iso(self) -> str:
@@ -35,8 +38,8 @@ class GuestStore:
         self._items: OrderedDict[str, GuestChart] = OrderedDict()
         self._lock = threading.Lock()
 
-    def put(self, master: dict[str, Any], chart_key: str) -> GuestChart:
-        item = GuestChart(str(uuid.uuid4()), master, self.clock() + self.ttl, chart_key)
+    def put(self, master: dict[str, Any], chart_key: str, seed: tuple[float, Fraction] | None = None) -> GuestChart:
+        item = GuestChart(str(uuid.uuid4()), master, self.clock() + self.ttl, chart_key, seed)
         with self._lock:
             self._items[item.profile_id] = item
             while len(self._items) > self.max_items:

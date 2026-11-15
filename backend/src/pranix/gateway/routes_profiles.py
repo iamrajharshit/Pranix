@@ -16,7 +16,7 @@ from fastapi import APIRouter, Header, Request, Response
 from fastapi.responses import JSONResponse
 
 from ..contracts.birth import BirthInputModel, PlaceById
-from ..ephemeris.master import BirthInput, compute
+from ..ephemeris.master import BirthInput, compute, dasha_seed
 from ..ephemeris.timeconv import MIN_YEAR, BirthTimeError
 from ..geo.tz import tz_at
 from .keys import chart_key, pepper
@@ -91,7 +91,7 @@ def create_profile(
         ) from None
 
     key = chart_key(pepper(settings), inp)
-    item = request.app.state.guests.put(master, key)
+    item = request.app.state.guests.put(master, key, dasha_seed(inp))
     log.info(
         "profile.created",
         chart_key=key,

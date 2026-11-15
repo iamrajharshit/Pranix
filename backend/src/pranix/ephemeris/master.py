@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time
+from fractions import Fraction
 from typing import Any, Literal
 
 from .. import __version__
@@ -265,6 +266,15 @@ def _unknown(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, 
     }
     m["facts"] = facts.build(m)
     return m
+
+
+def dasha_seed(inp: BirthInput) -> tuple[float, Fraction]:
+    """(Moon longitude, birth instant) for lazy Dasha timelines. Unknown time uses local noon,
+    which is only served when the active chain is the same all day (D56)."""
+    inp = inp.canonical()
+    swe.init()
+    snap = _snap(inp, inp.local_datetime)
+    return _body(snap, "Moon").longitude, dasha.instant(snap.utc)
 
 
 def canonical_json(master: dict[str, Any]) -> bytes:

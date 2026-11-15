@@ -8,6 +8,9 @@ Third-party components
 - GeoNames place data, CC BY 4.0, https://www.geonames.org/ (built into the image, not in git).
 - timezonefinder (MIT, (c) Jannik Kissinger) with time zone boundaries from timezone-boundary-builder
   (c) Evan Siroky, Open Database License (ODbL) v1.0, https://github.com/evansiroky/timezone-boundary-builder
+- Fonts for card images, SIL Open Font License 1.1: Cormorant Garamond (c) Christian Thalmann,
+  Catharsis Fonts; Inter (c) The Inter Project Authors (Rasmus Andersson). Not in git; fetched at build.
+- CairoSVG (LGPL-3.0-or-later) and Pillow (MIT-CMU) for card images.
 - Planned: OpenStreetMap tiles
   ("(c) OpenStreetMap contributors", https://www.openstreetmap.org/copyright), fonts Cormorant
   Garamond, Inter and Noto Sans Devanagari (SIL Open Font License 1.1).
