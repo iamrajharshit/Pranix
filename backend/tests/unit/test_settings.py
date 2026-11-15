@@ -29,3 +29,19 @@ def test_tests_ignore_a_local_env_file(tmp_path, monkeypatch) -> None:
     (tmp_path / ".env").write_text("PRANIX_GROQ_API_KEY=real-looking-key\n")
     monkeypatch.chdir(tmp_path)
     assert Settings().secret_fingerprints()["groq_api_key"] == "missing"
+
+
+def test_blank_secrets_count_as_missing(monkeypatch) -> None:
+    # "PRANIX_X=" with nothing after it must not become an empty key or an empty pepper.
+    for name in ("GROQ_API_KEY", "GEMINI_API_KEY", "LOG_PEPPER", "CHART_KEY_PEPPER"):
+        monkeypatch.setenv(f"PRANIX_{name}", "  ")
+    s = Settings()
+    assert s.groq_api_key is None and s.gemini_api_key is None
+    assert s.log_pepper is None and s.chart_key_pepper is None
+
+
+def test_prod_rejects_short_peppers(monkeypatch) -> None:
+    monkeypatch.setenv("PRANIX_ENV", "prod")
+    monkeypatch.setenv("PRANIX_LOG_PEPPER", "short")
+    monkeypatch.setenv("PRANIX_CHART_KEY_PEPPER", "x" * 64)
+    assert Settings().problems() == ["log_pepper must be at least 32 characters in prod"]
