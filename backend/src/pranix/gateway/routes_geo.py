@@ -3,8 +3,12 @@
 
 from __future__ import annotations
 
+import sqlite3
+import threading
+import time
 from typing import Any
 
+import structlog
 from fastapi import APIRouter, Query, Request
 
 from ..geo.index import GeoIndex
@@ -13,10 +17,32 @@ from .problems import ProblemError
 from .ratelimit import enforce
 
 router = APIRouter(tags=["geo"])
+log = structlog.get_logger()
+
+
+RETRY_SECONDS = 10.0
+_retry_lock = threading.Lock()
 
 
 def geo_index(request: Request) -> GeoIndex:
-    g: GeoIndex | None = request.app.state.geo
+    """The place index, loaded at startup; if it was missing then (e.g. built afterwards with
+    tools/fetch_geonames.sh), retry opening it at most every RETRY_SECONDS instead of needing a restart."""
+    state = request.app.state
+    g: GeoIndex | None = state.geo
+    if g is None:
+        with _retry_lock:
+            g = state.geo
+            now = time.monotonic()
+            if g is None and now - getattr(state, "geo_retry_at", float("-inf")) >= RETRY_SECONDS:
+                state.geo_retry_at = now
+                try:
+                    g = state.geo = GeoIndex(state.settings.geo_db_path)
+                except (OSError, sqlite3.Error):  # missing, or still being written
+                    g = None
+                else:
+                    state.failures = [f for f in state.failures if f != "geo_index_missing"]
+                    state.ready = not state.failures
+                    log.info("geo.ready", places=g.count, late=True)
     if g is None:
         raise ProblemError(503, "SERVICE_NOT_READY", "Place search is not available yet.", retry_after=30)
     return g
