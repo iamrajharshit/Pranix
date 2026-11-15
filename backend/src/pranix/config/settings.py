@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)
     guest_ttl_seconds: int = Field(default=86_400, ge=60, le=86_400)
+    guest_cache_max: int = Field(default=2_000, ge=10, le=50_000)
+    rate_profiles_per_min: int = Field(default=30, ge=1)
+    rate_places_per_min: int = Field(default=60, ge=1)
+    # Behind Render's proxy the client IP is the first X-Forwarded-For entry; never trust it elsewhere.
+    trust_proxy: bool = False
     map_tile_url: str = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
     # Secrets (required in prod, optional in dev/test)
@@ -44,12 +49,15 @@ class Settings(BaseSettings):
         return out
 
     def problems(self) -> list[str]:
+        """Prod must have the peppers. The database becomes required with accounts (P1.5);
+        missing AI keys are allowed: insight cards then use curated library text (FR-LLM-16)."""
         if self.env != "prod":
             return []
-        return [f"{n} is required in prod" for n in SECRET_NAMES if getattr(self, n) is None]
+        return [f"{n} is required in prod" for n in REQUIRED_IN_PROD if getattr(self, n) is None]
 
 
 SECRET_NAMES = ("database_url", "gemini_api_key", "groq_api_key", "log_pepper", "chart_key_pepper")
+REQUIRED_IN_PROD = ("log_pepper", "chart_key_pepper")
 
 
 @cache
