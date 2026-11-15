@@ -60,7 +60,9 @@ export default function PlaceField({ draft, error, set }: Props) {
     return (
       <Wrap error={error}>
         <Suspense fallback={<p className="hint">Loading the map…</p>}>
-          <MapPicker onUse={(c) => { set({ place: c, manual: false }); setMapOpen(false); }} onClose={() => setMapOpen(false)} />
+          <MapPicker onUse={(c) => { set({ place: c, manual: false }); setMapOpen(false); }}
+            onCoords={(lat, lon) => { set({ place: null, manual: true, lat: String(lat), lon: String(lon) }); setMapOpen(false); }}
+            onClose={() => setMapOpen(false)} />
         </Suspense>
       </Wrap>
     );
