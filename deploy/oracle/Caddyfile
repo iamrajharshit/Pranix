@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# HTTPS for Pranix. Caddy gets and renews the Let's Encrypt certificate by itself (ports 80 and 443 must be open).
+# Privacy (rule 3): no "log" directive on purpose. Access logs would record URLs, which can contain
+# typed place text and map coordinates. Do not add one.
+{$PRANIX_DOMAIN} {
+	@static path /assets/* /favicon.svg
+	encode @static zstd gzip
+
+	# Server-sent events (the card stream) must not be buffered.
+	reverse_proxy pranix:8000 {
+		flush_interval -1
+	}
+
+	header Strict-Transport-Security "max-age=31536000"
+	header -Server
+}

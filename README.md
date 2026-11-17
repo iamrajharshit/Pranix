@@ -39,8 +39,12 @@ Card images need the Cairo library: present on Linux and macOS (`brew install ca
 the image endpoint answers 503 unless Cairo is installed (for example via the GTK runtime). Everything else works.
 Docker: `docker build -f infra/Dockerfile -t pranix . && docker run -p 8000:8000 pranix`.
 
+## Deploy
+Always-free hosting on one Oracle Cloud Ampere A1 server (D66): see [deploy/oracle/README.md](deploy/oracle/README.md).
+Render's free tier runs the same image as a fallback.
+
 ## Stack
-FastAPI + pyswisseph (Python 3.12) · React + TypeScript · Postgres (Neon free) · Gemini and Groq free tiers · Render free hosting. Everything uses free services.
+FastAPI + pyswisseph (Python 3.12) · React + TypeScript · Postgres (Neon free) · Gemini and Groq free tiers · Oracle Cloud Always Free hosting (Render free as fallback). Everything uses free services.
 
 ## Licence
 AGPL-3.0-only. See `LICENSE`. Swiss Ephemeris (pyswisseph) is used under the AGPL.

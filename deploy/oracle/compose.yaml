@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Pranix on one Oracle Always Free Ampere A1 server (D66): 2 OCPU, 12 GB, home region.
+# Run from this folder:  docker compose up -d --build        (app + HTTPS)
+#                        docker compose --profile llm up -d  (adds the private local model)
+# Only Caddy is reachable from the internet; the app and the model stay on the internal network.
+name: pranix
+
+services:
+  pranix:
+    build:
+      context: ../..
+      dockerfile: infra/Dockerfile
+    image: pranix:local
+    env_file: .env                   # secrets live only on the server (chmod 600), never in git
+    environment:
+      PRANIX_TRUST_PROXY: "true"     # Caddy sets X-Forwarded-For; rate limits need the real client IP
+    expose: ["8000"]
+    restart: unless-stopped
+    mem_limit: 2g
+    cpu_shares: 1024                 # charts win the CPU over the model
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+
+  caddy:
+    image: caddy:2
+    depends_on: [pranix]
+    environment:
+      PRANIX_DOMAIN: ${PRANIX_DOMAIN:?set PRANIX_DOMAIN in .env, e.g. pranix.duckdns.org}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data             # certificates; keep this volume
+      - caddy_config:/config
+    restart: unless-stopped
+    mem_limit: 256m
+
+  llm:
+    profiles: [llm]                  # optional; not started by a plain "docker compose up"
+    image: ${LLM_IMAGE:-ghcr.io/ggml-org/llama.cpp:server}
+    command:
+      - -hf
+      - ${LLM_MODEL:-ggml-org/gemma-4-E4B-it-GGUF:Q4_K_M}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --ctx-size
+      - "4096"                       # our prompts are short; a small context keeps memory low
+      - --threads
+      - "2"
+      - --parallel
+      - "1"
+      - --jinja
+      - --api-key
+      - ${LLM_API_KEY:?set LLM_API_KEY in .env (openssl rand -hex 32)}
+    environment:
+      LLAMA_CACHE: /models           # the model file is downloaded once into this volume
+    volumes: ["models:/models"]
+    expose: ["8080"]                 # internal only: no published port
+    restart: unless-stopped
+    mem_limit: 8g
+    cpus: 1.5                        # leave headroom for Pranix
+    cpu_shares: 256
+
+volumes:
+  caddy_data:
+  caddy_config:
+  models:
