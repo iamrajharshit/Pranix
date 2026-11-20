@@ -82,14 +82,18 @@ def doshas(rs: Ruleset, bodies: list[Body], asc: float | None) -> dict[str, Any]
             t[cfg["planet_dosha"][lord]] += w * share
     pct = percentages(t)
     ranked = sorted(pct.items(), key=lambda kv: (-kv[1], kv[0]))
-    lab = cfg["label"]
-    if ranked[0][1] >= lab["mono_min"] and ranked[0][1] - ranked[1][1] >= lab["mono_gap"]:
-        label = "mono"
-    elif ranked[1][1] - ranked[2][1] >= lab["mono_gap"]:
-        label = "dual"
-    else:
-        label = "tridoshic"
+    label = dosha_label([v for _, v in ranked], cfg["label"])
     return {"percent": pct, "label": label, "dominant": [k for k, _ in ranked[: 1 if label == "mono" else 2]]}
+
+
+def dosha_label(ranked: list[int], lab: dict[str, Any]) -> str:
+    """Percentages high to low. mono: top >= mono_min and leads by mono_gap. dual (D67, owner 20 Nov 2026):
+    the second leads the third by the same gap. Otherwise tridoshic, e.g. 35/35/30 or 40/35/25."""
+    if ranked[0] >= lab["mono_min"] and ranked[0] - ranked[1] >= lab["mono_gap"]:
+        return "mono"
+    if ranked[1] - ranked[2] >= lab["mono_gap"]:
+        return "dual"
+    return "tridoshic"
 
 
 def chakras(rs: Ruleset, bodies: list[Body]) -> list[dict[str, Any]]:

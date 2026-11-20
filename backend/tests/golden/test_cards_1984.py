@@ -44,3 +44,25 @@ def test_unknown_time_cards_are_certain_only() -> None:
     assert not any("yours" in e["tags"] for e in name["entries"])
     assert any(s["kind"] == "variant" and "Mrigashira" in s["items"][0] for s in name["sections"])
     assert "rising" not in cards.build("identity", UNKNOWN, LIB)["headline"]
+
+
+PROD = Library(allow_drafts=False)
+
+
+@pytest.mark.parametrize("master", [KNOWN, UNKNOWN], ids=["known", "unknown"])
+def test_production_library_serves_every_card(master: dict) -> None:
+    # Batch 2 approved (D69): with drafts off, no card falls back to the error state.
+    for module in cards.MODULES:
+        c = cards.build(module, master, PROD)
+        check_card(c, master["facts"])
+        assert c["state"] in ("ready", "unavailable"), module
+
+
+def test_single_colour_card_says_why() -> None:
+    # 24 Jan 1980, 04:00, Pune (invented): Scorpio rising, Moon in Aries, AK Mars -> only Red (D65).
+    m = compute(BirthInput(datetime(1980, 1, 24, 4, 0), "Asia/Kolkata", 18.52, 73.85), date(2026, 11, 14))
+    assert [s["name"] for s in m["colors"]["swatches"]] == ["Red"]
+    c = cards.build("colors", m, PROD)
+    check_card(c, m["facts"])
+    assert c["headline"] == "Your colour: Red"
+    assert "stands alone" in c["detail"] and len(c["entries"]) == 1

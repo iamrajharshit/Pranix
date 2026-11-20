@@ -38,7 +38,8 @@ def ishta_devta(rs: Ruleset, bodies: list[Body]) -> dict[str, Any]:
     tie = {p: i for i, p in enumerate(t["tie_order"])}
 
     def strength(pid: str) -> tuple[int, int]:
-        d = dignity(rs, pid, twelfth) or t["node_dignity"]  # nodes have no dignity (convention)
+        # Nodes have no dignity: they rank as neutral, then the fixed tie list (D68, owner 20 Nov 2026).
+        d = dignity(rs, pid, twelfth) or t["node_dignity"]
         return rank[d], tie[pid]
 
     if occupants:
