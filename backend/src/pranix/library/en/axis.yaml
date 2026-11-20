@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# DRAFT library: Rahu (growth direction) by house; Ketu sits opposite (what comes naturally).
-house_1: {status: draft, grow: "Growth comes through stepping forward as yourself and taking up space.", natural: "Partnership and adapting to others come easily."}
-house_2: {status: draft, grow: "Growth comes through building your own resources and values.", natural: "Sharing and depth with others come easily."}
-house_3: {status: draft, grow: "Growth comes through speaking up, writing and taking small brave steps.", natural: "Big-picture belief comes easily."}
-house_4: {status: draft, grow: "Growth comes through home, inner security and emotional roots.", natural: "Public duty and achievement come easily."}
-house_5: {status: draft, grow: "Growth comes through creativity, play and following your heart.", natural: "Group causes and friendship come easily."}
-house_6: {status: draft, grow: "Growth comes through daily habits, service and caring for your health.", natural: "Retreat and imagination come easily."}
-house_7: {status: draft, grow: "Growth comes through partnership and meeting others halfway.", natural: "Self-reliance comes easily."}
-house_8: {status: draft, grow: "Growth comes through trust, depth and letting yourself be changed.", natural: "Steady self-sufficiency comes easily."}
-house_9: {status: draft, grow: "Growth comes through learning, travel and finding your own beliefs.", natural: "Everyday talk and practical skill come easily."}
-house_10: {status: draft, grow: "Growth comes through a public role and work that is seen.", natural: "Home and private life come easily."}
-house_11: {status: draft, grow: "Growth comes through community, friends and shared goals.", natural: "Personal creativity comes easily."}
-house_12: {status: draft, grow: "Growth comes through quiet, rest and an inner or spiritual life.", natural: "Practical service and routine come easily."}
+# APPROVED library batch 2 (owner, 20 Nov 2026, D69): Rahu (growth direction) by house; Ketu sits opposite (what comes naturally).
+house_1: {status: approved, grow: "Growth comes through stepping forward as yourself and taking up space.", natural: "Partnership and adapting to others come easily."}
+house_2: {status: approved, grow: "Growth comes through building your own resources and values.", natural: "Sharing and depth with others come easily."}
+house_3: {status: approved, grow: "Growth comes through speaking up, writing and taking small brave steps.", natural: "Big-picture belief comes easily."}
+house_4: {status: approved, grow: "Growth comes through home, inner security and emotional roots.", natural: "Public duty and achievement come easily."}
+house_5: {status: approved, grow: "Growth comes through creativity, play and following your heart.", natural: "Group causes and friendship come easily."}
+house_6: {status: approved, grow: "Growth comes through daily habits, service and caring for your well-being.", natural: "Retreat and imagination come easily."}
+house_7: {status: approved, grow: "Growth comes through partnership and meeting others halfway.", natural: "Self-reliance comes easily."}
+house_8: {status: approved, grow: "Growth comes through trust, depth and letting yourself be changed.", natural: "Steady self-sufficiency comes easily."}
+house_9: {status: approved, grow: "Growth comes through learning, travel and finding your own beliefs.", natural: "Everyday talk and practical skill come easily."}
+house_10: {status: approved, grow: "Growth comes through a public role and work that is seen.", natural: "Home and private life come easily."}
+house_11: {status: approved, grow: "Growth comes through community, friends and shared goals.", natural: "Personal creativity comes easily."}
+house_12: {status: approved, grow: "Growth comes through quiet, rest and an inner or spiritual life.", natural: "Practical service and routine come easily."}

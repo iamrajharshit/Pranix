@@ -75,7 +75,18 @@ def test_naming_table_is_complete() -> None:
 
 
 def test_single_planet_with_one_traditional_colour_is_not_padded() -> None:
-    # Lagna Aries, Moon in Scorpio, AK Mars: Mars has only Red and no variant (D65 open decision).
+    # Lagna Aries, Moon in Scorpio, AK Mars: Mars has only Red and no variant (D65: shown alone).
     b = bodies(Moon=215.0, Mars=29.5)
     assert allies.deciding_planets(RS, b, asc=10.0) == [("Mars", ["lagna_lord", "moon_sign_lord", "atmakaraka"])]
     assert [s["name"] for s in allies.colors(RS, b, asc=10.0)["swatches"]] == ["Red"]
+
+
+def test_dual_and_tridoshic_labels_owner_examples() -> None:
+    # D67 (owner, 20 Nov 2026): dual when the second leads the third by the mono gap; else tridoshic.
+    from pranix.ephemeris.heuristics import dosha_label
+
+    lab = RS.raw["doshas"]["label"]
+    assert dosha_label([60, 30, 10], lab) == "mono"
+    assert dosha_label([52, 48, 0], lab) == "dual"  # the sample chart
+    assert dosha_label([35, 35, 30], lab) == "tridoshic"
+    assert dosha_label([40, 35, 25], lab) == "tridoshic"

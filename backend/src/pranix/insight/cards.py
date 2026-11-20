@@ -437,11 +437,26 @@ def colors(m: Master, lib: Library) -> dict[str, Any]:
         )
         ideas.append(c["ideas"][0])
     names = ", ".join(s["name"] for s in sw)
+    detail = "These are traditional associations to use for reflection and mood, not guarantees."
+    if len(sw) == 1:
+        # D65: every deciding planet is the same planet, which has one traditional colour (Mars, Mercury).
+        # Show it alone and say why, rather than padding with a colour the tradition does not give.
+        p = _planet(sw[0]["planets"][0])
+        head = f"Your colour: {names}"
+        summary = f"{names}: the traditional colour linked with {p}, which guides your chart."
+        detail = _join(
+            f"Every planet that chooses your colours is {p}, and tradition gives {p} one colour, "
+            "so it stands alone here.",
+            detail,
+        )
+    else:
+        head = f"Your colours: {names}"
+        summary = f"{names}: traditional colours linked with the planets that guide your chart."
     return _card(
         "colors",
-        f"Your colours: {names}"[:60],
-        f"{names}: traditional colours linked with the planets that guide your chart.",
-        "These are traditional associations to use for reflection and mood, not guarantees.",
+        head[:60],
+        summary,
+        detail,
         [_sec("how_to_use", ideas)],
         [f"colors.swatch_{i}" for i in range(1, len(sw) + 1)],
         m,

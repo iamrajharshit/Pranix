@@ -1,27 +1,27 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-# DRAFT library: elements, doshas (tendencies, never diagnosis) and chakras.
+# APPROVED library batch 2 (owner, 20 Nov 2026, D69): elements, doshas (tendencies, never diagnosis) and chakras.
 elements:
-  Fire: {status: draft, high: "Fire runs strong: you bring warmth, drive and enthusiasm.", low: "Fire is quieter: motivation may need gentle kindling."}
-  Earth: {status: draft, high: "Earth runs strong: you are practical, steady and grounded.", low: "Earth is quieter: routines and structure may take conscious effort."}
-  Air: {status: draft, high: "Air runs strong: ideas, talk and connection energise you.", low: "Air is quieter: you may prefer depth and feeling to talk and theory."}
-  Water: {status: draft, high: "Water runs strong: feelings, care and intuition guide you.", low: "Water is quieter: you may approach feelings through thought or action."}
-  Ether: {status: draft, high: "Ether runs strong: space, meaning and a wide view matter to you.", low: "Ether is quieter: you tend to stay close to the practical and the present."}
+  Fire: {status: approved, high: "Fire runs strong: you bring warmth, drive and enthusiasm.", low: "Fire is quieter: motivation may need gentle kindling."}
+  Earth: {status: approved, high: "Earth runs strong: you are practical, steady and grounded.", low: "Earth is quieter: routines and structure may take conscious effort."}
+  Air: {status: approved, high: "Air runs strong: ideas, talk and connection energise you.", low: "Air is quieter: you may prefer depth and feeling to talk and theory."}
+  Water: {status: approved, high: "Water runs strong: feelings, care and intuition guide you.", low: "Water is quieter: you may approach feelings through thought or action."}
+  Ether: {status: approved, high: "Ether runs strong: space, meaning and a wide view matter to you.", low: "Ether is quieter: you tend to stay close to the practical and the present."}
 doshas:
-  Vata: {status: draft, nature: "Vata is the moving quality: lightness, creativity and quick change.", balance: "Warmth, regular routines and rest help a strong Vata feel settled."}
-  Pitta: {status: draft, nature: "Pitta is the transforming quality: focus, drive and sharp digestion of ideas.", balance: "Coolness, play and time off help a strong Pitta stay kind to itself."}
-  Kapha: {status: draft, nature: "Kapha is the steady quality: calm, loyalty and lasting strength.", balance: "Movement, variety and lightness help a strong Kapha feel lively."}
+  Vata: {status: approved, nature: "Vata is the moving quality: lightness, creativity and quick change.", balance: "Warmth, regular routines and rest help a strong Vata feel settled."}
+  Pitta: {status: approved, nature: "Pitta is the transforming quality: focus, drive and sharp digestion of ideas.", balance: "Coolness, play and time off help a strong Pitta stay kind to itself."}
+  Kapha: {status: approved, nature: "Kapha is the steady quality: calm, loyalty and lasting strength.", balance: "Movement, variety and lightness help a strong Kapha feel lively."}
   labels:
     mono: "One quality leads clearly."
     dual: "Two qualities share the lead."
     tridoshic: "All three qualities are fairly even."
 chakras:
-  muladhara: {status: draft, name: Root, about: "safety and belonging"}
-  svadhisthana: {status: draft, name: Sacral, about: "creativity and pleasure"}
-  manipura: {status: draft, name: Navel, about: "will and confidence"}
-  anahata: {status: draft, name: Heart, about: "love and compassion"}
-  vishuddha: {status: draft, name: Throat, about: "truth and expression"}
-  ajna: {status: draft, name: Brow, about: "insight and intuition"}
-  sahasrara: {status: draft, name: Crown, about: "meaning and connection"}
+  muladhara: {status: approved, name: Root, about: "safety and belonging"}
+  svadhisthana: {status: approved, name: Sacral, about: "creativity and pleasure"}
+  manipura: {status: approved, name: Navel, about: "will and confidence"}
+  anahata: {status: approved, name: Heart, about: "love and compassion"}
+  vishuddha: {status: approved, name: Throat, about: "truth and expression"}
+  ajna: {status: approved, name: Brow, about: "insight and intuition"}
+  sahasrara: {status: approved, name: Crown, about: "meaning and connection"}
 chakra_states:
   dominant: "flows strongly"
   balanced: "is steady"

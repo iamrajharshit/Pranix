@@ -31,9 +31,12 @@ def test_every_library_string_passes_the_guardrails() -> None:
 
 def test_approved_batch_and_production_mode() -> None:
     lib = Library(allow_drafts=False)
-    assert lib.stats()["approved"] == 26  # 14 colours, 7 weekdays, 5 roles (batch 1)
+    # Batch 1 (14 Nov): 26 colours, weekdays, roles. Batch 2 (20 Nov, D69): the other 89 entries.
+    assert lib.stats() == {"approved": 115, "draft": 0}
     assert lib.get("allies", "colours", "Saffron")["status"] == "approved"
+    assert lib.get("signs", "Leo")["status"] == "approved"
     with pytest.raises(LibraryGap):
-        lib.get("signs", "Leo")  # draft: not served in production
+        lib._ok({"status": "draft"})  # a future draft is still not served in production
+    assert Library(allow_drafts=True)._ok({"status": "draft"}) == {"status": "draft"}
     with pytest.raises(LibraryGap):
         lib.get("signs", "Ophiuchus")

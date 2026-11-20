@@ -60,7 +60,7 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
     if m["colors"] is not None:
         sw = m["colors"]["swatches"]
         # 2-3 colours, except when every deciding planet is Mars or Mercury, whose tradition gives only
-        # one colour and no variant: then one true colour, never an invented one (open decision D65).
+        # one colour and no variant: then one true colour, never an invented one (D65, owner 20 Nov 2026).
         assert 1 <= len(sw) <= 3
         if len(sw) == 1:
             assert sw[0]["planets"] in (["Mars"], ["Mercury"])
@@ -72,9 +72,11 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
         assert t["chart"] in ("d1", "d9", "none")
         if not known:
             assert t["kind"] not in ("house", "lagna") and t["chart"] == "none"
-    lib = Library(allow_drafts=True)
-    for module in cards.MODULES:  # no chart can make any card break a guardrail
-        check_card(cards.build(module, m, lib), m["facts"])
+    lib = Library(allow_drafts=False)  # production: approved entries only (FR-LIB-03)
+    for module in cards.MODULES:  # no chart can make any card break a guardrail or miss its text
+        c = cards.build(module, m, lib)
+        check_card(c, m["facts"])
+        assert c["state"] != "error", module
     if known:
         assert m["ishta_devta"]["main"] and len(m["ishta_devta"]["others"]) <= 2
         assert m["naming"]["syllables"][m["naming"]["pada"] - 1]["pada"] == m["naming"]["pada"]

@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 from datetime import date
+from typing import Any
 
 from pranix.ephemeris.master import compute
 from pranix.ephemeris.selftest import GOLDEN
-from pranix.insight.library import Library
+from pranix.insight.library import Library, LibraryGap
 from pranix.insight.pipeline import InsightService
 from pranix.llmgw.chain import Chain, Link
 from pranix.llmgw.providers import Stub
@@ -58,6 +59,15 @@ def test_deterministic_modules_never_call_ai_and_no_keys_means_curated() -> None
     assert plain["badge"] == "curated" and plain["degraded"] is False
 
 
+class GapLibrary(Library):
+    """Production library with one entry missing (all entries are approved since D69)."""
+
+    def get(self, *path: str) -> Any:
+        if path[:1] == ("signs",):
+            raise LibraryGap("/".join(path))
+        return super().get(*path)
+
+
 def test_library_gap_gives_an_error_card() -> None:
-    c = InsightService(Library(allow_drafts=False), Chain([])).card("identity", M)
+    c = InsightService(GapLibrary(allow_drafts=False), Chain([])).card("identity", M)
     assert c["state"] == "error" and c["degraded"] is True
