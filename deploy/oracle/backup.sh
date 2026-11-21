@@ -17,7 +17,9 @@ KEEP="${BACKUP_KEEP_DAYS:-14}"
 NAME="pranix-$(date -u +%Y%m%dT%H%M%SZ).dump.enc"
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 
-if [ -n "${PGURL:-}" ]; then dump() { pg_dump --format=custom --no-owner "$PGURL"; }
+# PGX: optional command prefix so the client tools match the server's major version (CI uses a
+# postgres:16 container); on the server the db container's own pg_dump is used.
+if [ -n "${PGURL:-}" ]; then dump() { ${PGX:-} pg_dump --format=custom --no-owner "$PGURL"; }
 else dump() { docker compose exec -T db pg_dump --format=custom --no-owner -U pranix pranix; }; fi
 dump | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass "file:$BACKUP_KEY_FILE" -out "$TMP/$NAME"
 SIZE=$(wc -c < "$TMP/$NAME")

@@ -25,9 +25,10 @@ echo "drill: newest backup $(basename "$LATEST")"
 openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass "file:$BACKUP_KEY_FILE" -in "$TMP/latest.enc" -out "$TMP/latest.dump"
 
 if [ -n "${LOCAL_PG:-}" ]; then
-  psqlx() { psql -d postgres -v ON_ERROR_STOP=1 -qAt "$@"; }
-  restore() { pg_restore --no-owner -d pranix_restore_check "$TMP/latest.dump"; }
-  inchk() { psql -d pranix_restore_check -qAt "$@"; }
+  # PGX: optional prefix so client tools match the server version (CI: a postgres:16 container)
+  psqlx() { ${PGX:-} psql -d postgres -v ON_ERROR_STOP=1 -qAt "$@"; }
+  restore() { ${PGX:-} pg_restore --no-owner --exit-on-error -d pranix_restore_check < "$TMP/latest.dump"; }
+  inchk() { ${PGX:-} psql -d pranix_restore_check -qAt "$@"; }
 else
   psqlx() { docker compose exec -T db psql -U pranix -d postgres -v ON_ERROR_STOP=1 -qAt "$@"; }
   restore() { docker compose exec -T db pg_restore --no-owner -U pranix -d pranix_restore_check < "$TMP/latest.dump"; }

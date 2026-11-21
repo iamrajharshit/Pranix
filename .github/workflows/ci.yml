@@ -50,6 +50,8 @@ jobs:
           PGHOST: localhost
           PGUSER: postgres
           PGPASSWORD: postgres
+          # client tools at the server's major version (the runner's own pg_dump is newer)
+          PGX: docker run --rm -i --network host -e PGHOST -e PGUSER -e PGPASSWORD postgres:16
         run: |
           PRANIX_DATABASE_URL="$PRANIX_TEST_DATABASE_URL" pranix-ctl db upgrade
           openssl rand -hex 32 > /tmp/backup.key
