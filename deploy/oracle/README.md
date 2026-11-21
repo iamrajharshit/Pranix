@@ -124,6 +124,36 @@ with `docker stats --no-stream`. The model is capped at 1.5 cores with low CPU p
 - **Fallback:** if this server is lost, the same image runs on Render's free tier (Docker, `infra/Dockerfile`,
   health check `/healthz`, same environment variables) at `<name>.onrender.com`.
 
+## 8. Accounts database and backups (when accounts arrive, track A)
+
+Postgres 16 runs beside the app on the internal network only; port 5432 is never published or
+opened in Oracle's firewall (D70).
+
+```bash
+openssl rand -hex 24                       # put it in .env as POSTGRES_PASSWORD
+# and PRANIX_DATABASE_URL=postgresql://pranix:<that password>@db:5432/pranix
+docker compose --profile accounts up -d db
+docker compose run --rm pranix pranix-ctl db upgrade
+```
+
+**Nightly encrypted backups** to Oracle's Always Free Object Storage, kept 14 days:
+
+1. In the console, create a private bucket `pranix-backups`; add a retention rule that deletes
+   objects after 15 days (the script also prunes after 14).
+2. Install the OCI CLI on the server (`bash -c "$(curl -L https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)"`)
+   and run `oci setup config`.
+3. Make the passphrase and **keep a second copy off the server** (a password manager): without
+   it, the backups can't be read.
+   ```bash
+   sudo mkdir -p /etc/pranix && openssl rand -hex 32 | sudo tee /etc/pranix/backup.key >/dev/null
+   sudo chown $USER /etc/pranix/backup.key && chmod 600 /etc/pranix/backup.key
+   ```
+4. In `.env`: `BACKUP_KEY_FILE=/etc/pranix/backup.key` and `BACKUP_TARGET=oci://pranix-backups`.
+5. `crontab -e`, add: `15 2 * * * cd ~/pranix/deploy/oracle && ./backup.sh >> ~/pranix-backup.log 2>&1`
+6. Once a month: `./restore_drill.sh`. It restores the newest backup into a throwaway database,
+   prints table row counts and the migration version, then deletes it. "drill: ok" means the
+   backups work.
+
 ## Privacy
 
 - Caddy writes **no access logs** (see `Caddyfile`), and Pranix logs only route patterns. Don't add a `log`

@@ -24,6 +24,7 @@ from ..insight.library import Library
 from ..insight.pipeline import InsightService
 from ..llmgw.build import insights_chain
 from ..obs.logging import configure
+from ..store.cache import open_cache, start_purger
 from . import routes_charts, routes_geo, routes_insights, routes_profiles, web
 from .guest_store import GuestStore
 from .problems import install
@@ -32,6 +33,9 @@ from .ratelimit import TokenBucket
 log = structlog.get_logger()
 access = structlog.get_logger("pranix.access")
 MAX_BODY_BYTES = 8_192
+
+
+PROVIDER_LABELS = {"gemini": "Google Gemini", "groq": "Groq", "fake": "Test provider"}
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -59,6 +63,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.renderer = Renderer(settings.fonts_dir)
         except CardImageUnavailable as e:  # optional feature: the rest of the app works without it
             log.warning("cardimg.unavailable", reason=str(e))
+        purged = app.state.cache.purge_expired()  # also hourly, from the cleanup timer (Data_model_v1 §4)
+        log.info("cache.ready", kind=type(app.state.cache).__name__, entries=app.state.cache.size(), purged=purged)
         app.state.ready, app.state.failures = not failures, failures
         log.info("selftest.result", ok=result.ok, failures=failures, ephemeris_mode=swe.mode())
         log.info(
@@ -67,7 +73,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             drafts_served=settings.allow_drafts,
             ai_providers=[f"{li.provider.name}:{li.provider.model}" for li in app.state.insights.chain.links],
         )
+        stop_purger = start_purger(app.state.cache)
         yield
+        stop_purger()
 
     app = FastAPI(title="Pranix API", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
     app.state.settings = settings
@@ -83,7 +91,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.renderer = None
     app.state.image_cache = {}
     app.state.library = Library(allow_drafts=settings.allow_drafts)
-    app.state.insights = InsightService(app.state.library, insights_chain(settings))
+    app.state.cache = open_cache(settings.cache_path)
+    app.state.insights = InsightService(app.state.library, insights_chain(settings), cache=app.state.cache)
     install(app)
 
     @app.middleware("http")
@@ -138,7 +147,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "ephemeris_mode": swe.mode(),
             "feature_flags": {"chat": settings.feature_chat, "passkeys": settings.feature_passkeys},
             "ai_providers": sorted(
-                {{"gemini": "Google Gemini", "groq": "Groq"}[li.provider.name] for li in app.state.insights.chain.links}
+                {PROVIDER_LABELS.get(li.provider.name, li.provider.name) for li in app.state.insights.chain.links}
             ),
         }
 

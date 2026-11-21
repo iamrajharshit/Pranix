@@ -34,6 +34,9 @@ def _resolve(value: str, default: str) -> str:
     return value
 
 
+FakeMode = Literal["off", "ok", "invalid_json", "numerals", "fear", "unknown_fact", "slow", "rate_limited", "down"]
+
+
 class Settings(BaseSettings):
     # Real environment variables win; a local .env fills the rest. It is found next to the code
     # (repo root or backend/) or in the working folder, so the start folder does not matter.
@@ -50,6 +53,8 @@ class Settings(BaseSettings):
     geo_db_path: str = "/app/data/geonames.sqlite"
     fonts_dir: str = "/app/data/fonts"
     web_dist: str = "/app/web"
+    # Meaning-keyed AI cache (D70): a SQLite file on a writable volume; empty = in-memory only.
+    cache_path: str = ""
     feature_chat: bool = False
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)
@@ -66,6 +71,9 @@ class Settings(BaseSettings):
     gemini_rpm: int = Field(default=10, ge=1)
     groq_model: str = "llama-3.3-70b-versatile"
     groq_rpm: int = Field(default=30, ge=1)
+    # Test-only fake provider (F1): replaces every real provider; refused in prod.
+    llm_fake: FakeMode = "off"
+    llm_fake_delay_ms: int = Field(default=0, ge=0, le=60_000)
     # Behind Render's proxy the client IP is the first X-Forwarded-For entry; never trust it elsewhere.
     trust_proxy: bool = False
     map_tile_url: str = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -113,6 +121,8 @@ class Settings(BaseSettings):
         if self.env != "prod":
             return []
         out = []
+        if self.llm_fake != "off":
+            out.append("llm_fake must be off in prod")
         for n in REQUIRED_IN_PROD:
             v = getattr(self, n)
             if v is None:

@@ -14,12 +14,35 @@ services:
     env_file: .env                   # secrets live only on the server (chmod 600), never in git
     environment:
       PRANIX_TRUST_PROXY: "true"     # Caddy sets X-Forwarded-For; rate limits need the real client IP
+      PRANIX_CACHE_PATH: /app/var/cache.sqlite   # meaning-keyed AI cache, kept across restarts (D70)
+    volumes: ["appvar:/app/var"]
     expose: ["8000"]
     restart: unless-stopped
     mem_limit: 2g
     cpu_shares: 1024                 # charts win the CPU over the model
     security_opt: ["no-new-privileges:true"]
     cap_drop: [ALL]
+
+  db:
+    # Accounts database (D70). Internal network only: port 5432 is never published or opened.
+    # Nightly encrypted backups: deploy/oracle/backup.sh (README, "Backups").
+    profiles: [accounts]             # starts with accounts (track A); not needed before then
+    image: postgres:16
+    environment:
+      POSTGRES_DB: pranix
+      POSTGRES_USER: pranix
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}  # required by the image; set it in .env (openssl rand -hex 24)
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    expose: ["5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pranix -d pranix"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    mem_limit: 768m
+    cpu_shares: 512
+    security_opt: ["no-new-privileges:true"]
 
   caddy:
     image: caddy:2
@@ -63,6 +86,8 @@ services:
     cpu_shares: 256
 
 volumes:
+  appvar:
+  pgdata:
   caddy_data:
   caddy_config:
   models:

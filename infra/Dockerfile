@@ -33,7 +33,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PRANIX_EPHE_PATH=/app/data/ephe
 # Cairo for card images (CairoSVG); nothing else from the OS.
 RUN apt-get update && apt-get install -y --no-install-recommends libcairo2 && rm -rf /var/lib/apt/lists/* \
-    && useradd --system --uid 10001 --home /app pranix
+    && useradd --system --uid 10001 --home /app pranix \
+    && mkdir -p /app/var && chown pranix /app/var   # writable: the AI cache file (D70); mount a volume here
 COPY --from=build /wheels /wheels
 RUN pip install --no-cache-dir /wheels/*.whl && rm -rf /wheels
 COPY --from=build --chown=root:root /ephe /app/data/ephe

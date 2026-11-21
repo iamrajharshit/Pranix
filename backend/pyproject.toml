@@ -15,6 +15,9 @@ dependencies = [
   "pydantic>=2.7",
   "pydantic-settings>=2.3",
   "pyswisseph==2.10.3.2",
+  "sqlalchemy>=2.0.30",
+  "alembic>=1.13",
+  "psycopg[binary]>=3.2",
   "PyYAML>=6.0",
   "structlog>=24.1",
   "tzdata>=2024.1",
@@ -32,8 +35,11 @@ dev = [
   "ruff>=0.5",
   "mypy>=1.10",
   "import-linter>=2.0",
+  "schemathesis>=4.3",
   "types-PyYAML",
 ]
+
+load = ["locust>=2.32"]
 
 [project.scripts]
 pranix-ctl = "pranix.config.cli:main"
@@ -46,6 +52,7 @@ where = ["src"]
 "pranix.library" = ["en/*.yaml"]
 "pranix.prompts" = ["*.md"]
 "pranix.cardimg" = ["art.json"]
+"pranix.store" = ["migrations/*.py", "migrations/*.mako", "migrations/versions/*.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -94,6 +101,18 @@ type = "forbidden"
 source_modules = ["pranix.gateway", "pranix.config", "pranix.obs"]
 forbidden_modules = ["swisseph"]
 allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Storage is a leaf: it never imports the engine, AI, web or geo layers (D70)"
+type = "forbidden"
+source_modules = ["pranix.store"]
+forbidden_modules = ["pranix.gateway", "pranix.ephemeris", "pranix.insight", "pranix.llmgw", "pranix.geo", "pranix.config"]
+
+[[tool.importlinter.contracts]]
+name = "Only insight, account and gateway use storage; the engine, AI and geo never do (D70)"
+type = "forbidden"
+source_modules = ["pranix.ephemeris", "pranix.llmgw", "pranix.geo"]
+forbidden_modules = ["pranix.store"]
 
 [[tool.importlinter.contracts]]
 name = "Insight and llm-gateway never import the web layer or geo (ARCH-04, ARCH-05)"

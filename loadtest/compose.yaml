@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# "Oracle-like" load-test stack (plan 15.5): the production image with the VM's limits
+# (2 CPUs; app memory budget 350 MB, REL-07) and the fake AI provider.
+#   docker compose -f loadtest/compose.yaml up --build -d
+#   locust -f loadtest/locustfile.py --host http://127.0.0.1:8000 --headless -u 25 -r 5 -t 10m
+services:
+  app:
+    build: { context: .., dockerfile: infra/Dockerfile }
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      PRANIX_ENV: test
+      PRANIX_LLM_FAKE: ok
+      PRANIX_RATE_PROFILES_PER_MIN: "100000"
+      PRANIX_RATE_PLACES_PER_MIN: "100000"
+      PRANIX_RATE_INSIGHTS_PER_MIN: "100000"
+    cpus: 2
+    mem_limit: 350m
