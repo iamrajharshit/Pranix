@@ -1,0 +1,942 @@
+{
+  "chakras": [
+    {
+      "class": "dominant",
+      "dignity": "exalted",
+      "id": "muladhara",
+      "planet": "Saturn"
+    },
+    {
+      "class": "dominant",
+      "dignity": "own",
+      "id": "svadhisthana",
+      "planet": "Jupiter"
+    },
+    {
+      "class": "dominant",
+      "dignity": "exalted",
+      "id": "manipura",
+      "planet": "Mars"
+    },
+    {
+      "class": "balanced",
+      "dignity": "friend",
+      "id": "anahata",
+      "planet": "Venus"
+    },
+    {
+      "class": "balanced",
+      "dignity": "neutral",
+      "id": "vishuddha",
+      "planet": "Mercury"
+    },
+    {
+      "class": "dominant",
+      "dignity": "exalted",
+      "id": "ajna",
+      "planet": "Moon"
+    },
+    {
+      "class": "balanced",
+      "dignity": "friend",
+      "id": "sahasrara",
+      "planet": "Sun"
+    }
+  ],
+  "colors": {
+    "swatches": [
+      {
+        "dark": false,
+        "hex": "#F4A300",
+        "kind": "main",
+        "name": "Saffron",
+        "planets": [
+          "Sun"
+        ],
+        "roles": [
+          "lagna_lord"
+        ]
+      },
+      {
+        "dark": false,
+        "hex": "#F5F3EC",
+        "kind": "main",
+        "name": "White",
+        "planets": [
+          "Venus"
+        ],
+        "roles": [
+          "moon_sign_lord"
+        ]
+      },
+      {
+        "dark": true,
+        "hex": "#121212",
+        "kind": "main",
+        "name": "Black",
+        "planets": [
+          "Saturn"
+        ],
+        "roles": [
+          "atmakaraka"
+        ]
+      }
+    ]
+  },
+  "d1": {
+    "houses": [
+      {
+        "house": 1,
+        "sign": "Leo"
+      },
+      {
+        "house": 2,
+        "sign": "Virgo"
+      },
+      {
+        "house": 3,
+        "sign": "Libra"
+      },
+      {
+        "house": 4,
+        "sign": "Scorpio"
+      },
+      {
+        "house": 5,
+        "sign": "Sagittarius"
+      },
+      {
+        "house": 6,
+        "sign": "Capricorn"
+      },
+      {
+        "house": 7,
+        "sign": "Aquarius"
+      },
+      {
+        "house": 8,
+        "sign": "Pisces"
+      },
+      {
+        "house": 9,
+        "sign": "Aries"
+      },
+      {
+        "house": 10,
+        "sign": "Taurus"
+      },
+      {
+        "house": 11,
+        "sign": "Gemini"
+      },
+      {
+        "house": 12,
+        "sign": "Cancer"
+      }
+    ],
+    "lagna": {
+      "deg_in_sign": 20.29511210553892,
+      "longitude": 140.29511210553892,
+      "nakshatra": "Purva Phalguni",
+      "pada": 3,
+      "sign": "Leo",
+      "vargottama": false
+    },
+    "planets": [
+      {
+        "deg_in_sign": 22.219117872479927,
+        "dignity": "friend",
+        "house": 4,
+        "id": "Sun",
+        "longitude": 232.21911787247993,
+        "nakshatra": "Jyeshtha",
+        "pada": 2,
+        "retrograde": false,
+        "sign": "Scorpio",
+        "speed": 1.0153689888374897,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 14.41399898624887,
+        "dignity": "exalted",
+        "house": 10,
+        "id": "Moon",
+        "longitude": 44.41399898624887,
+        "nakshatra": "Rohini",
+        "pada": 2,
+        "retrograde": false,
+        "sign": "Taurus",
+        "speed": 12.600278252648838,
+        "vargottama": true
+      },
+      {
+        "deg_in_sign": 23.00780486906183,
+        "dignity": "exalted",
+        "house": 6,
+        "id": "Mars",
+        "longitude": 293.00780486906183,
+        "nakshatra": "Shravana",
+        "pada": 4,
+        "retrograde": false,
+        "sign": "Capricorn",
+        "speed": 0.7611641938004298,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 6.423287199763308,
+        "dignity": "neutral",
+        "house": 5,
+        "id": "Mercury",
+        "longitude": 246.4232871997633,
+        "nakshatra": "Mula",
+        "pada": 2,
+        "retrograde": true,
+        "sign": "Sagittarius",
+        "speed": -0.5274086814397725,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 22.35179467744905,
+        "dignity": "own",
+        "house": 5,
+        "id": "Jupiter",
+        "longitude": 262.35179467744905,
+        "nakshatra": "Purva Ashadha",
+        "pada": 3,
+        "retrograde": false,
+        "sign": "Sagittarius",
+        "speed": 0.21683839645561714,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 4.757248145844301,
+        "dignity": "friend",
+        "house": 6,
+        "id": "Venus",
+        "longitude": 274.7572481458443,
+        "nakshatra": "Uttara Ashadha",
+        "pada": 3,
+        "retrograde": false,
+        "sign": "Capricorn",
+        "speed": 1.1790524907852065,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 28.54297223566209,
+        "dignity": "exalted",
+        "house": 3,
+        "id": "Saturn",
+        "longitude": 208.5429722356621,
+        "nakshatra": "Vishakha",
+        "pada": 3,
+        "retrograde": false,
+        "sign": "Libra",
+        "speed": 0.11304058444624429,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 2.787418245439895,
+        "dignity": null,
+        "house": 10,
+        "id": "Rahu",
+        "longitude": 32.787418245439895,
+        "nakshatra": "Krittika",
+        "pada": 2,
+        "retrograde": true,
+        "sign": "Taurus",
+        "speed": -0.05299203564181951,
+        "vargottama": false
+      },
+      {
+        "deg_in_sign": 2.7874182454398806,
+        "dignity": null,
+        "house": 4,
+        "id": "Ketu",
+        "longitude": 212.78741824543988,
+        "nakshatra": "Vishakha",
+        "pada": 4,
+        "retrograde": true,
+        "sign": "Scorpio",
+        "speed": -0.05299203564181951,
+        "vargottama": false
+      }
+    ]
+  },
+  "d9": {
+    "houses": [
+      {
+        "house": 1,
+        "sign": "Libra"
+      },
+      {
+        "house": 2,
+        "sign": "Scorpio"
+      },
+      {
+        "house": 3,
+        "sign": "Sagittarius"
+      },
+      {
+        "house": 4,
+        "sign": "Capricorn"
+      },
+      {
+        "house": 5,
+        "sign": "Aquarius"
+      },
+      {
+        "house": 6,
+        "sign": "Pisces"
+      },
+      {
+        "house": 7,
+        "sign": "Aries"
+      },
+      {
+        "house": 8,
+        "sign": "Taurus"
+      },
+      {
+        "house": 9,
+        "sign": "Gemini"
+      },
+      {
+        "house": 10,
+        "sign": "Cancer"
+      },
+      {
+        "house": 11,
+        "sign": "Leo"
+      },
+      {
+        "house": 12,
+        "sign": "Virgo"
+      }
+    ],
+    "lagna": {
+      "sign": "Libra"
+    },
+    "planets": [
+      {
+        "dignity": "enemy",
+        "house": 4,
+        "id": "Sun",
+        "retrograde": false,
+        "sign": "Capricorn"
+      },
+      {
+        "dignity": "exalted",
+        "house": 8,
+        "id": "Moon",
+        "retrograde": false,
+        "sign": "Taurus"
+      },
+      {
+        "dignity": "debilitated",
+        "house": 10,
+        "id": "Mars",
+        "retrograde": false,
+        "sign": "Cancer"
+      },
+      {
+        "dignity": "friend",
+        "house": 8,
+        "id": "Mercury",
+        "retrograde": true,
+        "sign": "Taurus"
+      },
+      {
+        "dignity": "enemy",
+        "house": 1,
+        "id": "Jupiter",
+        "retrograde": false,
+        "sign": "Libra"
+      },
+      {
+        "dignity": "friend",
+        "house": 5,
+        "id": "Venus",
+        "retrograde": false,
+        "sign": "Aquarius"
+      },
+      {
+        "dignity": "friend",
+        "house": 9,
+        "id": "Saturn",
+        "retrograde": false,
+        "sign": "Gemini"
+      },
+      {
+        "dignity": null,
+        "house": 4,
+        "id": "Rahu",
+        "retrograde": true,
+        "sign": "Capricorn"
+      },
+      {
+        "dignity": null,
+        "house": 10,
+        "id": "Ketu",
+        "retrograde": true,
+        "sign": "Cancer"
+      }
+    ]
+  },
+  "dasha": {
+    "active_chain": [
+      {
+        "contains_now": true,
+        "end": "2032-08-16T08:59:49Z",
+        "level": 1,
+        "lord": "Jupiter",
+        "path": "Ju",
+        "start": "2016-08-16T08:59:49Z"
+      },
+      {
+        "contains_now": true,
+        "end": "2027-02-27T16:11:49Z",
+        "level": 2,
+        "lord": "Venus",
+        "path": "Ju>Ve",
+        "start": "2024-06-28T16:11:49Z"
+      },
+      {
+        "contains_now": true,
+        "end": "2027-01-01T20:35:49Z",
+        "level": 3,
+        "lord": "Mercury",
+        "path": "Ju>Ve>Me",
+        "start": "2026-08-16T20:59:49Z"
+      },
+      {
+        "contains_now": true,
+        "end": "2026-11-22T14:42:49Z",
+        "level": 4,
+        "lord": "Rahu",
+        "path": "Ju>Ve>Me>Ra",
+        "start": "2026-11-01T21:58:25Z"
+      },
+      {
+        "contains_now": true,
+        "end": "2026-11-15T04:42:55Z",
+        "level": 5,
+        "lord": "Ketu",
+        "path": "Ju>Ve>Me>Ra>Ke",
+        "start": "2026-11-13T23:44:19Z"
+      }
+    ],
+    "as_of": "2026-11-14"
+  },
+  "days": {
+    "items": [
+      {
+        "planets": [
+          "Sun"
+        ],
+        "roles": [
+          "lagna_lord"
+        ],
+        "weekday": "Sunday"
+      },
+      {
+        "planets": [
+          "Venus"
+        ],
+        "roles": [
+          "moon_sign_lord"
+        ],
+        "weekday": "Friday"
+      },
+      {
+        "planets": [
+          "Saturn"
+        ],
+        "roles": [
+          "atmakaraka"
+        ],
+        "weekday": "Saturday"
+      }
+    ]
+  },
+  "doshas": {
+    "dominant": [
+      "Pitta",
+      "Kapha"
+    ],
+    "label": "dual",
+    "percent": {
+      "Kapha": 48,
+      "Pitta": 52,
+      "Vata": 0
+    }
+  },
+  "elements": {
+    "contributions": [
+      {
+        "element": "Fire",
+        "source": "lagna",
+        "weight": "2"
+      },
+      {
+        "element": "Water",
+        "source": "Sun",
+        "weight": "1/2"
+      },
+      {
+        "dignity": "friend",
+        "element": "Fire",
+        "source": "Sun",
+        "weight": "1/2"
+      },
+      {
+        "element": "Earth",
+        "source": "Moon",
+        "weight": "1"
+      },
+      {
+        "dignity": "exalted",
+        "element": "Water",
+        "source": "Moon",
+        "weight": "5/4"
+      },
+      {
+        "element": "Earth",
+        "source": "Mars",
+        "weight": "1/2"
+      },
+      {
+        "dignity": "exalted",
+        "element": "Fire",
+        "source": "Mars",
+        "weight": "5/8"
+      },
+      {
+        "element": "Fire",
+        "source": "Mercury",
+        "weight": "1/2"
+      },
+      {
+        "dignity": "neutral",
+        "element": "Earth",
+        "source": "Mercury",
+        "weight": "1/2"
+      },
+      {
+        "element": "Fire",
+        "source": "Jupiter",
+        "weight": "1/2"
+      },
+      {
+        "dignity": "own",
+        "element": "Ether",
+        "source": "Jupiter",
+        "weight": "5/8"
+      },
+      {
+        "element": "Earth",
+        "source": "Venus",
+        "weight": "1/2"
+      },
+      {
+        "dignity": "friend",
+        "element": "Water",
+        "source": "Venus",
+        "weight": "1/2"
+      },
+      {
+        "element": "Air",
+        "source": "Saturn",
+        "weight": "1/2"
+      },
+      {
+        "dignity": "exalted",
+        "element": "Air",
+        "source": "Saturn",
+        "weight": "5/8"
+      }
+    ],
+    "percent": {
+      "Air": 11,
+      "Earth": 23,
+      "Ether": 6,
+      "Fire": 39,
+      "Water": 21
+    }
+  },
+  "facts": {
+    "ak.planet": {
+      "label": "Soul planet Saturn",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Saturn"
+      }
+    },
+    "colors.swatch_1": {
+      "label": "Saffron",
+      "target": {
+        "chart": "none",
+        "kind": "colour",
+        "ref": "Saffron"
+      }
+    },
+    "colors.swatch_2": {
+      "label": "White",
+      "target": {
+        "chart": "none",
+        "kind": "colour",
+        "ref": "White"
+      }
+    },
+    "colors.swatch_3": {
+      "label": "Black",
+      "target": {
+        "chart": "none",
+        "kind": "colour",
+        "ref": "Black"
+      }
+    },
+    "dasha.antar": {
+      "label": "Venus sub-period",
+      "target": {
+        "chart": "none",
+        "kind": "dasha",
+        "ref": "Ju>Ve"
+      }
+    },
+    "dasha.maha": {
+      "label": "Jupiter period",
+      "target": {
+        "chart": "none",
+        "kind": "dasha",
+        "ref": "Ju"
+      }
+    },
+    "days.item_1": {
+      "label": "Sunday",
+      "target": {
+        "chart": "none",
+        "kind": "weekday",
+        "ref": "Sunday"
+      }
+    },
+    "days.item_2": {
+      "label": "Friday",
+      "target": {
+        "chart": "none",
+        "kind": "weekday",
+        "ref": "Friday"
+      }
+    },
+    "days.item_3": {
+      "label": "Saturday",
+      "target": {
+        "chart": "none",
+        "kind": "weekday",
+        "ref": "Saturday"
+      }
+    },
+    "deity.planet": {
+      "label": "Moon points to Gauri (Parvati)",
+      "target": {
+        "chart": "d9",
+        "kind": "planet",
+        "ref": "Moon"
+      }
+    },
+    "jupiter.house": {
+      "label": "Jupiter in the 5th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "5"
+      }
+    },
+    "jupiter.sign": {
+      "label": "Jupiter in Sagittarius",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Jupiter"
+      }
+    },
+    "ketu.house": {
+      "label": "Ketu in the 4th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "4"
+      }
+    },
+    "ketu.sign": {
+      "label": "Ketu in Scorpio",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Ketu"
+      }
+    },
+    "lagna.sign": {
+      "label": "Leo rising",
+      "target": {
+        "chart": "d1",
+        "kind": "lagna",
+        "ref": "Leo"
+      }
+    },
+    "mars.house": {
+      "label": "Mars in the 6th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "6"
+      }
+    },
+    "mars.sign": {
+      "label": "Mars in Capricorn",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Mars"
+      }
+    },
+    "mercury.house": {
+      "label": "Mercury in the 5th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "5"
+      }
+    },
+    "mercury.sign": {
+      "label": "Mercury in Sagittarius",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Mercury"
+      }
+    },
+    "moon.house": {
+      "label": "Moon in the 10th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "10"
+      }
+    },
+    "moon.nakshatra": {
+      "label": "Moon in Rohini",
+      "target": {
+        "chart": "d1",
+        "kind": "nakshatra",
+        "ref": "Rohini"
+      }
+    },
+    "moon.sign": {
+      "label": "Moon in Taurus",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Moon"
+      }
+    },
+    "naming.pada": {
+      "label": "Rohini, quarter 2",
+      "target": {
+        "chart": "none",
+        "kind": "syllable",
+        "ref": "pada:2"
+      }
+    },
+    "rahu.house": {
+      "label": "Rahu in the 10th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "10"
+      }
+    },
+    "rahu.sign": {
+      "label": "Rahu in Taurus",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Rahu"
+      }
+    },
+    "saturn.house": {
+      "label": "Saturn in the 3rd house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "3"
+      }
+    },
+    "saturn.sign": {
+      "label": "Saturn in Libra",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Saturn"
+      }
+    },
+    "sun.house": {
+      "label": "Sun in the 4th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "4"
+      }
+    },
+    "sun.sign": {
+      "label": "Sun in Scorpio",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Sun"
+      }
+    },
+    "venus.house": {
+      "label": "Venus in the 6th house",
+      "target": {
+        "chart": "d1",
+        "kind": "house",
+        "ref": "6"
+      }
+    },
+    "venus.sign": {
+      "label": "Venus in Capricorn",
+      "target": {
+        "chart": "d1",
+        "kind": "planet",
+        "ref": "Venus"
+      }
+    }
+  },
+  "flags": {
+    "near_boundary": [],
+    "time_sensitive": []
+  },
+  "identity": {
+    "lagna": {
+      "deg_in_sign": 20.29511210553892,
+      "house": 1,
+      "lord": "Sun",
+      "sign": "Leo"
+    },
+    "moon": {
+      "deg_in_sign": 14.41399898624887,
+      "house": 10,
+      "lord": "Venus",
+      "sign": "Taurus"
+    },
+    "sun": {
+      "deg_in_sign": 22.219117872479927,
+      "house": 4,
+      "lord": "Mars",
+      "sign": "Scorpio"
+    }
+  },
+  "ishta_devta": {
+    "deciding_planet": "Moon",
+    "main": "Gauri (Parvati)",
+    "others": [
+      "Krishna",
+      "Lalita"
+    ],
+    "time_sensitive": true,
+    "working": {
+      "atmakaraka": "Saturn",
+      "branch": "strongest_occupant",
+      "karakamsa": "Gemini",
+      "occupants": [
+        "Moon",
+        "Mercury"
+      ],
+      "twelfth": "Taurus"
+    }
+  },
+  "meta": {
+    "ayanamsa": "lahiri",
+    "ayanamsa_value": 23.646649584127033,
+    "birth_time_known": true,
+    "dasha_year_days": 365.25,
+    "engine_version": "0.1.0",
+    "ephemeris_mode": "swieph",
+    "house_system": "whole_sign",
+    "node_type": "mean",
+    "ruleset": {
+      "hash": "9541a10df5ca6ffd",
+      "id": "vedic-core",
+      "version": 1
+    },
+    "rulesets": [
+      {
+        "hash": "142673efc677fa52",
+        "id": "ishta-core",
+        "version": 1
+      },
+      {
+        "hash": "4f16ef023c41fe46",
+        "id": "colors-core",
+        "version": 1
+      },
+      {
+        "hash": "41e89805132cfbce",
+        "id": "days-core",
+        "version": 1
+      },
+      {
+        "hash": "2991b148cfa9218a",
+        "id": "naming-core",
+        "version": 1
+      }
+    ],
+    "schema_version": "1.0.0",
+    "swisseph_version": "2.10.03"
+  },
+  "nakshatra": {
+    "deity": "Brahma (Prajapati)",
+    "lord": "Moon",
+    "name": "Rohini",
+    "number": 4,
+    "pada": 2,
+    "symbol": "Chariot or ox-cart"
+  },
+  "naming": {
+    "alternatives": [],
+    "nakshatra": "Rohini",
+    "nakshatra_number": 4,
+    "pada": 2,
+    "syllables": [
+      {
+        "deva": "ओ",
+        "latin": "O",
+        "pada": 1
+      },
+      {
+        "deva": "वा",
+        "latin": "Va",
+        "pada": 2
+      },
+      {
+        "deva": "वी",
+        "latin": "Vi",
+        "pada": 3
+      },
+      {
+        "deva": "वू",
+        "latin": "Vu",
+        "pada": 4
+      }
+    ],
+    "variant": "naming-core@1"
+  },
+  "purpose": {
+    "atmakaraka": "Saturn",
+    "rahu_ketu_axis": {
+      "ketu_house": 4,
+      "rahu_house": 10
+    }
+  }
+}

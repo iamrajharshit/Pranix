@@ -12,5 +12,5 @@ export default defineConfig({
     proxy: { "/v1": api, "/version": api, "/healthz": api, "/readyz": api },
   },
   build: { outDir: "dist", sourcemap: false, chunkSizeWarningLimit: 400 },
-  test: { environment: "jsdom", globals: true },
+  test: { environment: "jsdom", globals: true, exclude: ["e2e/**", "node_modules/**"] },
 });
