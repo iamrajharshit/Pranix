@@ -11,13 +11,12 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
-import time
-from collections import OrderedDict
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from importlib import resources
 from typing import Any
 
 from ..llmgw.chain import Chain
+from ..store.cache import CacheStore, MemoryCacheStore
 from . import cards
 from .library import Library, LibraryGap
 from .validators import GuardrailError, check_card
@@ -61,32 +60,10 @@ def nodes(module: str, m: Mapping[str, Any]) -> dict[str, Any]:
     raise ValueError(module)
 
 
-class _TTLCache:
-    def __init__(self, ttl: float, max_items: int = 5_000, clock: Callable[[], float] = time.time) -> None:
-        self.ttl, self.max_items, self.clock = ttl, max_items, clock
-        self._d: OrderedDict[str, tuple[float, dict[str, Any]]] = OrderedDict()
-        self._lock = threading.Lock()
-
-    def get(self, k: str) -> dict[str, Any] | None:
-        with self._lock:
-            v = self._d.get(k)
-            if v is None or v[0] <= self.clock():
-                self._d.pop(k, None)
-                return None
-            self._d.move_to_end(k)
-            return v[1]
-
-    def put(self, k: str, val: dict[str, Any]) -> None:
-        with self._lock:
-            self._d[k] = (self.clock() + self.ttl, val)
-            while len(self._d) > self.max_items:
-                self._d.popitem(last=False)
-
-
 class InsightService:
-    def __init__(self, lib: Library, chain: Chain, locale: str = "en") -> None:
+    def __init__(self, lib: Library, chain: Chain, locale: str = "en", cache: CacheStore | None = None) -> None:
         self.lib, self.chain, self.locale = lib, chain, locale
-        self.cache = _TTLCache(CACHE_TTL)
+        self.cache: CacheStore = cache if cache is not None else MemoryCacheStore()
         self._flights: dict[str, threading.Lock] = {}
         self._flights_lock = threading.Lock()
 
@@ -106,7 +83,7 @@ class InsightService:
                 if hit is None:
                     hit = self._phrase(module, master, curated)
                     if hit is not None:
-                        self.cache.put(key, hit)
+                        self.cache.put(key, hit, CACHE_TTL)
         if hit is None:
             return {**curated, "degraded": True}
         return {**curated, **hit, "badge": "ai", "prompt_version": PROMPT_ID}
@@ -125,7 +102,9 @@ class InsightService:
         return curated
 
     def _key(self, module: str, master: Mapping[str, Any]) -> str:
-        raw = json.dumps([module, PROMPT_ID, SCHEMA_VERSION, self.locale, nodes(module, master)], sort_keys=True)
+        raw = json.dumps(
+            [module, PROMPT_ID, SCHEMA_VERSION, self.locale, self.lib.version, nodes(module, master)], sort_keys=True
+        )
         return hashlib.sha256(raw.encode()).hexdigest()
 
     def _flight(self, key: str) -> threading.Lock:
