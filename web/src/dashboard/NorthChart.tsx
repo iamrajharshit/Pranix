@@ -10,7 +10,7 @@ export default function NorthChart({ firstSign, planets, mark, selected, onPick,
   const cells = layout(firstSign, planets);
   const byId = Object.fromEntries(planets.map((p) => [p.id, p]));
   return (
-    <div className="ni" role="img" aria-label={aria}>
+    <div className="ni" role="group" aria-label={aria}>
       <svg viewBox="0 0 400 400" aria-hidden="true">
         <defs><linearGradient id="ng" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#1B1B4A" /><stop offset="1" stopColor="#0F0F2E" /></linearGradient></defs>
         <rect x="1" y="1" width="398" height="398" rx="6" fill="url(#ng)" stroke="#F4C566" strokeOpacity=".75" strokeWidth="2" />

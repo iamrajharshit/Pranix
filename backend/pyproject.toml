@@ -32,8 +32,11 @@ dev = [
   "ruff>=0.5",
   "mypy>=1.10",
   "import-linter>=2.0",
+  "schemathesis>=4.3",
   "types-PyYAML",
 ]
+
+load = ["locust>=2.32"]
 
 [project.scripts]
 pranix-ctl = "pranix.config.cli:main"

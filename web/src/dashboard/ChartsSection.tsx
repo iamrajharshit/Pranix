@@ -66,7 +66,7 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
             </div>
           )}
           <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
-            <div style={{ overflowX: "auto" }}>
+            <div style={{ overflowX: "auto" }} tabIndex={0} role="region" aria-label="Planet table">
               <table className="pt">
                 <caption style={{ textAlign: "left", font: "600 20px var(--serif)", color: "#fff", paddingBottom: 8 }}>{tab === "d9" ? "Planets in your D9" : known ? "Planets in your D1" : "What held all day"}</caption>
                 <thead><tr><th scope="col">Planet</th><th scope="col">Sign</th>{known && tab === "d1" && <th scope="col">Degree</th>}{known && <th scope="col">House</th>}{tab !== "d9" && <th scope="col">Star</th>}<th scope="col">Dignity</th></tr></thead>
