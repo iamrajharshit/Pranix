@@ -511,7 +511,7 @@
   "ishta_devta": null,
   "meta": {
     "ayanamsa": "lahiri",
-    "ayanamsa_value": 23.646668174073113,
+    "ayanamsa_value": 23.646668,
     "birth_time_known": false,
     "dasha_year_days": 365.25,
     "engine_version": "0.1.0",

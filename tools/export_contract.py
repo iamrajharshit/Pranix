@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import difflib
 import json
 import os
 import sys
@@ -30,8 +31,21 @@ os.environ.setdefault("PRANIX_ENV", "test")
 AS_OF = date(2026, 11, 14)  # the reference date used across docs and tests
 
 
-def _dump(obj: object) -> str:
-    return json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+def _quantize(obj: object) -> object:
+    """Floats to 6 decimals in the fixtures only: full-precision engine floats can differ in the
+    last bits between CPUs and Python builds, which would make the drift gate flaky. Everything
+    the screen shows (truncated degrees, signs, padas) is far coarser than a millionth."""
+    if isinstance(obj, float):
+        return round(obj, 6)
+    if isinstance(obj, dict):
+        return {k: _quantize(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_quantize(v) for v in obj]
+    return obj
+
+
+def _dump(obj: object, quantize: bool = False) -> str:
+    return json.dumps(_quantize(obj) if quantize else obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 
 
 def outputs() -> dict[Path, str]:
@@ -45,9 +59,9 @@ def outputs() -> dict[Path, str]:
     web = ROOT / "web" / "src"
     return {
         web / "api" / "openapi.json": _dump(create_app().openapi()),
-        web / "__fixtures__" / "sample_1984.json": _dump(compute(GOLDEN, AS_OF)),
+        web / "__fixtures__" / "sample_1984.json": _dump(compute(GOLDEN, AS_OF), quantize=True),
         web / "__fixtures__" / "sample_1984_unknown_time.json": _dump(
-            compute(dataclasses.replace(GOLDEN, birth_time_known=False), AS_OF)
+            compute(dataclasses.replace(GOLDEN, birth_time_known=False), AS_OF), quantize=True
         ),
     }
 
@@ -63,6 +77,9 @@ def main() -> int:
             continue
         if args.check:
             stale.append(path.relative_to(ROOT))
+            old, new = (current or "").splitlines(), text.splitlines()
+            diff = difflib.unified_diff(old, new, "committed", "now", n=1, lineterm="")
+            print("\n".join(list(diff)[:40]))
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text, encoding="utf-8")
