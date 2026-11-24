@@ -62,6 +62,10 @@ jobs:
         run: python tools/export_contract.py --check
       - name: Engine self-test
         run: pranix-ctl selftest
+      - name: Library and rule tables are intact (F3)
+        run: |
+          pranix-ctl library verify
+          pranix-ctl rules verify
 
   secrets:
     runs-on: ubuntu-latest
