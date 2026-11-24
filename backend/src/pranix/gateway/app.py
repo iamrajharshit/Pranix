@@ -34,6 +34,9 @@ access = structlog.get_logger("pranix.access")
 MAX_BODY_BYTES = 8_192
 
 
+PROVIDER_LABELS = {"gemini": "Google Gemini", "groq": "Groq", "fake": "Test provider"}
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     configure()
@@ -138,7 +141,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "ephemeris_mode": swe.mode(),
             "feature_flags": {"chat": settings.feature_chat, "passkeys": settings.feature_passkeys},
             "ai_providers": sorted(
-                {{"gemini": "Google Gemini", "groq": "Groq"}[li.provider.name] for li in app.state.insights.chain.links}
+                {PROVIDER_LABELS.get(li.provider.name, li.provider.name) for li in app.state.insights.chain.links}
             ),
         }
 

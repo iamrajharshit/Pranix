@@ -8,7 +8,9 @@ no name, pronouns, date, time, place or coordinates ever reach a provider.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+import threading
+import time
+from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 import httpx
@@ -123,3 +125,51 @@ class Stub:
         if self.error:
             raise ProviderError(self.error, 30.0 if self.error == "rate_limited" else None)
         return json.dumps(self.reply or {}), Usage(10, 20)
+
+
+FAKE_MODES = ("ok", "invalid_json", "numerals", "fear", "unknown_fact", "slow", "rate_limited", "down")
+
+
+@dataclass
+class Fake:
+    """Deterministic, free provider for end-to-end, load and failure tests (never in prod).
+
+    ``ok`` echoes the curated draft from the prompt, so it always passes the guardrails; the other
+    modes produce one specific failure. Every payload is kept (last 200) so tests can assert that
+    no personal data ever reaches a provider.
+    """
+
+    mode: str = "ok"
+    delay_ms: int = 0
+    name: str = "fake"
+    model: str = "fake-1"
+    payloads: list[str] = field(default_factory=list)
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
+
+    def generate(self, system: str, user: str, timeout: float) -> tuple[str, Usage]:
+        with self._lock:
+            self.payloads.append(user)
+            del self.payloads[:-200]
+        wait = self.delay_ms / 1000.0 if self.mode != "slow" else max(self.delay_ms / 1000.0, timeout + 0.05)
+        if wait:
+            time.sleep(min(wait, timeout))
+            if wait > timeout:
+                raise ProviderError("timeout")
+        if self.mode == "rate_limited":
+            raise ProviderError("rate_limited", 30.0)
+        if self.mode == "down":
+            raise ProviderError("http")
+        if self.mode == "invalid_json":
+            return "{not json", Usage(10, 3)
+        try:
+            draft = dict(json.loads(user).get("draft") or {})
+        except (ValueError, AttributeError):
+            draft = {}
+        if self.mode == "numerals":
+            draft["headline"] = "Your chart in 3 lines"
+        elif self.mode == "fear":
+            draft["summary"] = "A cursed placement brings disaster."
+        elif self.mode == "unknown_fact":
+            draft["fact_ids"] = ["d1.nonexistent.sign"]
+            draft["detail"] = str(draft.get("detail", "")) + " {{unknown}}"
+        return json.dumps(draft, ensure_ascii=False), Usage(len(user) // 4, 50)
