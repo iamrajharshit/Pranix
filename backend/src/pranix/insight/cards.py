@@ -27,8 +27,10 @@ MODULES = (
     "colors",
     "days",
 )
-DETERMINISTIC = frozenset({"birthstar", "nameletter", "deity", "colors", "days"})
-SYNTHESIS = frozenset(MODULES) - DETERMINISTIC
+# The engine's rules choose what these cards show (star, syllables, deity, colours, days); since D80
+# their wording is AI-synthesised too, like the other seven. Selection never comes from the AI.
+RULE_SELECTED = frozenset({"birthstar", "nameletter", "deity", "colors", "days"})
+SYNTHESIS = frozenset(MODULES)
 PROMPT_VERSION = "library@1"
 ORDINAL = {1: "first", 2: "second", 3: "third", 4: "fourth"}
 Master = Mapping[str, Any]

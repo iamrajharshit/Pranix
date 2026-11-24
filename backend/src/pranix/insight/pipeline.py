@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 """Insight pipeline (Requirements §7.3): curated card first, then optional AI phrasing.
 
-For synthesis modules the AI only re-words the curated draft, given de-identified facts.
+Every module (D80) gets a structured reading (insight.reading.CardReading) written by the AI from
+de-identified facts (insight.facts) and the curated draft; Pydantic checks the shape, the guardrails
+check every field, and the entity check rejects any planet, sign or star the facts did not contain.
 Results are cached by (module, prompt version, locale, fact nodes), single-flight, so one call
 serves every chart that shares those facts. Any guardrail failure keeps the curated card.
 """
@@ -15,49 +17,26 @@ from collections.abc import Mapping
 from importlib import resources
 from typing import Any
 
+from pydantic import ValidationError
+
 from ..llmgw.chain import Chain
 from ..store.cache import CacheStore, MemoryCacheStore
 from . import cards
+from .entities import unknown_entities
+from .facts import facts_for
 from .library import Library, LibraryGap
+from .reading import CardReading, draft_of, merge
 from .validators import GuardrailError, check_card
 
-PROMPT_ID = "insight@1"
-SCHEMA_VERSION = "1"
+PROMPT_ID = "insight@2"
+SCHEMA_VERSION = "2"
 CACHE_TTL = 30 * 86_400
 SYSTEM_PROMPT = resources.files("pranix.prompts").joinpath(f"{PROMPT_ID}.md").read_text(encoding="utf-8")
 
 
 def nodes(module: str, m: Mapping[str, Any]) -> dict[str, Any]:
-    """The de-identified facts a module depends on (never date, time, place, name or numbers)."""
-    ident = m["identity"]
-    if module == "identity":
-        return {
-            "rising": ident["lagna"]["sign"] if ident["lagna"] else None,
-            "moon": ident["moon"]["sign"] if ident["moon"] else None,
-            "sun": ident["sun"]["sign"] if ident["sun"] else None,
-        }
-    if module == "elements":
-        pct = m["elements"]["percent"]
-        order = sorted(pct, key=lambda k: (-pct[k], k))
-        return {"strongest": order[:2], "quietest": order[-1]}
-    if module == "doshas":
-        return {"pattern": m["doshas"]["label"], "leading": m["doshas"]["dominant"]}
-    if module == "chakras":
-        return {c["id"]: c["class"] for c in m["chakras"]}
-    if module == "motive":
-        axis = m["purpose"]["rahu_ketu_axis"]
-        return {"soul_planet": m["purpose"]["atmakaraka"], "growth_house": axis["rahu_house"] if axis else None}
-    if module == "season":
-        chain = m["dasha"]["active_chain"]
-        return {"period": chain[0]["lord"], "sub_period": chain[1]["lord"] if len(chain) > 1 else None}
-    if module == "growth":
-        axis = m["purpose"]["rahu_ketu_axis"]
-        return {
-            "quiet_centres": [c["id"] for c in m["chakras"] or [] if c["class"] == "low_activity"],
-            "growth_house": axis["rahu_house"] if axis else None,
-            "soul_planet": m["purpose"]["atmakaraka"],
-        }
-    raise ValueError(module)
+    """The de-identified facts a module depends on (D80: facts.facts_for)."""
+    return facts_for(module, m)
 
 
 class InsightService:
@@ -112,26 +91,22 @@ class InsightService:
             return self._flights.setdefault(key, threading.Lock())
 
     def _phrase(self, module: str, master: Mapping[str, Any], curated: dict[str, Any]) -> dict[str, Any] | None:
-        draft = {k: curated[k] for k in ("headline", "summary", "detail", "sections")}
-        user = json.dumps({"module": module, "facts": nodes(module, master), "draft": draft}, ensure_ascii=False)
-        kinds = {s["kind"] for s in curated["sections"]}
+        facts = nodes(module, master)
+        draft = draft_of(curated)
+        user = json.dumps({"module": module, "facts": facts, "draft": draft}, ensure_ascii=False)
+        given = user + json.dumps(curated, ensure_ascii=False)  # names the AI may use
         out: dict[str, Any] = {}
 
         def accept(text: str) -> bool:
             try:
-                data = json.loads(text)
-                cand = {
-                    "headline": str(data["headline"]),
-                    "summary": str(data["summary"]),
-                    "detail": str(data["detail"]),
-                    "sections": [
-                        {"kind": s["kind"], "items": [str(i) for i in s["items"]][:3]}
-                        for s in data.get("sections", [])
-                        if s.get("kind") in kinds
-                    ][:4],
-                }
+                reading = CardReading.model_validate_json(text)
+                cand = merge(curated, reading)
                 check_card({**curated, **cand}, master["facts"])
-            except (ValueError, KeyError, TypeError, GuardrailError):
+            except (ValidationError, ValueError, KeyError, TypeError, GuardrailError):
+                return False
+            prose = " ".join([cand["headline"], cand["summary"], cand["detail"], cand["reflect"] or ""]
+                             + [i for sec in cand["sections"] for i in sec["items"]])  # fmt: skip
+            if unknown_entities(prose, given):
                 return False
             out.update(cand)
             return True

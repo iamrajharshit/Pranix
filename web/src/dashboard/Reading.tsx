@@ -61,7 +61,7 @@ export default function Reading({ card, m, profileId, name, readyIds, onClose, o
 
         {card.detail && (
           <section className="rise" style={{ animationDelay: ".2s", display: "flex", flexDirection: "column", gap: 12 }}>
-            <h3 style={{ margin: 0, font: "600 28px var(--serif)", color: "#fff" }}>What your chart shows</h3>
+            <h3 style={{ margin: 0, font: "600 28px var(--serif)", color: "#fff" }}>{card.badge === "ai" ? "What it means for you" : "What your chart shows"}</h3>
             <p style={{ margin: 0, fontSize: 17, lineHeight: 1.75, color: "var(--text2)" }}>{t(card.detail)}</p>
           </section>
         )}
@@ -98,6 +98,13 @@ export default function Reading({ card, m, profileId, name, readyIds, onClose, o
               </section>
             ))}
           </div>
+        )}
+
+        {card.reflect && (
+          <section className="rise" aria-labelledby="rf-t" style={{ animationDelay: ".44s", display: "flex", flexDirection: "column", gap: 10, alignItems: "center", textAlign: "center", padding: "8px 12px" }}>
+            <div id="rf-t" className="eyebrow" style={{ color: meta.group.accent }}>Reflect</div>
+            <p style={{ margin: 0, maxWidth: 640, font: "italic 500 22px/1.5 var(--serif)", color: "#fff" }}>{t(card.reflect)}</p>
+          </section>
         )}
 
         <section className="rise" style={{ animationDelay: ".5s", display: "flex", flexDirection: "column", gap: 10 }}>
