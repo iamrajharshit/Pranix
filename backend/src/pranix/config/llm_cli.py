@@ -110,27 +110,51 @@ def bench(s: Settings, rounds: int, only: list[str] | None) -> int:
     import structlog
 
     structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.ERROR))  # table only
-    print(f"{'provider':<8} {'model':<32} {'calls':>5} {'passed':>7} {'p50 s':>7} {'p95 s':>7} {'tok/s':>6}  errors")
-    print("(cards = ready cards on the sample chart, with and without a birth time; passed = AI text accepted)")
+    from ..util.tokenbucket import TokenBucket
+
+    jobs = [(m, label, mod) for m, label in zip(charts, ("time known", "time unknown"), strict=True)
+            for mod in sorted(cards.SYNTHESIS)]  # fmt: skip
     for link in links:
         timed = _Timed(link.provider)
         passed = total = 0
-        for _ in range(rounds):
-            for master in charts:
-                for module in sorted(cards.SYNTHESIS):
-                    # a fresh chain and cache per card: every card is a real call, and one failure
-                    # never opens the breaker for the rest of the run
-                    one = Chain([Link(timed, link.bucket, timeout=link.timeout)])
+        print(f"{link.provider.name}: {len(jobs) * rounds} cards, one at a time (Ctrl+C prints the results so far)")
+        try:
+            for r in range(rounds):
+                for i, (master, label, module) in enumerate(jobs, start=1):
+                    # a fresh chain and cache per card: every card is a real call, one failure never
+                    # opens the breaker for the rest, and the bench is not slowed by the app's rate limit
+                    one = Chain([Link(timed, TokenBucket(100_000), timeout=link.timeout)])
+                    before = len(timed.calls)
                     card = InsightService(lib, one, cache=MemoryCacheStore()).card(module, master)
                     if card.get("state") != "ready":
                         continue
                     total += 1
                     passed += card.get("badge") == "ai"
+                    call = timed.calls[-1] if len(timed.calls) > before else None
+                    how = (
+                        "AI text"
+                        if card.get("badge") == "ai"
+                        else (
+                            "rejected by guardrails"
+                            if call and call[2] == "ok"
+                            else (call[2] if call else "not called")
+                        )
+                    )
+                    took = f"{call[0]:6.1f} s" if call else "      -"
+                    print(
+                        f"  [{r * len(jobs) + i:>2}/{len(jobs) * rounds}] {module:<9} {label:<12} {took}  {how}",
+                        flush=True,
+                    )
+        except KeyboardInterrupt:
+            print("  stopped by you; results so far:")
         ok = [c for c in timed.calls if c[2] == "ok"]
         secs = sorted(c[0] for c in ok) or [0.0]
         p95 = secs[min(len(secs) - 1, int(len(secs) * 0.95))]
         tps = sum(c[1] for c in ok) / max(sum(c[0] for c in ok), 1e-9)
         errors = sorted({c[2] for c in timed.calls if c[2] != "ok"})
+        print(
+            f"{'provider':<8} {'model':<32} {'calls':>5} {'passed':>7} {'p50 s':>7} {'p95 s':>7} {'tok/s':>6}  errors"
+        )
         print(
             f"{link.provider.name:<8} {link.provider.model:<32} {len(timed.calls):>5} {passed:>3}/{total:<3} "
             f"{statistics.median(secs):>7.1f} {p95:>7.1f} {tps:>6.1f}  {', '.join(errors) or '-'}"
