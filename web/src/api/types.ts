@@ -41,6 +41,8 @@ export interface Entry { ref: string; title: string; text: string; tags?: string
 export interface InsightCard {
   module_id: string; headline: string; summary: string; detail: string; sections: Section[]; entries?: Entry[];
   badge: "curated" | "ai"; fact_ids: string[]; state: CardState; reason: string | null; degraded: boolean; chart_ref?: string;
+  /** D80: one open question to sit with (AI readings only). */
+  reflect?: string | null;
 }
 
 export interface Place { place_id: string; name: string; admin1: string | null; country: string; lat: number; lon: number; tz: string }

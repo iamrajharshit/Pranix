@@ -12,11 +12,14 @@ from pranix.util.tokenbucket import TokenBucket
 
 M = compute(GOLDEN, date(2026, 11, 14))
 LIB = Library(allow_drafts=True)
-GOOD = {
+GOOD = {  # the structured reading shape (D80)
     "headline": "Warm Leo, steady Taurus Moon",
-    "summary": "You meet life warmly and feel safe in calm.",
-    "detail": "You meet the world warmly. " * 10,
-    "sections": [{"kind": "strengths", "items": ["Warmth"]}],
+    "in_short": "You meet life warmly and feel safe in calm.",
+    "what_it_means": "You meet the world warmly. " * 10,
+    "strengths": ["Warmth"],
+    "growth_edges": ["Letting others lead sometimes"],
+    "in_daily_life": ["Start the day with one calm, unhurried task"],
+    "reflect": "Where do you feel most at ease being seen?",
 }
 
 
@@ -29,13 +32,13 @@ def test_ai_phrasing_is_used_and_cached() -> None:
     svc = InsightService(LIB, chain(s))
     c1 = svc.card("identity", M)
     c2 = svc.card("identity", M)
-    assert c1["badge"] == "ai" and c1["headline"] == GOOD["headline"] and c1["prompt_version"] == "insight@1"
+    assert c1["badge"] == "ai" and c1["headline"] == GOOD["headline"] and c1["prompt_version"] == "insight@2"
     assert c2 == c1 and s.calls == 1  # second card served from cache
     assert c1["fact_ids"] == svc.card("identity", M)["fact_ids"]
 
 
 def test_bad_ai_output_keeps_the_curated_card() -> None:
-    bad = {**GOOD, "summary": "You were born in 1984 and are lucky."}
+    bad = {**GOOD, "in_short": "You were born in 1984 and are lucky."}
     svc = InsightService(LIB, chain(Stub(reply=bad)))
     c = svc.card("identity", M)
     assert c["badge"] == "curated" and c["degraded"] is True and "1984" not in c["summary"]
@@ -49,12 +52,7 @@ def test_rate_limited_provider_falls_through_to_the_next() -> None:
     assert first.calls == 1  # breaker open until Retry-After: not called again
 
 
-def test_deterministic_modules_never_call_ai_and_no_keys_means_curated() -> None:
-    s = Stub(reply=GOOD)
-    svc = InsightService(LIB, chain(s))
-    for m in ("birthstar", "nameletter", "deity", "colors", "days"):
-        assert svc.card(m, M)["badge"] == "curated"
-    assert s.calls == 0
+def test_no_keys_means_curated() -> None:
     plain = InsightService(LIB, Chain([])).card("identity", M)
     assert plain["badge"] == "curated" and plain["degraded"] is False
 

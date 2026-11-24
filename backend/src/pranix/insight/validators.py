@@ -12,7 +12,10 @@ import re
 from collections.abc import Iterable
 from typing import Any
 
-LIMITS = {"headline": 60, "summary": 280, "detail": 1000, "item": 160, "entries.title": 40, "entries.text": 400}
+LIMITS = {
+    "headline": 60, "summary": 280, "detail": 1000, "item": 160, "reflect": 200,
+    "entries.title": 40, "entries.text": 400,
+}  # fmt: skip
 _ALLOWED = re.compile(r"\bD[19]\b")
 _DIGIT = re.compile(r"\d")
 _PERCENT = re.compile(r"\b(per ?cent|percentage)\b", re.I)
@@ -38,7 +41,7 @@ class GuardrailError(ValueError):
 
 
 def _texts(card: dict[str, Any]) -> Iterable[tuple[str, str]]:
-    for f in ("headline", "summary", "detail"):
+    for f in ("headline", "summary", "detail", "reflect"):
         yield f, card.get(f) or ""
     for s in card.get("sections") or []:
         for it in s["items"]:

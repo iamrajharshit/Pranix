@@ -219,11 +219,14 @@ class Fake:
             draft = dict(json.loads(user).get("draft") or {})
         except (ValueError, AttributeError):
             draft = {}
+        # the draft is in the structured-reading shape (D80); each failure mode spoils one field
+        if "reflect" in draft and not draft["reflect"]:
+            draft["reflect"] = "What feels most true for you here?"
         if self.mode == "numerals":
             draft["headline"] = "Your chart in 3 lines"
         elif self.mode == "fear":
-            draft["summary"] = "A cursed placement brings disaster."
+            draft["in_short"] = "A cursed placement brings disaster."
         elif self.mode == "unknown_fact":
             draft["fact_ids"] = ["d1.nonexistent.sign"]
-            draft["detail"] = str(draft.get("detail", "")) + " {{unknown}}"
+            draft["what_it_means"] = str(draft.get("what_it_means", "")) + " {{unknown}}"
         return json.dumps(draft, ensure_ascii=False), Usage(len(user) // 4, 50)

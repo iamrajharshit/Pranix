@@ -142,7 +142,7 @@ def bench(s: Settings, rounds: int, only: list[str] | None) -> int:
                     )
                     took = f"{call[0]:6.1f} s" if call else "      -"
                     print(
-                        f"  [{r * len(jobs) + i:>2}/{len(jobs) * rounds}] {module:<9} {label:<12} {took}  {how}",
+                        f"  [{r * len(jobs) + i:>2}/{len(jobs) * rounds}] {module:<10} {label:<12} {took}  {how}",
                         flush=True,
                     )
         except KeyboardInterrupt:

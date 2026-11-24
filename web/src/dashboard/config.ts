@@ -21,6 +21,7 @@ export const SECTION_TITLES: Record<string, string> = {
   tradition: "The tradition", variant: "Also possible", other_forms: "Other forms", qualities_to_grow: "Qualities to grow",
   practice: "A practice", this_season: "This season", how_to_use: "Ways to use them", ideas_for_the_day: "Ideas for the day",
   how_we_choose: "How we choose",
+  growth_edges: "Growth edges", in_daily_life: "In daily life", // D80 structured readings
 };
 export const SECTION_DOTS = ["#F4C566", "#6FD6C9", "#A99CFF", "#F2A6C0"];
 

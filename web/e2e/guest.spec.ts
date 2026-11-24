@@ -32,6 +32,14 @@ test("guest reaches a complete dashboard and every screen passes axe", async ({ 
   await expect(page.locator("article.card")).toHaveCount(12, { timeout: 30_000 });
   await expect(page.getByText("Leo").first()).toBeVisible();
   await axe(page);
+
+  // D80: a rule-selected card now opens a structured AI reading (fake provider in e2e)
+  await page.locator("#more-birthstar").click();
+  await expect(page.getByRole("heading", { name: "What it means for you" })).toBeVisible();
+  await expect(page.getByText("Reflect", { exact: true })).toBeVisible();
+  await expect(page.locator(".page").getByText("AI-phrased")).toBeVisible();
+  await expect(page.locator("article.card .b-ai")).toHaveCount(12); // every card is now AI-written
+  await axe(page);
 });
 
 test("the API serves the security headers the app relies on", async ({ request }) => {

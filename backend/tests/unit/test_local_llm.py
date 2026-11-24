@@ -172,6 +172,6 @@ def test_cli_check_and_bench_with_the_fake_provider(
     assert main(["llm", "check"]) == 0
     assert main(["llm", "bench", "--rounds", "1"]) == 0
     out = capsys.readouterr().out
-    assert "fake-1" in out and "13/13" in out
+    assert "fake-1" in out and "22/22" in out
     monkeypatch.setenv("PRANIX_LLM_FAKE", "down")
     assert main(["llm", "check"]) == 1
