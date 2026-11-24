@@ -53,6 +53,8 @@ class Settings(BaseSettings):
     geo_db_path: str = "/app/data/geonames.sqlite"
     fonts_dir: str = "/app/data/fonts"
     web_dist: str = "/app/web"
+    # Meaning-keyed AI cache (D70): a SQLite file on a writable volume; empty = in-memory only.
+    cache_path: str = ""
     feature_chat: bool = False
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)

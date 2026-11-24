@@ -13,7 +13,7 @@ from pranix.ephemeris import swe
 # PRANIX_* secrets must never change a result or reach a real AI provider. Only the data-file
 # paths CI sets on purpose are kept.
 Settings.model_config["env_file"] = None
-_KEEP = {"PRANIX_EPHE_PATH", "PRANIX_FONTS_DIR", "PRANIX_GEO_DB_PATH"}
+_KEEP = {"PRANIX_EPHE_PATH", "PRANIX_FONTS_DIR", "PRANIX_GEO_DB_PATH", "PRANIX_TEST_DATABASE_URL"}
 for _k in [k for k in os.environ if k.upper().startswith("PRANIX_") and k.upper() not in _KEEP]:
     del os.environ[_k]
 

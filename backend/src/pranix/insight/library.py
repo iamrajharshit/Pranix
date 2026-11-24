@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Mapping
 from functools import cache
 from importlib import resources
@@ -31,6 +33,10 @@ class Library:
     def __init__(self, allow_drafts: bool, locale: str = "en") -> None:
         self.allow_drafts = allow_drafts
         self.data = _load(locale)
+        # Content version: part of every AI cache key, so approving or editing an entry retires
+        # stale cached text automatically (plan section 18).
+        raw = json.dumps([locale, allow_drafts, self.data], sort_keys=True, ensure_ascii=False, default=str)
+        self.version = hashlib.sha256(raw.encode()).hexdigest()[:16]
 
     def _ok(self, entry: Mapping[str, Any]) -> Mapping[str, Any]:
         status = entry.get("status")

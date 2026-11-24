@@ -12,9 +12,19 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      postgres:                          # accounts schema tests and the backup drill (F2, D70)
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pranix_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 3s --health-retries 10
     env:
       PRANIX_EPHE_PATH: ${{ github.workspace }}/data/ephe
       PRANIX_FONTS_DIR: ${{ github.workspace }}/data/fonts
+      PRANIX_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pranix_test
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -34,6 +44,19 @@ jobs:
       - run: mypy
       - run: lint-imports
       - run: pytest
+      - name: Backup and restore drill on the test database (F2)
+        working-directory: deploy/oracle
+        env:
+          PGHOST: localhost
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          # client tools at the server's major version (the runner's own pg_dump is newer)
+          PGX: docker run --rm -i --network host -e PGHOST -e PGUSER -e PGPASSWORD postgres:16
+        run: |
+          PRANIX_DATABASE_URL="$PRANIX_TEST_DATABASE_URL" pranix-ctl db upgrade
+          openssl rand -hex 32 > /tmp/backup.key
+          BACKUP_KEY_FILE=/tmp/backup.key BACKUP_TARGET=dir:/tmp/backups PGURL="$PRANIX_TEST_DATABASE_URL" ./backup.sh
+          LOCAL_PG=1 BACKUP_KEY_FILE=/tmp/backup.key BACKUP_TARGET=dir:/tmp/backups ./restore_drill.sh
       - name: Contract and fixtures are current (F1)
         working-directory: .
         run: python tools/export_contract.py --check
