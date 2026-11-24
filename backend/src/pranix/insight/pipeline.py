@@ -31,7 +31,7 @@ from .validators import GuardrailError, check_card
 
 log = structlog.get_logger()
 
-PROMPT_ID = "insight@2"
+PROMPT_ID = "insight@3"
 SCHEMA_VERSION = "2"
 CACHE_TTL = 30 * 86_400
 SYSTEM_PROMPT = resources.files("pranix.prompts").joinpath(f"{PROMPT_ID}.md").read_text(encoding="utf-8")

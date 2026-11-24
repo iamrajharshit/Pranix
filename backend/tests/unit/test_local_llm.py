@@ -175,3 +175,29 @@ def test_cli_check_and_bench_with_the_fake_provider(
     assert "fake-1" in out and "22/22" in out
     monkeypatch.setenv("PRANIX_LLM_FAKE", "down")
     assert main(["llm", "check"]) == 1
+
+
+def test_dev_chain_queues_for_gemma_instead_of_falling_back(monkeypatch: pytest.MonkeyPatch) -> None:
+    gate = threading.Event()
+    rec = Recorder(delay=gate)
+    monkeypatch.setattr(providers.httpx, "post", rec)
+    local = {"local_llm_url": "http://localhost:11434/v1"}
+    dev = insights_chain(Settings(env="test", llm_chains="dev", **local)).links[0]
+    prod = insights_chain(Settings(env="test", **local)).links[0]
+    assert dev.provider.wait_s > 0 and prod.provider.wait_s == 0  # type: ignore[attr-defined]
+    assert dev.bucket.capacity > 1000 and prod.bucket.capacity == 6  # no rate cap on your own laptop
+    first = threading.Thread(target=dev.provider.generate, args=("s", "u", 5))
+    second_result: list[str] = []
+    second = threading.Thread(target=lambda: second_result.append(dev.provider.generate("s", "u", 5)[0]))
+    first.start()
+    for _ in range(200):
+        if dev.provider._slots._value == 0:  # type: ignore[attr-defined]
+            break
+        threading.Event().wait(0.005)
+    second.start()
+    threading.Event().wait(0.05)
+    assert second.is_alive()  # waiting its turn, not failed with busy
+    gate.set()
+    first.join()
+    second.join()
+    assert second_result == ['{"ok": true}'] and len(rec.calls) == 2

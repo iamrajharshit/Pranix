@@ -21,10 +21,18 @@ def local_link(s: Settings) -> Link | None:
     if not s.local_llm_url:
         return None
     key = s.local_llm_api_key.get_secret_value() if s.local_llm_api_key is not None else None
+    dev = s.llm_chains == "dev"
     provider = OpenAICompatible(
-        s.local_llm_url, s.local_llm_model, key, name="gemma", max_concurrent=s.local_llm_concurrency
+        s.local_llm_url,
+        s.local_llm_model,
+        key,
+        name="gemma",
+        max_concurrent=s.local_llm_concurrency,
+        # dev: Gemma is the only AI, so cards queue for it rather than falling back to library text
+        wait_s=600.0 if dev else 0.0,
     )
-    return Link(provider, TokenBucket(s.local_llm_rpm), timeout=s.local_llm_timeout_s)
+    bucket = TokenBucket(100_000) if dev else TokenBucket(s.local_llm_rpm)  # no rate cap on your own laptop
+    return Link(provider, bucket, timeout=s.local_llm_timeout_s)
 
 
 def cloud_links(s: Settings) -> list[Link]:
