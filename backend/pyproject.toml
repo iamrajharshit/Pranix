@@ -49,7 +49,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "pranix.rulesets" = ["*.yaml"]
-"pranix.library" = ["en/*.yaml", "en/inspect/*.yaml", "en/inspect/manifest.json"]
+"pranix.library" = ["en/*.yaml", "en/reviewed/*.yaml", "en/reviewed/manifest.json"]
 "pranix.prompts" = ["*.md"]
 "pranix.cardimg" = ["art.json"]
 "pranix.store" = ["migrations/*.py", "migrations/*.mako", "migrations/versions/*.py"]

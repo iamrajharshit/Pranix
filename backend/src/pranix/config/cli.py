@@ -24,6 +24,10 @@ def main(argv: list[str] | None = None) -> int:
     llm_cli.add_parsers(sub)
     args = ap.parse_args(argv)
 
+    if args.cmd == "library" and args.action == "draft":
+        from . import draft_cli
+
+        return draft_cli.run(args)
     if args.cmd in ("library", "rules"):
         return ingest_cli.run(args)
     if args.cmd == "llm":

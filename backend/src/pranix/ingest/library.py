@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-"""Library intake: review sheet (CSV) -> reviewed YAML under `library/en/inspect/`.
+"""Library intake: review sheet (CSV) -> reviewed YAML under `library/en/reviewed/`.
 
 Loop: Claude drafts entries as `status: draft` YAML -> `export_sheet` lists them -> the owner fills
 `decision` (approve / edit / reject / hold) -> `import_sheet` validates *everything* first and writes
@@ -28,7 +28,7 @@ Data = dict[str, dict[str, Any]]  # kind -> nested mapping
 def default_root() -> Path:
     from .. import library as lib_pkg
 
-    return Path(lib_pkg.__file__).parent / "en" / "inspect"
+    return Path(lib_pkg.__file__).parent / "en" / "reviewed"
 
 
 # ---------- loading and walking ----------
@@ -214,6 +214,37 @@ def _write_all(root: Path, data: Data) -> str:
     m = build_manifest(files, data)
     _write_atomic(root / MANIFEST, _manifest_text(m).encode())
     return str(m["content_hash"])
+
+
+# ---------- new drafts (D80: written by `pranix-ctl library draft`) ----------
+
+
+def missing_keys(root: Path, kind_name: str) -> list[str]:
+    """Keys of a one-level kind with no entry yet, in the kind's own order."""
+    kind = KINDS[kind_name]
+    level = kind.levels[0]
+    if len(kind.levels) != 1 or level is None:
+        raise ValueError(f"{kind_name} is not a one-level kind")
+    have = load_all(root)[kind_name]
+    return [k for k in level if k not in have]
+
+
+def add_draft(root: Path, kind_name: str, key: str, fields: dict[str, str]) -> list[guard.Issue]:
+    """Add one new `status: draft` entry and refresh the manifest. Never replaces an existing entry,
+    so nothing reviewed is ever overwritten. Returns the problems (and writes nothing) if any check fails."""
+    kind = KINDS[kind_name]
+    data = load_all(root)
+    if key in data[kind_name]:
+        return [guard.Issue("EXISTS", f"{kind_name}/{key}", "already drafted or reviewed; not replaced")]
+    entry = {"status": "draft", **{f: fields.get(f, "") for f in kind.fields}}
+    issues = _entry_issues(kind, (key,), entry)
+    if issues:
+        return issues
+    data[kind_name][key] = entry
+    ordered = {k: data[kind_name][k] for k in (kind.levels[0] or ()) if k in data[kind_name]}
+    data[kind_name] = ordered
+    _write_all(root, data)
+    return []
 
 
 # ---------- export ----------
