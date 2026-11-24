@@ -40,6 +40,15 @@ test("guest reaches a complete dashboard and every screen passes axe", async ({ 
   await expect(page.locator(".page").getByText("AI-phrased")).toBeVisible();
   await expect(page.locator("article.card .b-ai")).toHaveCount(12); // every card is now AI-written
   await axe(page);
+
+  // Next, Next, then "Back to your map" must close the reading in one click (owner's bug, 25 Nov)
+  await page.getByRole("button", { name: /Next/ }).click();
+  await page.getByRole("button", { name: /Next/ }).click();
+  await expect(page).toHaveURL(/#reading=/);
+  await page.getByRole("button", { name: "Back to your map" }).click();
+  await expect(page).not.toHaveURL(/#reading=/);
+  await expect(page.locator(".page")).toHaveCount(0);
+  await expect(page.locator("article.card")).toHaveCount(12);
 });
 
 test("the API serves the security headers the app relies on", async ({ request }) => {
