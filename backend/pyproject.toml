@@ -49,7 +49,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "pranix.rulesets" = ["*.yaml"]
-"pranix.library" = ["en/*.yaml"]
+"pranix.library" = ["en/*.yaml", "en/inspect/*.yaml", "en/inspect/manifest.json"]
 "pranix.prompts" = ["*.md"]
 "pranix.cardimg" = ["art.json"]
 "pranix.store" = ["migrations/*.py", "migrations/*.mako", "migrations/versions/*.py"]
@@ -68,6 +68,7 @@ ignore = ["S101", "RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "B"]
+"tests/unit/test_ingest.py" = ["E501"]  # review-sheet rows are long literal data
 
 [tool.mypy]
 strict = true
@@ -113,6 +114,18 @@ name = "Only insight, account and gateway use storage; the engine, AI and geo ne
 type = "forbidden"
 source_modules = ["pranix.ephemeris", "pranix.llmgw", "pranix.geo"]
 forbidden_modules = ["pranix.store"]
+
+[[tool.importlinter.contracts]]
+name = "Intake tooling is offline: the runtime never imports it, and it never imports the runtime (F3)"
+type = "forbidden"
+source_modules = ["pranix.gateway", "pranix.insight", "pranix.llmgw", "pranix.ephemeris", "pranix.store", "pranix.geo", "pranix.obs"]
+forbidden_modules = ["pranix.ingest"]
+
+[[tool.importlinter.contracts]]
+name = "Intake tooling needs only insight validators, never the web, engine, AI or storage layers (F3)"
+type = "forbidden"
+source_modules = ["pranix.ingest"]
+forbidden_modules = ["pranix.gateway", "pranix.ephemeris", "pranix.llmgw", "pranix.store", "pranix.geo", "pranix.obs", "pranix.config"]
 
 [[tool.importlinter.contracts]]
 name = "Insight and llm-gateway never import the web layer or geo (ARCH-04, ARCH-05)"
