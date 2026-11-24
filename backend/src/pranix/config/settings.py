@@ -71,6 +71,17 @@ class Settings(BaseSettings):
     gemini_rpm: int = Field(default=10, ge=1)
     groq_model: str = "llama-3.3-70b-versatile"
     groq_rpm: int = Field(default=30, ge=1)
+    # Local model (F5, D77): one setting group for both places it runs.
+    #   PC:     PRANIX_LOCAL_LLM_URL=http://localhost:11434/v1   PRANIX_LOCAL_LLM_MODEL=gemma4:e2b   (Ollama)
+    #   Oracle: PRANIX_LOCAL_LLM_URL=http://llm:8080/v1          + PRANIX_LOCAL_LLM_API_KEY          (llama.cpp)
+    local_llm_url: str = ""
+    local_llm_model: str = "gemma4:e2b"
+    local_llm_timeout_s: float = Field(default=60.0, ge=1.0, le=600.0)
+    local_llm_rpm: int = Field(default=6, ge=1)
+    local_llm_concurrency: int = Field(default=1, ge=1, le=8)
+    # Which chain the insights use: "default" = Gemini free -> Groq -> local -> curated;
+    # "dev" = local only (offline, zero cost); "cloud" = Gemini and Groq only (no local model).
+    llm_chains: Literal["default", "dev", "cloud"] = "default"
     # Test-only fake provider (F1): replaces every real provider; refused in prod.
     llm_fake: FakeMode = "off"
     llm_fake_delay_ms: int = Field(default=0, ge=0, le=60_000)
@@ -82,11 +93,13 @@ class Settings(BaseSettings):
     database_url: SecretStr | None = None
     gemini_api_key: SecretStr | None = None
     groq_api_key: SecretStr | None = None
+    local_llm_api_key: SecretStr | None = None
     log_pepper: SecretStr | None = None
     chart_key_pepper: SecretStr | None = None
 
     @field_validator(
-        *("database_url", "gemini_api_key", "groq_api_key", "log_pepper", "chart_key_pepper"), mode="before"
+        *("database_url", "gemini_api_key", "groq_api_key", "local_llm_api_key", "log_pepper", "chart_key_pepper"),
+        mode="before",
     )
     @classmethod
     def _blank_is_missing(cls, v: object) -> object:
@@ -94,6 +107,14 @@ class Settings(BaseSettings):
         if isinstance(v, SecretStr):
             v = v.get_secret_value()
         return None if isinstance(v, str) and not v.strip() else v
+
+    @field_validator("local_llm_url")
+    @classmethod
+    def _http_url(cls, v: str) -> str:
+        v = v.strip()
+        if v and not v.startswith(("http://", "https://")):
+            raise ValueError("local_llm_url must start with http:// or https://")
+        return v.rstrip("/")
 
     @model_validator(mode="after")
     def _resolve_paths(self) -> Settings:
@@ -123,6 +144,10 @@ class Settings(BaseSettings):
         out = []
         if self.llm_fake != "off":
             out.append("llm_fake must be off in prod")
+        if self.llm_chains == "dev":
+            out.append("llm_chains=dev is for a developer machine, not prod")
+        if self.local_llm_url and self.local_llm_api_key is None:
+            out.append("local_llm_api_key is required in prod when local_llm_url is set")
         for n in REQUIRED_IN_PROD:
             v = getattr(self, n)
             if v is None:
@@ -132,7 +157,7 @@ class Settings(BaseSettings):
         return out
 
 
-SECRET_NAMES = ("database_url", "gemini_api_key", "groq_api_key", "log_pepper", "chart_key_pepper")
+SECRET_NAMES = ("database_url", "gemini_api_key", "groq_api_key", "local_llm_api_key", "log_pepper", "chart_key_pepper")
 REQUIRED_IN_PROD = ("log_pepper", "chart_key_pepper")
 MIN_PEPPER_CHARS = 32  # e.g. python -c "import secrets; print(secrets.token_hex(32))"
 

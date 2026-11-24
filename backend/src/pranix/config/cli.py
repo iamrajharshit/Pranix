@@ -17,7 +17,13 @@ def main(argv: list[str] | None = None) -> int:
     db = sub.add_parser("db", help="database migrations (needs PRANIX_DATABASE_URL)")
     db.add_argument("action", choices=["upgrade", "downgrade", "current"])
     db.add_argument("revision", nargs="?", default=None, help="target (default: head / -1)")
+    from . import llm_cli
+
+    llm_cli.add_parsers(sub)
     args = ap.parse_args(argv)
+
+    if args.cmd == "llm":
+        return llm_cli.run(args)
 
     if args.cmd == "db":
         from ..store import migrate
