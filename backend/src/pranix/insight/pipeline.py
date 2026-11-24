@@ -13,10 +13,11 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from importlib import resources
 from typing import Any
 
+import structlog
 from pydantic import ValidationError
 
 from ..llmgw.chain import Chain
@@ -27,6 +28,8 @@ from .facts import facts_for
 from .library import Library, LibraryGap
 from .reading import CardReading, draft_of, merge
 from .validators import GuardrailError, check_card
+
+log = structlog.get_logger()
 
 PROMPT_ID = "insight@2"
 SCHEMA_VERSION = "2"
@@ -45,6 +48,8 @@ class InsightService:
         self.cache: CacheStore = cache if cache is not None else MemoryCacheStore()
         self._flights: dict[str, threading.Lock] = {}
         self._flights_lock = threading.Lock()
+        # Optional hook for tools (llm bench): told why an AI answer was rejected. Never given the text.
+        self.on_reject: Callable[[str, str, str], None] | None = None
 
     def card(self, module: str, master: Mapping[str, Any]) -> dict[str, Any]:
         try:
@@ -86,6 +91,13 @@ class InsightService:
         )
         return hashlib.sha256(raw.encode()).hexdigest()
 
+    def _reject(self, module: str, rule: str, where: str) -> bool:
+        # rule and field/name only: never the answer text (it may echo facts; rule 3 keeps logs clean)
+        log.info("insight.rejected", module=module, rule=rule)
+        if self.on_reject is not None:
+            self.on_reject(module, rule, where)
+        return False
+
     def _flight(self, key: str) -> threading.Lock:
         with self._flights_lock:
             return self._flights.setdefault(key, threading.Lock())
@@ -102,12 +114,18 @@ class InsightService:
                 reading = CardReading.model_validate_json(text)
                 cand = merge(curated, reading)
                 check_card({**curated, **cand}, master["facts"])
-            except (ValidationError, ValueError, KeyError, TypeError, GuardrailError):
-                return False
+            except ValidationError as e:
+                err = e.errors()[0]
+                return self._reject(module, "SCHEMA", ".".join(str(x) for x in err["loc"]) or err["type"])
+            except GuardrailError as e:
+                return self._reject(module, e.rule, e.field)
+            except (ValueError, KeyError, TypeError):
+                return self._reject(module, "BAD_JSON", "")
             prose = " ".join([cand["headline"], cand["summary"], cand["detail"], cand["reflect"] or ""]
                              + [i for sec in cand["sections"] for i in sec["items"]])  # fmt: skip
-            if unknown_entities(prose, given):
-                return False
+            names = unknown_entities(prose, given)
+            if names:
+                return self._reject(module, "UNKNOWN_ENTITY", ", ".join(names))
             out.update(cand)
             return True
 
