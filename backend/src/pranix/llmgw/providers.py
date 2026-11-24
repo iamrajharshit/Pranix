@@ -127,6 +127,9 @@ class OpenAICompatible:
     name: str = "local"
     max_concurrent: int = 1
     temperature: float = 0.6
+    # 0 = fail fast with "busy" (production: fall through to the next provider). In the offline `dev`
+    # chain there is no next provider, so cards wait this many seconds for their turn instead.
+    wait_s: float = 0.0
     _slots: threading.BoundedSemaphore = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -134,7 +137,8 @@ class OpenAICompatible:
         self._slots = threading.BoundedSemaphore(max(1, self.max_concurrent))
 
     def generate(self, system: str, user: str, timeout: float) -> tuple[str, Usage]:
-        if not self._slots.acquire(blocking=False):
+        got = self._slots.acquire(timeout=self.wait_s) if self.wait_s > 0 else self._slots.acquire(blocking=False)
+        if not got:
             raise ProviderError("busy")
         try:
             headers = {"content-type": "application/json"}

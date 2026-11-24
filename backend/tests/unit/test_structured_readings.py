@@ -50,7 +50,7 @@ def test_every_ready_card_gets_a_structured_ai_reading(master: Any) -> None:
         c = s.card(module, master)
         if c["state"] != "ready":
             continue
-        assert c["badge"] == "ai" and c["prompt_version"] == "insight@2", module
+        assert c["badge"] == "ai" and c["prompt_version"] == "insight@3", module
 
 
 def test_rule_selected_cards_keep_engine_content() -> None:
