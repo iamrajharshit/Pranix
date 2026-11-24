@@ -35,7 +35,12 @@ access = structlog.get_logger("pranix.access")
 MAX_BODY_BYTES = 8_192
 
 
-PROVIDER_LABELS = {"gemini": "Google Gemini", "groq": "Groq", "fake": "Test provider"}
+PROVIDER_LABELS = {
+    "gemini": "Google Gemini",
+    "groq": "Groq",
+    "gemma": "Gemma (runs on our own server)",
+    "fake": "Test provider",
+}
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:

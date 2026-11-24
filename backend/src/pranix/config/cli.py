@@ -18,12 +18,16 @@ def main(argv: list[str] | None = None) -> int:
     db.add_argument("action", choices=["upgrade", "downgrade", "current"])
     db.add_argument("revision", nargs="?", default=None, help="target (default: head / -1)")
     from ..ingest import cli as ingest_cli
+    from . import llm_cli
 
     ingest_cli.add_parsers(sub)
+    llm_cli.add_parsers(sub)
     args = ap.parse_args(argv)
 
     if args.cmd in ("library", "rules"):
         return ingest_cli.run(args)
+    if args.cmd == "llm":
+        return llm_cli.run(args)
 
     if args.cmd == "db":
         from ..store import migrate

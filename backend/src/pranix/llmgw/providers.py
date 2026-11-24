@@ -19,7 +19,7 @@ import httpx
 class ProviderError(Exception):
     def __init__(self, kind: str, retry_after: float | None = None) -> None:
         super().__init__(kind)
-        self.kind, self.retry_after = kind, retry_after  # kind: rate_limited|timeout|http|bad_output
+        self.kind, self.retry_after = kind, retry_after  # kind: rate_limited|timeout|http|bad_output|busy
 
 
 @dataclass(frozen=True)
@@ -108,6 +108,60 @@ class Groq:
             raise ProviderError("bad_output") from None
         u = data.get("usage", {})
         return str(text), Usage(int(u.get("prompt_tokens", 0)), int(u.get("completion_tokens", 0)))
+
+
+@dataclass
+class OpenAICompatible:
+    """Any server with the OpenAI chat API: Ollama on the PC (`http://localhost:11434/v1`) and the
+    llama.cpp server on the Oracle VM (`http://llm:8080/v1`) are the same class with a different URL
+    (F5, D77). Moving from local to cloud is a configuration change only.
+
+    `max_concurrent` answers at a time (CPU-only Gemma: 1). A call that finds every slot taken fails
+    at once with `busy` instead of queueing, so the chain falls through to the next provider or to
+    curated text and nothing waits behind a slow model.
+    """
+
+    base_url: str
+    model: str
+    api_key: str | None = None
+    name: str = "local"
+    max_concurrent: int = 1
+    temperature: float = 0.6
+    _slots: threading.BoundedSemaphore = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        self.base_url = self.base_url.rstrip("/")
+        self._slots = threading.BoundedSemaphore(max(1, self.max_concurrent))
+
+    def generate(self, system: str, user: str, timeout: float) -> tuple[str, Usage]:
+        if not self._slots.acquire(blocking=False):
+            raise ProviderError("busy")
+        try:
+            headers = {"content-type": "application/json"}
+            if self.api_key:
+                headers["authorization"] = f"Bearer {self.api_key}"
+            data = _post(
+                f"{self.base_url}/chat/completions",
+                headers,
+                {
+                    "model": self.model,
+                    "temperature": self.temperature,
+                    "stream": False,
+                    "response_format": {"type": "json_object"},
+                    "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                },
+                timeout,
+            )
+        finally:
+            self._slots.release()
+        try:
+            text = data["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError):
+            raise ProviderError("bad_output") from None
+        if not isinstance(text, str) or not text.strip():
+            raise ProviderError("bad_output")
+        u = data.get("usage") or {}
+        return text, Usage(int(u.get("prompt_tokens", 0)), int(u.get("completion_tokens", 0)))
 
 
 @dataclass

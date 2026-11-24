@@ -15,6 +15,11 @@ services:
     environment:
       PRANIX_TRUST_PROXY: "true"     # Caddy sets X-Forwarded-For; rate limits need the real client IP
       PRANIX_CACHE_PATH: /app/var/cache.sqlite   # meaning-keyed AI cache, kept across restarts (D70)
+      # Gemma on this server (F5, D77). Used only when the llm profile runs; otherwise the chain skips it.
+      PRANIX_LOCAL_LLM_URL: ${PRANIX_LOCAL_LLM_URL:-}
+      PRANIX_LOCAL_LLM_MODEL: ${PRANIX_LOCAL_LLM_MODEL:-gemma}
+      PRANIX_LOCAL_LLM_API_KEY: ${LLM_API_KEY:-}
+      PRANIX_LOCAL_LLM_TIMEOUT_S: ${PRANIX_LOCAL_LLM_TIMEOUT_S:-90}
     volumes: ["appvar:/app/var"]
     expose: ["8000"]
     restart: unless-stopped

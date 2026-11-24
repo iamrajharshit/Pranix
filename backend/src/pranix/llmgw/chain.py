@@ -48,6 +48,7 @@ class Link:
     provider: Provider
     bucket: TokenBucket
     breaker: Breaker = field(default_factory=Breaker)
+    timeout: float | None = None  # per-provider override: a CPU-only local model needs longer
 
 
 @dataclass
@@ -85,12 +86,13 @@ class Chain:
                     continue
             started = time.perf_counter()
             try:
-                text, usage = link.provider.generate(system, user, timeout)
+                text, usage = link.provider.generate(system, user, link.timeout or timeout)
                 if not accept(text):
                     raise ProviderError("bad_output")
             except ProviderError as e:
-                with self._lock:
-                    link.breaker.failure(self.clock(), e.retry_after)
+                if e.kind != "busy":  # busy is normal for a one-slot local model, not a fault
+                    with self._lock:
+                        link.breaker.failure(self.clock(), e.retry_after)
                 log.warning(
                     "llm.call",
                     provider=link.provider.name,
