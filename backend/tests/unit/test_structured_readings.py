@@ -118,3 +118,16 @@ def test_fake_failure_modes_fall_back_to_curated() -> None:
     for mode in ("numerals", "fear", "unknown_fact", "invalid_json", "down"):
         c = svc(Fake(mode)).card("deity", KNOWN)
         assert c["badge"] == "curated" and c["degraded"] is True, mode
+
+
+def test_rejections_report_the_rule_never_the_text() -> None:
+    seen: list[tuple[str, str, str]] = []
+    s = svc(Stub(reply=reading(what_it_means="Your Venus in Pisces softens everything. " * 6)))
+    s.on_reject = lambda m, rule, where: seen.append((m, rule, where))
+    s.card("birthstar", KNOWN)
+    assert seen == [("birthstar", "UNKNOWN_ENTITY", "Venus, Pisces")]
+    seen.clear()
+    s2 = svc(Stub(reply=reading(headline="x" * 61)))
+    s2.on_reject = lambda m, rule, where: seen.append((m, rule, where))
+    s2.card("identity", KNOWN)
+    assert seen == [("identity", "SCHEMA", "headline")]

@@ -125,7 +125,12 @@ def bench(s: Settings, rounds: int, only: list[str] | None) -> int:
                     # opens the breaker for the rest, and the bench is not slowed by the app's rate limit
                     one = Chain([Link(timed, TokenBucket(100_000), timeout=link.timeout)])
                     before = len(timed.calls)
-                    card = InsightService(lib, one, cache=MemoryCacheStore()).card(module, master)
+                    service = InsightService(lib, one, cache=MemoryCacheStore())
+                    why: list[str] = []
+                    service.on_reject = lambda _m, rule, where, why=why: why.append(
+                        f"{rule} ({where})" if where else rule
+                    )
+                    card = service.card(module, master)
                     if card.get("state") != "ready":
                         continue
                     total += 1
@@ -135,7 +140,7 @@ def bench(s: Settings, rounds: int, only: list[str] | None) -> int:
                         "AI text"
                         if card.get("badge") == "ai"
                         else (
-                            "rejected by guardrails"
+                            ("rejected: " + why[-1] if why else "rejected by guardrails")
                             if call and call[2] == "ok"
                             else (call[2] if call else "not called")
                         )
