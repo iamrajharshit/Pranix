@@ -88,7 +88,10 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
   const openCard = (id: string) => {
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const show = () => { setFlipping(null); window.history.pushState(null, "", `#reading=${id}`); setOpen(id); };
-    if (reduce || open) { if (open) window.history.replaceState(null, "", `#reading=${id}`); show(); return; }
+    // Previous/Next inside an open reading swaps the reading in place: one history entry for the whole
+    // visit, so "Back to your map" (and the browser's Back) always returns to the dashboard.
+    if (open) { window.history.replaceState(null, "", `#reading=${id}`); setOpen(id); return; }
+    if (reduce) { show(); return; }
     setFlipping(id); setTimeout(show, 650);
   };
   const closeCard = () => {
