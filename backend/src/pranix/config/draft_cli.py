@@ -20,10 +20,11 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ..ingest import guard
 from .settings import Settings
 
-PROMPT_ID = "library-draft@4"
-REPAIR_PROMPT_ID = "library-repair@1"
+PROMPT_ID = "library-draft@5"
+REPAIR_PROMPT_ID = "library-repair@2"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
 BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life",
                 "you are defined by")  # fmt: skip
@@ -70,7 +71,7 @@ MAX_OPENER_USES = 2  # an opening may appear at most twice per field across a ki
 # Small models ignore "don't start like X" but follow "start with Y". Each field has a bank of natural
 # openings; every draft is given the least-used one, so openings spread evenly across all entries.
 OPENER_BANK: dict[str, tuple[str, ...]] = {
-    "core": ("At heart, you", "Your nature is", "There is something", "This star gives you", "You are someone who",
+    "core": ("At heart, you", "Your nature is", "Your way is", "This star gives you", "You are someone who",
              "Deep down, you", "Your essence is", "You carry a", "By nature you", "You embody",
              "Above all, you", "What defines you", "Your spirit is", "Inside you lives"),
     "gifts": ("What comes easily is", "Your gift is", "People rely on your", "A natural strength is", "You bring a",
@@ -174,7 +175,28 @@ def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> li
             if over:
                 bad.append(f"{f} starts like {MAX_OPENER_USES} other entries: '{over[0]}'")
     bad += [f"same phrase in two fields: '{p}'" for p in shared_phrases(draft)]
+    if len(draft) > 1:  # whole-entry checks (a single field is checked on its own during repair)
+        bad += [f"same word in too many fields: '{w}'" for w in overused_words(draft)]
+        bad += [f"{f}: only one sentence" for f, t in draft.items() if guard.sentences(t) < MIN_SENTENCES]
     return bad
+
+
+MIN_SENTENCES = 2  # small models shrink fields to one sentence late in a run (owner's batch 5)
+WORD_FIELD_LIMIT = 2  # a distinctive word may appear in at most two fields of one entry
+
+
+def stem(word: str) -> str:
+    """A rough stem so "rhythm" and "rhythmic", "inspire" and "inspiring" count as one word."""
+    return word[:6]
+
+
+def overused_words(draft: dict[str, str]) -> list[str]:
+    """Distinctive words (six letters or more, not stop words) found in more than WORD_FIELD_LIMIT fields."""
+    where: dict[str, list[str]] = {}
+    for f, text in draft.items():
+        for w in {stem(w) for w in words(text) if len(w) >= 6 and w not in _STOP}:
+            where.setdefault(w, []).append(f)
+    return sorted(w for w, fs in where.items() if len(fs) > WORD_FIELD_LIMIT)
 
 
 def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[str, str]:
@@ -189,6 +211,13 @@ def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[s
         holders = [f for f, t in draft.items() if phrase in " ".join(words(t))]
         if len(holders) > 1 and holders[-1] not in out:
             out[holders[-1]] = f"same phrase as another field: '{phrase}'"
+    for w in overused_words(draft):
+        holders = [f for f, t in draft.items() if any(stem(x) == w for x in words(t))]
+        for f in holders[WORD_FIELD_LIMIT:]:
+            out.setdefault(f, f"same word in too many fields: '{w}'")
+    for f, text in draft.items():
+        if guard.sentences(text) < MIN_SENTENCES:
+            out.setdefault(f, "only one sentence: write two")
     return out
 
 
@@ -203,10 +232,13 @@ def repair_field(chain: Any, field: str, text: str, begin_with: str, reason: str
     from importlib import resources
 
     system = resources.files("pranix.prompts").joinpath(f"{REPAIR_PROMPT_ID}.md").read_text(encoding="utf-8")
-    avoid = [b for b in BANNED_STEMS]
-    if "same phrase" in reason:
+    avoid = list(BANNED_STEMS)
+    if "same phrase" in reason or "same word" in reason:
         avoid.append(reason.split("'")[1])
-    user = json.dumps({"field": field, "text": text, "begin_with": begin_with, "avoid": avoid}, ensure_ascii=False)
+    user = json.dumps(
+        {"field": field, "text": text, "begin_with": begin_with, "avoid": avoid, "sentences": MIN_SENTENCES},
+        ensure_ascii=False,
+    )
     got: list[str] = []
 
     def accept(raw: str) -> bool:
@@ -216,6 +248,8 @@ def repair_field(chain: Any, field: str, text: str, begin_with: str, reason: str
             return False
         if words(new)[: len(words(begin_with))] != words(begin_with):
             return False  # it ignored the opening again
+        if guard.sentences(new) < MIN_SENTENCES:
+            return False
         got.append(new)
         return True
 
