@@ -237,6 +237,7 @@ def overused_words(draft: dict[str, str], theme: frozenset[str] = frozenset()) -
 
 
 THEME_WORDS: dict[tuple[str, str], tuple[str, ...]] = {("planet_deep", "Moon"): ("emotional", "feelings", "nurturing")}
+_WITHIN_OK = {"about", "yourself"}  # fine to say twice in one field
 SHORT_WATCH = ("deep",)  # short words that still count as distinctive
 ACROSS_LIMIT = 3  # a distinctive word may appear in one field of at most three entries of a kind
 _COMMON = set("nature others people around through feelings energy natural naturally "
@@ -260,10 +261,12 @@ def _distinct(text: str) -> set[str]:
 
 
 def repeated_within(text: str, theme: frozenset[str] = frozenset()) -> list[str]:
-    """Distinctive words used twice inside one field ("necessary shifts ... necessary evolution")."""
+    """Words used twice inside one field ("necessary shifts ... necessary evolution"). Stricter than
+    the across-field check: any word of four letters or more counts, common ones too, because a
+    reader hears "others ... others", "need ... need", "small ... small" (planets review, 25 Nov)."""
     seen: dict[str, int] = {}
     for w in words(text):
-        k = _watch(w)
+        k = stem(w) if len(w) >= 4 and w not in _STOP and w not in _WITHIN_OK else None
         if k and k not in theme:
             seen[k] = seen.get(k, 0) + 1
     return sorted(w for w, n in seen.items() if n > 1)
