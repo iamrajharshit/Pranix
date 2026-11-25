@@ -64,7 +64,8 @@ def entry_at(node: dict[str, Any], path: tuple[str, ...]) -> Any:
 
 
 def _hash(b: bytes) -> str:
-    return hashlib.sha256(b).hexdigest()
+    """Line endings are normalised first: a Windows checkout (CRLF) must hash like Linux (LF)."""
+    return hashlib.sha256(b.replace(b"\r\n", b"\n")).hexdigest()
 
 
 # ---------- report ----------

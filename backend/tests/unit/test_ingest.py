@@ -409,3 +409,14 @@ def test_cli_rules(tmp_path: Path) -> None:
     assert main(["rules", "import", str(sh), "--file", str(f), "--reviewed-on", "2026-11-28", "--write"]) == 0
     assert main(["rules", "verify", "--file", str(f)]) == 0
     assert main(["rules", "export-sheet", "--file", str(f), "--out", str(tmp_path / "o.csv")]) == 0
+
+
+def test_windows_line_endings_do_not_look_like_hand_edits(root: Path, tmp_path: Path) -> None:
+    """Owner's laptop: git on Windows checks files out with CRLF; verify must still pass."""
+    library.import_sheet(
+        root, make_sheet(tmp_path / "s.csv", [row("planet_in_house/Jupiter/house_1", OK_TEXT, "approve")]), write=True
+    )
+    for p in root.iterdir():
+        p.write_bytes(p.read_bytes().replace(b"\n", b"\r\n"))
+    rep = library.verify(root)
+    assert rep.ok, rep.errors
