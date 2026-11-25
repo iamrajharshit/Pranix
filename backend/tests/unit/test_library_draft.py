@@ -295,3 +295,17 @@ def test_one_sentence_fields_and_overused_words_are_reworded() -> None:
     }
     assert overused_words(rhythm) == ["rhythm"]
     assert bad_fields(rhythm, {}) == {"in_relationships": "same word in too many fields: 'rhythm'"}
+
+
+def test_sign_and_planet_seeds_use_only_approved_tables() -> None:
+    from pranix.config.draft_cli import OPENER_BANK, seed
+
+    libra = seed("sign_deep", "Libra")
+    assert libra["element"] == "Air" and libra["ruling_planet"] == "Venus"
+    assert libra["exalted_here"] == ["Saturn"] and libra["debilitated_here"] == ["Sun"]
+    saturn = seed("planet_deep", "Saturn")
+    assert saturn["rules_signs"] == ["Capricorn", "Aquarius"]
+    assert saturn["exalted_in"] == "Libra" and saturn["debilitated_in"] == "Aries"
+    rahu = seed("planet_deep", "Rahu")  # no dignity table for the nodes, and no empty fields sent
+    assert set(rahu) == {"planet", "library"} and all(rahu["library"].values())
+    assert not any("star" in o.lower().split() for bank in OPENER_BANK.values() for o in bank)

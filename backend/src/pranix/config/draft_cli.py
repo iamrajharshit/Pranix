@@ -23,7 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from ..ingest import guard
 from .settings import Settings
 
-PROMPT_ID = "library-draft@5"
+PROMPT_ID = "library-draft@6"
 REPAIR_PROMPT_ID = "library-repair@2"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
 BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life",
@@ -41,23 +41,40 @@ class DeepDraft(BaseModel):
 
 
 def seed(kind: str, key: str) -> dict[str, Any]:
-    """What the approved library and tables already say about this key: the AI stays consistent with it."""
+    """What the approved library and tables already say about this key: the AI stays consistent with it.
+    Only approved sources: the reviewed library and the owner-approved ruleset (vedic-core@1)."""
     from ..ephemeris.ruleset import load_ruleset
     from ..insight.library import Library
 
     lib, rs = Library(allow_drafts=True), load_ruleset()
+    elements = rs.raw["elements"]
     if kind == "nakshatra_deep":
         n = next(x for x in rs.nakshatras if x.name == key)
         e = lib.get("nakshatras", key)
         return {"star": key, "ruling_planet": n.lord, "deity": n.deity, "symbol": n.symbol,
                 "library": {"essence": e["essence"], "strength": e["strength"], "watch": e["watch"]}}  # fmt: skip
     if kind == "sign_deep":
+        i = rs.signs.index(key)
         e = lib.get("signs", key)
-        lord = rs.sign_lords[rs.signs.index(key)]
-        return {"sign": key, "ruling_planet": lord,
-                "library": {k: e[k] for k in ("rising", "moon", "sun") if k in e}}  # fmt: skip
+        out: dict[str, Any] = {
+            "sign": key,
+            "element": elements["sign_element"][i % 4],
+            "ruling_planet": rs.sign_lords[i],
+            "exalted_here": [p for p, s in rs.exalted.items() if s == i] or None,
+            "debilitated_here": [p for p, s in rs.debilitated.items() if s == i] or None,
+            "library": {k: e[k] for k in ("rising", "moon", "sun") if e.get(k)},
+        }
+        return {k: v for k, v in out.items() if v}
     e = lib.get("planets", key)
-    return {"planet": key, "library": {k: e[k] for k in ("motive", "period", "gift", "edge") if k in e}}
+    out = {
+        "planet": key,
+        "element": elements["planet_element"].get(key),
+        "rules_signs": [rs.signs[i] for i in rs.own.get(key, ())] or None,
+        "exalted_in": rs.signs[rs.exalted[key]] if key in rs.exalted else None,
+        "debilitated_in": rs.signs[rs.debilitated[key]] if key in rs.debilitated else None,
+        "library": {k: e[k] for k in ("motive", "period", "gift", "edge") if e.get(k)},
+    }
+    return {k: v for k, v in out.items() if v}
 
 
 def opener(text: str) -> str:
@@ -71,7 +88,7 @@ MAX_OPENER_USES = 2  # an opening may appear at most twice per field across a ki
 # Small models ignore "don't start like X" but follow "start with Y". Each field has a bank of natural
 # openings; every draft is given the least-used one, so openings spread evenly across all entries.
 OPENER_BANK: dict[str, tuple[str, ...]] = {
-    "core": ("At heart, you", "Your nature is", "Your way is", "This star gives you", "You are someone who",
+    "core": ("At heart, you", "Your nature is", "Your way is", "This placement gives you", "You are someone who",
              "Deep down, you", "Your essence is", "You carry a", "By nature you", "You embody",
              "Above all, you", "What defines you", "Your spirit is", "Inside you lives"),
     "gifts": ("What comes easily is", "Your gift is", "People rely on your", "A natural strength is", "You bring a",
