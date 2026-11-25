@@ -15,13 +15,13 @@ from pranix.llmgw.chain import Chain, Link
 from pranix.llmgw.providers import Stub
 from pranix.util.tokenbucket import TokenBucket
 
-GOOD = {
-    "core": "You carry a steady, growing warmth that likes to build things slowly.",
-    "gifts": "Patience, a love of beauty and a talent for helping things grow.",
-    "growth_edges": "You may hold on to comfort a little long; gentle change can refresh you.",
-    "at_work": "You do well with steady, hands-on work where quality is noticed.",
-    "in_relationships": "You show love through care, comfort and being reliably there.",
-    "practice": "Tend one small growing thing, a plant or a habit, each day this week.",
+GOOD = {  # two sentences per field, no distinctive word in more than two fields (as the tool now requires)
+    "core": "You carry a steady warmth that likes to build things slowly. Patience feels natural to you.",
+    "gifts": "Beauty and care come easily to you. You help ideas take root and grow.",
+    "growth_edges": "You may hold on to comfort a little long. Gentle change can refresh you.",
+    "at_work": "You do well with hands-on work where quality is noticed. Careful craft is your strength.",
+    "in_relationships": "You show love through comfort and being reliably there. People feel safe near you.",
+    "practice": "Tend one small plant or habit each day this week. Notice how little steps add up.",
 }
 
 
@@ -38,7 +38,18 @@ class RecordingStub(Stub):
         return super().generate(system, user, timeout)
 
 
-STARTS = ("Steady", "Bright", "Quiet", "Open", "Warm", "Clear", "Gentle", "Bold", "Patient", "Lively")
+STARTS = (
+    "Calm",
+    "Kind",
+    "Quiet",
+    "Open",
+    "Warm",
+    "Clear",
+    "Brave",
+    "Wise",
+    "Fair",
+    "True",
+)  # short: never "distinctive"
 
 
 class VaryingStub(RecordingStub):
@@ -85,10 +96,10 @@ def test_draft_writes_drafts_then_the_sheet_loop_works(tmp_path: Path, monkeypat
 @pytest.mark.parametrize(
     ("bad", "reason"),
     [
-        ({**GOOD, "core": "It lasts 3 years."}, "NO_NUMERALS"),
-        ({**GOOD, "gifts": "Your Venus in Pisces gives charm."}, "UNKNOWN_ENTITY"),
+        ({**GOOD, "core": "It lasts 3 years. You can rest."}, "NO_NUMERALS"),
+        ({**GOOD, "gifts": "Your Venus in Pisces gives charm. It shows."}, "UNKNOWN_ENTITY"),
         ({**GOOD, "practice": "x" * 241}, "no valid answer"),
-        ({**GOOD, "growth_edges": "A cursed habit."}, "FEAR_LEXICON"),
+        ({**GOOD, "growth_edges": "A cursed habit. It returns."}, "FEAR_LEXICON"),
     ],
 )
 def test_bad_drafts_are_not_written(
@@ -153,7 +164,7 @@ def test_template_voice_is_redrafted_with_feedback(
 
     class FirstBadThenGood(RecordingStub):
         def generate(self, system: str, user: str, timeout: float) -> Any:
-            self.reply = {**GOOD, "core": "You possess a quiet fire."} if self.calls == 0 else GOOD
+            self.reply = {**GOOD, "core": "You possess a quiet fire. It glows."} if self.calls == 0 else GOOD
             return super().generate(system, user, timeout)
 
     stub = use(monkeypatch, FirstBadThenGood(reply=GOOD))
@@ -247,9 +258,9 @@ def test_a_failing_field_is_reworded_alone(tmp_path: Path, monkeypatch: pytest.M
             if "rewrite ONE short field" in system:  # the repair prompt
                 ask = json.loads(user)
                 self.repairs += 1
-                self.reply = {"text": f"{ask['begin_with']} keep a steady pace and finish what you start."}
+                self.reply = {"text": f"{ask['begin_with']} keep a calm pace. You finish what you start."}
             else:
-                self.reply = {**GOOD, "core": "You possess a quiet, growing warmth."}  # a banned stem
+                self.reply = {**GOOD, "core": "You possess a quiet warmth. It grows."}  # a banned stem
             return super().generate(system, user, timeout)
 
     stub = use(monkeypatch, Smart(reply=GOOD))
@@ -264,5 +275,23 @@ def test_a_failing_field_is_reworded_alone(tmp_path: Path, monkeypatch: pytest.M
 def test_bad_fields_names_the_later_field_for_a_shared_phrase() -> None:
     from pranix.config.draft_cli import bad_fields
 
-    draft = {"at_work": "You bring unwavering loyalty to tasks.", "in_relationships": "You offer unwavering loyalty."}
+    draft = {
+        "at_work": "You bring unwavering loyalty to tasks. Work gets done.",
+        "in_relationships": "You offer unwavering loyalty. People feel it.",
+    }
     assert list(bad_fields(draft, {})) == ["in_relationships"]
+
+
+def test_one_sentence_fields_and_overused_words_are_reworded() -> None:
+    """Batch 5: fields shrank to one sentence late in the run; "rhythm/rhythmic" appeared in three fields."""
+    from pranix.config.draft_cli import bad_fields, overused_words
+
+    assert bad_fields({**GOOD, "core": "You are calm."}, {}) == {"core": "only one sentence: write two"}
+    rhythm = {
+        **GOOD,
+        "core": "You have rhythm and abundance. Groups suit you.",
+        "at_work": "You set a rhythmic flow at work. Teams follow it.",
+        "in_relationships": "You meet people in a rhythmic way. They feel secure.",
+    }
+    assert overused_words(rhythm) == ["rhythm"]
+    assert bad_fields(rhythm, {}) == {"in_relationships": "same word in too many fields: 'rhythm'"}
