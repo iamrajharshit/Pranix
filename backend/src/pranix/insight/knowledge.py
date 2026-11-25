@@ -4,7 +4,7 @@
 The engine's facts say *what* a chart has (Moon in Rohini); the reviewed deep library says what
 that tends to mean (core nature, gifts, growth edges, work, relationships, a practice). Only
 entries the library may serve are included (approved in production), so the AI words its reading
-from text the owner has reviewed. Kinds with no approved entries yet (signs, planets) are skipped,
+from text the owner has reviewed. Kinds with no approved entries yet are skipped,
 and light up on their own once they are reviewed.
 """
 

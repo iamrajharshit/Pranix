@@ -367,3 +367,14 @@ def test_short_word_deep_counts() -> None:
              "practice": "Breathe deeply each morning. Then begin."}  # fmt: skip
     assert overused_words(draft) == ["deep"]
     assert word_usage({"a": {"core": "Deep down, you seek. You wait."}}, ("core",))["core"]["deep"] == 1
+
+
+def test_short_and_common_words_twice_in_one_field() -> None:
+    """Planets review: "Others ... others", "need ... need", "small ... small" in one sentence."""
+    from pranix.config.draft_cli import repeated_within, themes_of
+
+    assert repeated_within("Others notice how you understand others. You listen.") == ["others"]
+    assert repeated_within("You need a place that honors your need for calm. You thrive.") == ["need"]
+    assert repeated_within("A small step is one small challenge. It helps.") == ["small"]
+    moon = themes_of("planet_deep", "Moon")
+    assert repeated_within("Your feelings shift; honor those feelings. You steady.", moon) == []
