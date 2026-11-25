@@ -322,3 +322,25 @@ def test_a_word_twice_in_one_field_is_reworded() -> None:
     openings = [o.lower() for bank in OPENER_BANK.values() for o in bank]
     for gone in ("your way is", "with family and friends,", "for a few minutes"):
         assert gone not in openings
+
+
+def test_word_worn_across_entries_is_flagged() -> None:
+    """Signs batch two: five practices said "observe" — fine one by one, flat as a set (owner review)."""
+    from pranix.config.draft_cli import ACROSS_LIMIT, bad_fields, word_usage
+
+    fields = ("practice",)
+    have = {k: {"practice": f"Pause and observe your mood, {k}. Then choose one calm step."} for k in "abc"}
+    across = word_usage(have, fields)
+    assert across["practice"]["observ"] == ACROSS_LIMIT
+    worn = {"practice": "Each day, observe your breath for a while. Then return to the task."}
+    assert "observ" in bad_fields(worn, {"practice": {}}, across)["practice"]
+    fresh = {"practice": "Each day, finish one detail before the next idea. Then rest a moment."}
+    assert bad_fields(fresh, {"practice": {}}, across) == {}
+    assert bad_fields(worn, {"practice": {}}) == {}  # without the kind's entries, no cross check
+
+
+def test_template_practice_stems_are_banned() -> None:
+    from pranix.config.draft_cli import bad_fields
+
+    got = bad_fields({"practice": "Simply observe your thoughts today. This gentle pause helps you."}, {"practice": {}})
+    assert "simply observe" in got["practice"]
