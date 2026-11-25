@@ -50,7 +50,7 @@ def test_every_ready_card_gets_a_structured_ai_reading(master: Any) -> None:
         c = s.card(module, master)
         if c["state"] != "ready":
             continue
-        assert c["badge"] == "ai" and c["prompt_version"] == "insight@3", module
+        assert c["badge"] == "ai" and c["prompt_version"] == "insight@4", module
 
 
 def test_rule_selected_cards_keep_engine_content() -> None:
@@ -131,3 +131,55 @@ def test_rejections_report_the_rule_never_the_text() -> None:
     s2.on_reject = lambda m, rule, where: seen.append((m, rule, where))
     s2.card("identity", KNOWN)
     assert seen == [("identity", "SCHEMA", "headline")]
+
+
+class Recording(Stub):
+    users: list[str]
+
+    def generate(self, system: str, user: str, timeout: float) -> Any:
+        self.__dict__.setdefault("users", []).append(user)
+        return super().generate(system, user, timeout)
+
+
+def test_reviewed_star_knowledge_reaches_the_reading() -> None:
+    """D80: the 27 approved nakshatra entries feed the Birth star, Naming and Identity readings."""
+    from pranix.insight.knowledge import knowledge_for
+
+    prod = Library(allow_drafts=False)  # production: approved entries only
+    star = KNOWN["nakshatra"]["name"]
+    k = knowledge_for("birthstar", KNOWN, prod)
+    assert list(k) == ["stars"] and list(k["stars"]) == [star]
+    assert set(k["stars"][star]) == {"core", "gifts", "growth_edges", "at_work", "in_relationships", "practice"}
+    assert "status" not in k["stars"][star]
+    # unknown time: both possible stars, never one chosen
+    both = knowledge_for("birthstar", UNKNOWN, prod)["stars"]
+    assert len(both) == 2
+    # identity uses the Moon's star; cards with no reviewed kind yet get none
+    assert star in knowledge_for("identity", KNOWN, prod)["stars"]
+    assert knowledge_for("elements", KNOWN, prod) == {}
+    # and it is in the request the AI receives
+    rec = Recording(reply=reading())
+    InsightService(prod, Chain([Link(rec, TokenBucket(100))])).card("birthstar", KNOWN)
+    sent = json.loads(rec.users[0])
+    assert sent["knowledge"]["stars"][star]["core"] == k["stars"][star]["core"]
+
+
+def test_drafts_never_reach_production_readings(monkeypatch: pytest.MonkeyPatch) -> None:
+    from pranix.insight import library as libmod
+    from pranix.insight.knowledge import knowledge_for
+
+    data = dict(libmod._load("en"))
+    data["nakshatra_deep"] = {k: {**v, "status": "draft"} for k, v in data["nakshatra_deep"].items()}
+    prod = Library(allow_drafts=False)
+    prod.data = data
+    assert knowledge_for("birthstar", KNOWN, prod) == {}
+    dev = Library(allow_drafts=True)
+    dev.data = data
+    assert knowledge_for("birthstar", KNOWN, dev) != {}
+
+
+def test_library_version_changes_with_reviewed_text() -> None:
+    a = Library(allow_drafts=False)
+    b = Library(allow_drafts=False)
+    assert a.version == b.version
+    assert "nakshatra_deep" in a.data and len(a.data["nakshatra_deep"]) == 27

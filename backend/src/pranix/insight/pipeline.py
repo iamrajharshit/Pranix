@@ -25,13 +25,14 @@ from ..store.cache import CacheStore, MemoryCacheStore
 from . import cards
 from .entities import unknown_entities
 from .facts import facts_for
+from .knowledge import knowledge_for
 from .library import Library, LibraryGap
 from .reading import CardReading, draft_of, merge
 from .validators import GuardrailError, check_card
 
 log = structlog.get_logger()
 
-PROMPT_ID = "insight@3"
+PROMPT_ID = "insight@4"
 SCHEMA_VERSION = "2"
 CACHE_TTL = 30 * 86_400
 SYSTEM_PROMPT = resources.files("pranix.prompts").joinpath(f"{PROMPT_ID}.md").read_text(encoding="utf-8")
@@ -105,7 +106,11 @@ class InsightService:
     def _phrase(self, module: str, master: Mapping[str, Any], curated: dict[str, Any]) -> dict[str, Any] | None:
         facts = nodes(module, master)
         draft = draft_of(curated)
-        user = json.dumps({"module": module, "facts": facts, "draft": draft}, ensure_ascii=False)
+        knowledge = knowledge_for(module, master, self.lib)
+        payload: dict[str, Any] = {"module": module, "facts": facts, "draft": draft}
+        if knowledge:
+            payload["knowledge"] = knowledge  # reviewed background (D80): draw on it, never copy it whole
+        user = json.dumps(payload, ensure_ascii=False)
         given = user + json.dumps(curated, ensure_ascii=False)  # names the AI may use
         out: dict[str, Any] = {}
 

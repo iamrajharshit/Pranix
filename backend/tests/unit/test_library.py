@@ -32,7 +32,8 @@ def test_every_library_string_passes_the_guardrails() -> None:
 def test_approved_batch_and_production_mode() -> None:
     lib = Library(allow_drafts=False)
     # Batch 1 (14 Nov): 26 colours, weekdays, roles. Batch 2 (20 Nov, D69): the other 89 entries.
-    assert lib.stats() == {"approved": 115, "draft": 0}
+    # Deep batches 1-5 (25 Nov, D80): the 27 nakshatra_deep entries.
+    assert lib.stats() == {"approved": 115 + 27, "draft": 0}
     assert lib.get("allies", "colours", "Saffron")["status"] == "approved"
     assert lib.get("signs", "Leo")["status"] == "approved"
     with pytest.raises(LibraryGap):
