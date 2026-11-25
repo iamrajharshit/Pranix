@@ -265,8 +265,9 @@ def test_coverage_counts_expected_keys(root: Path) -> None:
 
 
 def test_packaged_library_verifies() -> None:
-    assert library.verify(library.default_root()).ok  # no inspect files yet, or all clean once they land
-    assert set(KINDS) == {"houses", "planet_in_house", "lord_in_house", "signals", "bridge"}
+    assert library.verify(library.default_root()).ok  # no reviewed files yet, or all clean once they land
+    assert set(KINDS) == {"houses", "planet_in_house", "lord_in_house", "signals", "bridge",
+                          "nakshatra_deep", "sign_deep", "planet_deep"}  # fmt: skip
 
 
 # ---------- rules ----------

@@ -22,7 +22,11 @@ def add_parsers(sub: argparse._SubParsersAction) -> None:  # type: ignore[type-a
     i.add_argument("--write", action="store_true")
     i.add_argument("--report", type=Path, help="write the diff report (markdown) here")
     ls.add_parser("verify", help="check every entry, the key layout and the manifest (CI gate)")
-    for p in (e, i, ls.choices["verify"]):
+    d = ls.add_parser("draft", help="AI-draft missing deep entries as status: draft, for review (D80)")
+    d.add_argument("--kind", required=True, choices=["nakshatra_deep", "sign_deep", "planet_deep"])
+    d.add_argument("--key", action="append", help="only these keys, e.g. --key Rohini")
+    d.add_argument("--limit", type=int, default=0, help="stop after this many new drafts (0 = all missing)")
+    for p in (e, i, ls.choices["verify"], d):
         p.add_argument("--root", type=Path, default=None, help="library folder (default: the packaged one)")
 
     ru = sub.add_parser("rules", help="owner-approved rule tables")
