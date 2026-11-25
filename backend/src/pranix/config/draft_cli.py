@@ -27,7 +27,7 @@ PROMPT_ID = "library-draft@6"
 REPAIR_PROMPT_ID = "library-repair@2"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
 BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life",
-                "you are defined by")  # fmt: skip
+                "you are defined by", "simply observe", "this gentle pause")  # fmt: skip
 
 
 class DeepDraft(BaseModel):
@@ -217,6 +217,27 @@ def overused_words(draft: dict[str, str]) -> list[str]:
     return sorted(w for w, fs in where.items() if len(fs) > WORD_FIELD_LIMIT)
 
 
+ACROSS_LIMIT = 3  # a distinctive word may appear in one field of at most three entries of a kind
+_COMMON = set("nature others people around through deeply feelings energy natural naturally "
+              "yourself presence create creates".split())  # fmt: skip
+
+
+def word_usage(entries: dict[str, Any], fields: tuple[str, ...]) -> dict[str, dict[str, int]]:
+    """How many entries of the kind already use each distinctive word, per field. Catches a batch
+    whose practices all say "observe" even though each entry on its own reads fine."""
+    out: dict[str, dict[str, int]] = {f: {} for f in fields}
+    for e in entries.values():
+        for f in fields:
+            if isinstance(e, dict) and e.get(f):
+                for w in _distinct(str(e[f])):
+                    out[f][w] = out[f].get(w, 0) + 1
+    return out
+
+
+def _distinct(text: str) -> set[str]:
+    return {stem(w) for w in words(text) if len(w) >= 6 and w not in _STOP and w not in _COMMON}
+
+
 def repeated_within(text: str) -> list[str]:
     """Distinctive words used twice inside one field ("necessary shifts ... necessary evolution")."""
     seen: dict[str, int] = {}
@@ -226,7 +247,9 @@ def repeated_within(text: str) -> list[str]:
     return sorted(w for w, n in seen.items() if n > 1)
 
 
-def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[str, str]:
+def bad_fields(
+    draft: dict[str, str], used: dict[str, dict[str, int]], across: dict[str, dict[str, int]] | None = None
+) -> dict[str, str]:
     """Each field that fails the voice check, with why. For a phrase shared by two fields, the later
     field is the one to reword."""
     out: dict[str, str] = {}
@@ -248,6 +271,9 @@ def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[s
         twice = repeated_within(text)
         if twice:
             out.setdefault(f, f"same word twice in one field: '{twice[0]}'")
+        worn = sorted(w for w in _distinct(text) if (across or {}).get(f, {}).get(w, 0) >= ACROSS_LIMIT)
+        if worn:
+            out.setdefault(f, f"word already used in this field by {ACROSS_LIMIT} entries: '{worn[0]}'")
     return out
 
 
@@ -318,7 +344,9 @@ def run(args: argparse.Namespace) -> int:
         for i, key in enumerate(todo, start=1):
             facts = seed(args.kind, key)
             fields = KINDS[args.kind].fields
-            used = usage(intake.load_all(root)[args.kind], fields)
+            have = intake.load_all(root)[args.kind]
+            used = usage(have, fields)
+            across = word_usage(have, fields)
             start = assign(fields, used, spread=i)
             ask = {"kind": args.kind, "facts": facts, "start_with": start}
             reason = ""
@@ -351,7 +379,7 @@ def run(args: argparse.Namespace) -> int:
                     continue
                 # reword just the failing fields (up to two rounds) before redrafting the whole star
                 for _round in range(2):
-                    bad = bad_fields(got, used)
+                    bad = bad_fields(got, used, across)
                     if not bad:
                         break
                     for f, why in bad.items():
