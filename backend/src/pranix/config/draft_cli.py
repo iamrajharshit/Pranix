@@ -14,6 +14,7 @@ import argparse
 import json
 import re
 import time
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +24,8 @@ from .settings import Settings
 
 PROMPT_ID = "library-draft@3"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
-BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life")
+BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life",
+                "you are defined by")  # fmt: skip
 
 
 class DeepDraft(BaseModel):
@@ -68,7 +70,7 @@ MAX_OPENER_USES = 2  # an opening may appear at most twice per field across a ki
 # openings; every draft is given the least-used one, so openings spread evenly across all entries.
 OPENER_BANK: dict[str, tuple[str, ...]] = {
     "core": ("At heart, you", "Your nature is", "There is something", "This star gives you", "You are someone who",
-             "Deep down, you", "Your essence is", "Something in you", "By nature you", "Quietly, you",
+             "Deep down, you", "Your essence is", "You carry a", "By nature you", "You embody",
              "Above all, you", "What defines you", "Your spirit is", "Inside you lives"),
     "gifts": ("What comes easily is", "Your gift is", "People rely on your", "A natural strength is", "You bring a",
               "One of your strengths", "Others notice your", "Your quiet power", "You shine through",
@@ -84,7 +86,7 @@ OPENER_BANK: dict[str, tuple[str, ...]] = {
     "in_relationships": ("With people you love,", "In close bonds,", "Those close to you", "In friendship and love,",
                          "With family and friends,", "In relationships, you", "The people near you",
                          "When you love someone,", "Close to home, you", "Your loved ones", "In love and friendship",
-                         "Among friends, you", "With a partner, you", "People who know you"),
+                         "With those dear to you,", "With a partner, you", "People who know you"),
     "practice": ("Once this week,", "It can help to", "Each evening,", "Before you start something,",
                  "For a few minutes",
                  "This week,", "When you notice", "A small step is", "Every morning,", "Next time you",
@@ -92,14 +94,30 @@ OPENER_BANK: dict[str, tuple[str, ...]] = {
 }  # fmt: skip
 
 
+def words(text: str) -> list[str]:
+    return [w for w in (t.strip(".,;:!?\"'()").lower() for t in text.split()) if w]
+
+
+def openings_of(text: str, field: str) -> set[str]:
+    """Every opening this text uses: each bank opening it begins with (any length), and its first
+    three words. Comparing only three words missed two-word openings like "Quietly, you" (batch 3)."""
+    w = words(text)
+    keys = {" ".join(w[:3])}
+    for option in OPENER_BANK.get(field, ()):
+        ow = words(option)
+        if w[: len(ow)] == ow:
+            keys.add(" ".join(ow))
+    return keys
+
+
 def usage(entries: dict[str, Any], fields: tuple[str, ...]) -> dict[str, dict[str, int]]:
-    """How many entries already start each field with each opening (reviewed or draft)."""
+    """How many entries already use each opening, per field (reviewed or draft)."""
     out: dict[str, dict[str, int]] = {f: {} for f in fields}
     for e in entries.values():
         for f in fields:
             if isinstance(e, dict) and e.get(f):
-                o = opener(str(e[f]))
-                out[f][o] = out[f].get(o, 0) + 1
+                for k in openings_of(str(e[f]), f):
+                    out[f][k] = out[f].get(k, 0) + 1
     return out
 
 
@@ -108,8 +126,30 @@ def assign(fields: tuple[str, ...], used: dict[str, dict[str, int]], spread: int
     out = {}
     for f in fields:
         bank = OPENER_BANK[f]
-        order = sorted(range(len(bank)), key=lambda i: (used[f].get(opener(bank[i]), 0), (i - spread) % len(bank)))
-        out[f] = bank[order[0]]
+        ranked = sorted(((used[f].get(" ".join(words(o)), 0), (i - spread) % len(bank), o) for i, o in enumerate(bank)))
+        out[f] = ranked[0][2]
+    return out
+
+
+_STOP = set("a an the and or of to in on at for with by your you yours this that these those is are be "
+            "can may when what who it its as from into than then there their them they our more most "
+            "one some each every all any not no so very".split())  # fmt: skip
+
+
+def shared_phrases(draft: dict[str, str]) -> list[str]:
+    """Two-word phrases of content words that appear in more than one field of the same draft
+    ("unwavering loyalty" in both at_work and in_relationships, batch 3)."""
+    seen: dict[str, str] = {}
+    out = []
+    for f, text in draft.items():
+        w = words(text)
+        for a, b in pairwise(w):
+            if a in _STOP or b in _STOP or len(a) < 4 or len(b) < 4:
+                continue
+            pair = f"{a} {b}"
+            if pair in seen and seen[pair] != f and pair not in out:
+                out.append(pair)
+            seen.setdefault(pair, f)
     return out
 
 
@@ -127,8 +167,11 @@ def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> li
         stem = next((b for b in BANNED_STEMS if b in low), None)
         if stem:
             bad.append(f"{f}: '{stem}'")
-        elif used.get(f, {}).get(opener(text), 0) >= MAX_OPENER_USES:
-            bad.append(f"{f} starts like {MAX_OPENER_USES} other entries: '{opener(text)}'")
+        else:
+            over = sorted(k for k in openings_of(text, f) if used.get(f, {}).get(k, 0) >= MAX_OPENER_USES)
+            if over:
+                bad.append(f"{f} starts like {MAX_OPENER_USES} other entries: '{over[0]}'")
+    bad += [f"same phrase in two fields: '{p}'" for p in shared_phrases(draft)]
     return bad
 
 

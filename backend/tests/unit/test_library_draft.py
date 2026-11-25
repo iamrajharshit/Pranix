@@ -193,3 +193,26 @@ def test_label_prefix_and_healing_are_refused() -> None:
         assert "MEDICAL_LEXICON" in rules, word
     assert not guard.check("t", "You restore balance and well-being.", max_len=240, max_sentences=2)
     assert not guard.check("t", "This is for reflection, not health advice.", max_len=240, max_sentences=2)
+
+
+def test_two_word_openings_are_counted_and_phrases_not_reused_across_fields() -> None:
+    """Batch 3: "Quietly, you" (two words) was never counted, so it was handed to four stars in a row."""
+    from pranix.config import draft_cli as d
+
+    bank = d.OPENER_BANK["core"]
+    two = next(o for o in bank if len(d.words(o)) == 2)  # "You embody": a two-word opening
+    entries = {k: {"core": f"{two} steady and kind, and more besides."} for k in ("A", "B")}
+    used = d.usage(entries, ("core",))
+    assert used["core"][" ".join(d.words(two))] == 2
+    assert d.assign(("core",), used, spread=0)["core"] != two  # used twice: never assigned again
+    assert d.voice_problems({"core": f"{two} warm and bright."}, used)  # and a third use is refused
+    assert "quietly, you" not in [o.lower() for o in bank] and "something in you" not in [o.lower() for o in bank]
+    assert d.voice_problems({"core": "Quietly, you are defined by grace."}, {}) == ["core: 'you are defined by'"]
+    # the same content phrase in two fields of one draft is refused
+    clash = {
+        "at_work": "You approach tasks with unwavering loyalty.",
+        "in_relationships": "You offer unwavering loyalty.",
+    }
+    assert d.shared_phrases(clash) == ["unwavering loyalty"]
+    assert "same phrase in two fields: 'unwavering loyalty'" in d.voice_problems(clash, {})
+    assert d.shared_phrases({"a": "You are kind to people.", "b": "You are calm with people."}) == []  # stop words
