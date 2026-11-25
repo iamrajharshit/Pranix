@@ -20,7 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .settings import Settings
 
-PROMPT_ID = "library-draft@2"
+PROMPT_ID = "library-draft@3"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
 BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life")
 
@@ -61,26 +61,65 @@ def opener(text: str) -> str:
     return " ".join(w for w in words[:3] if w)
 
 
-def openers(entries: dict[str, Any], fields: tuple[str, ...]) -> dict[str, list[str]]:
-    """How each field already starts across the kind's entries (reviewed or draft)."""
-    out: dict[str, set[str]] = {f: set() for f in fields}
+MAX_OPENER_USES = 2  # an opening may appear at most twice per field across a kind (owner review, 25 Nov)
+
+# Small models ignore "don't start like X" but follow "start with Y". Each field has a bank of natural
+# openings; every draft is given the least-used one, so openings spread evenly across all entries.
+OPENER_BANK: dict[str, tuple[str, ...]] = {
+    "core": ("At heart, you", "Your nature is", "There is something", "This star gives you", "You are someone who",
+             "Deep down, you", "Your essence is", "Something in you", "By nature you", "Quietly, you",
+             "Above all, you", "What defines you", "Your spirit is", "Inside you lives"),
+    "gifts": ("What comes easily is", "Your gift is", "People rely on your", "A natural strength is", "You bring a",
+              "One of your strengths", "Others notice your", "Your quiet power", "You shine through",
+              "Where you excel is", "A gift you carry", "Your best quality", "It comes naturally", "You are gifted"),
+    "growth_edges": ("Your edge is", "At times your", "Sometimes you may", "Growth comes when you",
+                     "Watch for the moment", "Your challenge is", "It helps to notice", "When pushed, your",
+                     "The lesson here", "Your growth lies", "Under pressure, you", "Now and then",
+                     "Left unchecked, your", "A gentle caution:"),
+    "at_work": ("At work and in", "In work and study,", "Where you work and", "Your best work comes", "On the job",
+                "You work best when", "Colleagues and teachers notice", "In any task, you", "Given a goal, you",
+                "In study and work", "Your working style", "Teams value your", "When you learn,", "At your desk,"),
+    "in_relationships": ("With people you love,", "In close bonds,", "Those close to you", "In friendship and love,",
+                         "With family and friends,", "In relationships, you", "The people near you",
+                         "When you love someone,", "Close to home, you", "Your loved ones", "In love and friendship",
+                         "Among friends, you", "With a partner, you", "People who know you"),
+    "practice": ("Once this week,", "Try this:", "Each evening,", "Before you start something,", "For a few minutes",
+                 "This week,", "When you notice", "One small practice:", "Every morning,", "Next time you",
+                 "Once a day,", "Set aside a", "Today, try to", "Choose one moment"),
+}  # fmt: skip
+
+
+def usage(entries: dict[str, Any], fields: tuple[str, ...]) -> dict[str, dict[str, int]]:
+    """How many entries already start each field with each opening (reviewed or draft)."""
+    out: dict[str, dict[str, int]] = {f: {} for f in fields}
     for e in entries.values():
         for f in fields:
             if isinstance(e, dict) and e.get(f):
-                out[f].add(opener(str(e[f])))
-    return {f: sorted(v) for f, v in out.items() if v}
+                o = opener(str(e[f]))
+                out[f][o] = out[f].get(o, 0) + 1
+    return out
 
 
-def voice_problems(draft: dict[str, str], avoid: dict[str, list[str]]) -> list[str]:
-    """Repeated openers and flagged stems: the "template voice" the owner's review caught."""
+def assign(fields: tuple[str, ...], used: dict[str, dict[str, int]], spread: int) -> dict[str, str]:
+    """The least-used opening of each field's bank; `spread` rotates ties so neighbours differ."""
+    out = {}
+    for f in fields:
+        bank = OPENER_BANK[f]
+        order = sorted(range(len(bank)), key=lambda i: (used[f].get(opener(bank[i]), 0), (i - spread) % len(bank)))
+        out[f] = bank[order[0]]
+    return out
+
+
+def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> list[str]:
+    """Flagged stems, or an opening already used MAX_OPENER_USES times in that field."""
     bad = []
     for f, text in draft.items():
         low = text.lower()
         stem = next((b for b in BANNED_STEMS if b in low), None)
         if stem:
             bad.append(f"{f}: '{stem}'")
-        elif opener(text) in avoid.get(f, []):
-            bad.append(f"{f} starts like another entry: '{opener(text)}'")
+        elif used.get(f, {}).get(opener(text), 0) >= MAX_OPENER_USES:
+            bad.append(f"{f} starts like {MAX_OPENER_USES} other entries: '{opener(text)}'")
     return bad
 
 
@@ -116,13 +155,17 @@ def run(args: argparse.Namespace) -> int:
         for i, key in enumerate(todo, start=1):
             facts = seed(args.kind, key)
             fields = KINDS[args.kind].fields
-            avoid = openers(intake.load_all(root)[args.kind], fields)
-            ask = {"kind": args.kind, "facts": facts, "avoid_openers": avoid}
+            used = usage(intake.load_all(root)[args.kind], fields)
+            start = assign(fields, used, spread=i)
+            ask = {"kind": args.kind, "facts": facts, "start_with": start}
             reason = ""
             started = time.perf_counter()
             for attempt in range(2):  # one retry, told what was wrong the first time
                 if attempt and reason:
-                    ask["fix_this"] = f"Your previous draft was rejected: {reason}. Write it again without that."
+                    ask["fix_this"] = (
+                        f"Your previous draft was rejected: {reason}. Write it again, and begin each field "
+                        "with exactly the words given under start_with."
+                    )
                 user = json.dumps(ask, ensure_ascii=False)
                 got: dict[str, str] = {}
 
@@ -143,7 +186,7 @@ def run(args: argparse.Namespace) -> int:
                 if names:
                     reason = "UNKNOWN_ENTITY (" + ", ".join(names) + ")"
                     continue
-                voice = voice_problems(got, avoid)
+                voice = voice_problems(got, used)
                 if voice:
                     reason = "TEMPLATE_VOICE (" + "; ".join(voice[:2]) + ")"
                     continue
