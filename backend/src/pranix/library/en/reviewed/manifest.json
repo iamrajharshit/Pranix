@@ -1,11 +1,11 @@
 {
-  "content_hash": "d5e0b7ea9fe04f36fa74d384b061d61ce3dbbe099c437945695cf45e39875f3c",
+  "content_hash": "b9b6887d6c39943106e1adf3db2d63af14b85411f79308d82a0cded00a2b77bf",
   "counts": {
-    "approved": 3,
+    "approved": 9,
     "draft": 0
   },
   "files": {
-    "nakshatra_deep.yaml": "8a31b4588f806a478e2c0d02a8629a201aeab30093169cf8584da92c283219f8"
+    "nakshatra_deep.yaml": "6f02fa81dda6a50acccef6880070550f55c5496c228dc5a1442f4b8778478561"
   },
   "schema": 1
 }

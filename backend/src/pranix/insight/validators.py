@@ -27,7 +27,9 @@ FEAR = re.compile(
 )
 MEDICAL = re.compile(
     r"\b(diagnos\w*|cure\w*|treat(?:ment|s|ed)?|disease\w*|illness\w*|disorder\w*|medicin\w*|"
-    r"medication\w*|dosage|prescri\w*|symptom\w*|therapy)\b",
+    r"medication\w*|dosage|prescri\w*|symptom\w*|therapy|"
+    r"heal(?:s|ed|ing|er|ers)?)\b",  # owner reviews D69, deep batch 2: "healing" reads as a medical claim
+    # ("health" stays allowed: the doshas card's own disclaimer says "not health advice")
     re.I,
 )
 _NAME = "{{name}}"

@@ -178,3 +178,18 @@ def test_openings_are_assigned_least_used_first(tmp_path: Path, monkeypatch: pyt
     stub = use(monkeypatch, RecordingStub(reply=v))
     assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Krittika", "--root", str(root)]) == 1
     assert "start_with" in json.loads(stub.last_user) and "Krittika" not in intake.load_all(root)["nakshatra_deep"]
+
+
+def test_label_prefix_and_healing_are_refused() -> None:
+    from pranix.config.draft_cli import OPENER_BANK, voice_problems
+    from pranix.ingest import guard
+
+    assert voice_problems({"practice": "Try this: step outside one routine."}, {}) == [
+        "practice starts with a label: 'Try this:'"
+    ]
+    assert not any(o.rstrip().endswith(":") for bank in OPENER_BANK.values() for o in bank)  # bank has no labels
+    for word in ("healing", "heal", "heals", "healer"):
+        rules = {i.rule for i in guard.check("t", f"You work well in {word} roles.", max_len=240, max_sentences=2)}
+        assert "MEDICAL_LEXICON" in rules, word
+    assert not guard.check("t", "You restore balance and well-being.", max_len=240, max_sentences=2)
+    assert not guard.check("t", "This is for reflection, not health advice.", max_len=240, max_sentences=2)

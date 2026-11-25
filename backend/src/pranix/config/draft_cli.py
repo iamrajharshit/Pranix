@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -75,16 +76,18 @@ OPENER_BANK: dict[str, tuple[str, ...]] = {
     "growth_edges": ("Your edge is", "At times your", "Sometimes you may", "Growth comes when you",
                      "Watch for the moment", "Your challenge is", "It helps to notice", "When pushed, your",
                      "The lesson here", "Your growth lies", "Under pressure, you", "Now and then",
-                     "Left unchecked, your", "A gentle caution:"),
-    "at_work": ("At work and in", "In work and study,", "Where you work and", "Your best work comes", "On the job",
+                     "Left unchecked, your", "Be gentle when"),
+    "at_work": ("At work and in", "In work and study,", "Where you work and", "Your best work comes",
+                "In your work and projects",
                 "You work best when", "Colleagues and teachers notice", "In any task, you", "Given a goal, you",
                 "In study and work", "Your working style", "Teams value your", "When you learn,", "At your desk,"),
     "in_relationships": ("With people you love,", "In close bonds,", "Those close to you", "In friendship and love,",
                          "With family and friends,", "In relationships, you", "The people near you",
                          "When you love someone,", "Close to home, you", "Your loved ones", "In love and friendship",
                          "Among friends, you", "With a partner, you", "People who know you"),
-    "practice": ("Once this week,", "Try this:", "Each evening,", "Before you start something,", "For a few minutes",
-                 "This week,", "When you notice", "One small practice:", "Every morning,", "Next time you",
+    "practice": ("Once this week,", "It can help to", "Each evening,", "Before you start something,",
+                 "For a few minutes",
+                 "This week,", "When you notice", "A small step is", "Every morning,", "Next time you",
                  "Once a day,", "Set aside a", "Today, try to", "Choose one moment"),
 }  # fmt: skip
 
@@ -110,11 +113,17 @@ def assign(fields: tuple[str, ...], used: dict[str, dict[str, int]], spread: int
     return out
 
 
+LABEL_PREFIX = re.compile(r"^[A-Z][A-Za-z ]{0,30}:\s")  # "Try this: ..." duplicates the UI's own heading
+
+
 def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> list[str]:
-    """Flagged stems, or an opening already used MAX_OPENER_USES times in that field."""
+    """Flagged stems, a label prefix, or an opening already used MAX_OPENER_USES times in that field."""
     bad = []
     for f, text in draft.items():
         low = text.lower()
+        if LABEL_PREFIX.match(text):
+            bad.append(f"{f} starts with a label: '{text.split(':', 1)[0]}:'")
+            continue
         stem = next((b for b in BANNED_STEMS if b in low), None)
         if stem:
             bad.append(f"{f}: '{stem}'")
