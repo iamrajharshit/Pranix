@@ -22,7 +22,7 @@ from ..ephemeris.ruleset import load_ruleset
 from ..geo.index import GeoIndex
 from ..insight.library import Library
 from ..insight.pipeline import InsightService
-from ..llmgw.build import insights_chain
+from ..llmgw.build import background_chain, insights_chain, reword_gap_s
 from ..obs.logging import configure
 from ..store.cache import open_cache, start_purger
 from . import routes_charts, routes_geo, routes_insights, routes_profiles, web
@@ -77,10 +77,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             library=app.state.library.stats(),
             drafts_served=settings.allow_drafts,
             ai_providers=[f"{li.provider.name}:{li.provider.model}" for li in app.state.insights.chain.links],
+            background_reword=app.state.insights.rewording is not None,
         )
         stop_purger = start_purger(app.state.cache)
         yield
         stop_purger()
+        if app.state.insights.rewording is not None:
+            app.state.insights.rewording.stop()
 
     app = FastAPI(title="Pranix API", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
     app.state.settings = settings
@@ -97,7 +100,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.image_cache = {}
     app.state.library = Library(allow_drafts=settings.allow_drafts)
     app.state.cache = open_cache(settings.cache_path)
-    app.state.insights = InsightService(app.state.library, insights_chain(settings), cache=app.state.cache)
+    live = insights_chain(settings)
+    app.state.insights = InsightService(
+        app.state.library,
+        live,
+        cache=app.state.cache,
+        background=background_chain(settings, live),
+        reword_max=settings.background_reword_max,
+        reword_gap_s=reword_gap_s(settings),
+    )
     install(app)
 
     @app.middleware("http")

@@ -71,6 +71,14 @@ def check(s: Settings) -> int:
 
     chain = _chain(s)
     print(f"chain: {s.llm_chains}" + (f" (fake: {s.llm_fake})" if s.llm_fake != "off" else ""))
+    from ..llmgw.build import background_chain, reword_gap_s
+
+    bg = background_chain(s, chain)
+    print(
+        f"background re-wording: on, one at a time, every {reword_gap_s(s):.0f} s at most (D77)"
+        if bg is not None
+        else "background re-wording: off (needs PRANIX_LOCAL_LLM_URL and PRANIX_BACKGROUND_REWORD=true)"
+    )
     if not chain.links:
         print("no providers configured: every card uses reviewed library text")
         return 1
