@@ -23,6 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .settings import Settings
 
 PROMPT_ID = "library-draft@4"
+REPAIR_PROMPT_ID = "library-repair@1"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
 BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life",
                 "you are defined by")  # fmt: skip
@@ -176,6 +177,51 @@ def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> li
     return bad
 
 
+def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[str, str]:
+    """Each field that fails the voice check, with why. For a phrase shared by two fields, the later
+    field is the one to reword."""
+    out: dict[str, str] = {}
+    for f, text in draft.items():
+        problems = voice_problems({f: text}, used)
+        if problems:
+            out[f] = problems[0]
+    for phrase in shared_phrases(draft):
+        holders = [f for f, t in draft.items() if phrase in " ".join(words(t))]
+        if len(holders) > 1 and holders[-1] not in out:
+            out[holders[-1]] = f"same phrase as another field: '{phrase}'"
+    return out
+
+
+class Repaired(BaseModel):
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
+    text: str = Field(min_length=1, max_length=240)
+
+
+def repair_field(chain: Any, field: str, text: str, begin_with: str, reason: str) -> str | None:
+    """Ask for just this one field again, beginning with the given words. A small model follows a
+    one-sentence rewrite far more reliably than a whole new draft (owner's batch 5, 25 Nov)."""
+    from importlib import resources
+
+    system = resources.files("pranix.prompts").joinpath(f"{REPAIR_PROMPT_ID}.md").read_text(encoding="utf-8")
+    avoid = [b for b in BANNED_STEMS]
+    if "same phrase" in reason:
+        avoid.append(reason.split("'")[1])
+    user = json.dumps({"field": field, "text": text, "begin_with": begin_with, "avoid": avoid}, ensure_ascii=False)
+    got: list[str] = []
+
+    def accept(raw: str) -> bool:
+        try:
+            new = Repaired.model_validate_json(raw).text
+        except ValueError:
+            return False
+        if words(new)[: len(words(begin_with))] != words(begin_with):
+            return False  # it ignored the opening again
+        got.append(new)
+        return True
+
+    return got[0] if chain.generate(system, user, module="draft.repair", accept=accept) is not None else None
+
+
 def run(args: argparse.Namespace) -> int:
     import logging
 
@@ -239,9 +285,23 @@ def run(args: argparse.Namespace) -> int:
                 if names:
                     reason = "UNKNOWN_ENTITY (" + ", ".join(names) + ")"
                     continue
+                # reword just the failing fields (up to two rounds) before redrafting the whole star
+                for _round in range(2):
+                    bad = bad_fields(got, used)
+                    if not bad:
+                        break
+                    for f, why in bad.items():
+                        opening = assign((f,), used, spread=i + _round + 1)[f]
+                        fixed = repair_field(chain, f, got[f], opening, why)
+                        if fixed:
+                            got[f] = fixed
                 voice = voice_problems(got, used)
                 if voice:
                     reason = "TEMPLATE_VOICE (" + "; ".join(voice[:2]) + ")"
+                    continue
+                names = unknown_entities(" ".join(got.values()), json.dumps(facts, ensure_ascii=False))
+                if names:
+                    reason = "UNKNOWN_ENTITY (" + ", ".join(names) + ")"
                     continue
                 issues = intake.add_draft(root, args.kind, key, got)
                 if not issues:

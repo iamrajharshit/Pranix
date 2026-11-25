@@ -32,6 +32,9 @@ class RecordingStub(Stub):
 
     def generate(self, system: str, user: str, timeout: float) -> Any:
         self.last_user = user
+        self.__dict__.setdefault("users", []).append(user)
+        if "rewrite ONE short field" not in system:
+            self.__dict__["last_draft_user"] = user
         return super().generate(system, user, timeout)
 
 
@@ -70,7 +73,7 @@ def test_draft_writes_drafts_then_the_sheet_loop_works(tmp_path: Path, monkeypat
     data = intake.load_all(root)["nakshatra_deep"]
     assert list(data) == ["Rohini", "Hasta"] and data["Rohini"]["status"] == "draft"  # star order, not argument order
     assert stub.calls == 2 and intake.verify(root).ok
-    payload = json.loads(stub.last_user)  # type: ignore[attr-defined]
+    payload = json.loads(stub.last_draft_user)  # type: ignore[attr-defined]
     assert payload["facts"]["star"] in ("Rohini", "Hasta") and "library" in payload["facts"]
     # second run: nothing left for these keys, nothing overwritten
     assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Rohini", "--root", str(root)]) == 0
@@ -156,7 +159,8 @@ def test_template_voice_is_redrafted_with_feedback(
     stub = use(monkeypatch, FirstBadThenGood(reply=GOOD))
     root = tmp_path / "r"
     assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Rohini", "--root", str(root)]) == 0
-    assert stub.calls == 2 and "fix_this" in stub.last_user and "start_with" in stub.last_user
+    drafts = [u for u in stub.users if "start_with" in u]  # type: ignore[attr-defined]
+    assert len(drafts) == 2 and "fix_this" in drafts[1]
     assert intake.load_all(root)["nakshatra_deep"]["Rohini"]["core"] == GOOD["core"]
 
 
@@ -177,7 +181,8 @@ def test_openings_are_assigned_least_used_first(tmp_path: Path, monkeypatch: pyt
     assert intake.add_draft(root, "nakshatra_deep", "Bharani", v) == []
     stub = use(monkeypatch, RecordingStub(reply=v))
     assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Krittika", "--root", str(root)]) == 1
-    assert "start_with" in json.loads(stub.last_user) and "Krittika" not in intake.load_all(root)["nakshatra_deep"]
+    assert "start_with" in json.loads(stub.last_draft_user)  # type: ignore[attr-defined]
+    assert "Krittika" not in intake.load_all(root)["nakshatra_deep"]
 
 
 def test_label_prefix_and_healing_are_refused() -> None:
@@ -229,3 +234,35 @@ def test_openings_fit_every_reader_and_anxiety_is_refused() -> None:
     for word in ("anxiety", "anxieties"):
         rules = {i.rule for i in guard.check("t", f"Release your {word} gently.", max_len=240, max_sentences=2)}
         assert "MEDICAL_LEXICON" in rules
+
+
+def test_a_failing_field_is_reworded_alone(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Batch 5: Gemma kept writing "Watch for the" after it was used up. Only that field is redone."""
+    from pranix.config import draft_cli as d
+
+    class Smart(RecordingStub):
+        repairs = 0
+
+        def generate(self, system: str, user: str, timeout: float) -> Any:
+            if "rewrite ONE short field" in system:  # the repair prompt
+                ask = json.loads(user)
+                self.repairs += 1
+                self.reply = {"text": f"{ask['begin_with']} keep a steady pace and finish what you start."}
+            else:
+                self.reply = {**GOOD, "core": "You possess a quiet, growing warmth."}  # a banned stem
+            return super().generate(system, user, timeout)
+
+    stub = use(monkeypatch, Smart(reply=GOOD))
+    root = tmp_path / "r"
+    assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Rohini", "--root", str(root)]) == 0
+    core = intake.load_all(root)["nakshatra_deep"]["Rohini"]["core"]
+    assert stub.repairs == 1 and "possess" not in core.lower()
+    assert any(core.startswith(o) for o in d.OPENER_BANK["core"])  # begins with an assigned opening
+    assert intake.load_all(root)["nakshatra_deep"]["Rohini"]["gifts"] == GOOD["gifts"]  # other fields kept
+
+
+def test_bad_fields_names_the_later_field_for_a_shared_phrase() -> None:
+    from pranix.config.draft_cli import bad_fields
+
+    draft = {"at_work": "You bring unwavering loyalty to tasks.", "in_relationships": "You offer unwavering loyalty."}
+    assert list(bad_fields(draft, {})) == ["in_relationships"]
