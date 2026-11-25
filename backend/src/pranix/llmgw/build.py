@@ -4,6 +4,7 @@
     default: Gemini free models -> Groq -> local model -> (caller) curated library text
     dev:     local model only (offline, zero cost; refused in prod)
     cloud:   Gemini and Groq only
+    background (D77): the same local model, for re-wording curated serves later
 
 The local model is one `OpenAICompatible` link whatever runs it: Ollama on the PC or llama.cpp on
 the Oracle VM. Moving from one to the other changes PRANIX_LOCAL_LLM_URL (and the key), nothing else.
@@ -55,6 +56,22 @@ def insights_chain(s: Settings) -> Chain:
     if s.llm_chains == "default" and local:
         links.append(local)
     return Chain(links)
+
+
+def background_chain(s: Settings, live: Chain) -> Chain | None:
+    """The local link of the live chain, shared (same one-slot provider and the same rate bucket), so
+    background work never runs a second Gemma call beside a live one or exceeds its rate (D77)."""
+    if not s.background_reword or s.llm_fake != "off":
+        return None
+    for li in live.links:
+        if isinstance(li.provider, OpenAICompatible):
+            return Chain([Link(li.provider, li.bucket, timeout=li.timeout)])
+    return None
+
+
+def reword_gap_s(s: Settings) -> float:
+    """Seconds between background jobs: the local model's own pace."""
+    return 60.0 / s.local_llm_rpm
 
 
 def describe(chain: Chain) -> list[dict[str, str]]:

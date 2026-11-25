@@ -82,6 +82,10 @@ class Settings(BaseSettings):
     # Which chain the insights use: "default" = Gemini free -> Groq -> local -> curated;
     # "dev" = local only (offline, zero cost); "cloud" = Gemini and Groq only (no local model).
     llm_chains: Literal["default", "dev", "cloud"] = "default"
+    # Background re-wording (D77): a reading served as curated text is re-worded later by the local
+    # model, one at a time, and cached for the next reader. Needs PRANIX_LOCAL_LLM_URL.
+    background_reword: bool = True
+    background_reword_max: int = Field(default=200, ge=1, le=5000)
     # Test-only fake provider (F1): replaces every real provider; refused in prod.
     llm_fake: FakeMode = "off"
     llm_fake_delay_ms: int = Field(default=0, ge=0, le=60_000)
