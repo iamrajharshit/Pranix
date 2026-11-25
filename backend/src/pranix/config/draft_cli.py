@@ -88,7 +88,7 @@ MAX_OPENER_USES = 2  # an opening may appear at most twice per field across a ki
 # Small models ignore "don't start like X" but follow "start with Y". Each field has a bank of natural
 # openings; every draft is given the least-used one, so openings spread evenly across all entries.
 OPENER_BANK: dict[str, tuple[str, ...]] = {
-    "core": ("At heart, you", "Your nature is", "Your instinct is", "This placement gives you", "You are someone who",
+    "core": ("At heart, you", "Your nature is", "Your instinct is", "What drives you is", "You are someone who",
              "Deep down, you", "Your essence is", "You carry a", "By nature you", "You embody",
              "Above all, you", "What defines you", "Your spirit is", "Inside you lives"),
     "gifts": ("What comes easily is", "Your gift is", "People rely on your", "A natural strength is", "You bring a",
@@ -176,7 +176,9 @@ def shared_phrases(draft: dict[str, str]) -> list[str]:
 LABEL_PREFIX = re.compile(r"^[A-Z][A-Za-z ]{0,30}:\s")  # "Try this: ..." duplicates the UI's own heading
 
 
-def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> list[str]:
+def voice_problems(
+    draft: dict[str, str], used: dict[str, dict[str, int]], theme: frozenset[str] = frozenset()
+) -> list[str]:
     """Flagged stems, a label prefix, or an opening already used MAX_OPENER_USES times in that field."""
     bad = []
     for f, text in draft.items():
@@ -193,9 +195,9 @@ def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> li
                 bad.append(f"{f} starts like {MAX_OPENER_USES} other entries: '{over[0]}'")
     bad += [f"same phrase in two fields: '{p}'" for p in shared_phrases(draft)]
     if len(draft) > 1:  # whole-entry checks (a single field is checked on its own during repair)
-        bad += [f"same word in too many fields: '{w}'" for w in overused_words(draft)]
+        bad += [f"same word in too many fields: '{w}'" for w in overused_words(draft, theme)]
         bad += [f"{f}: only one sentence" for f, t in draft.items() if guard.sentences(t) < MIN_SENTENCES]
-        bad += [f"{f}: '{w}' twice" for f, t in draft.items() for w in repeated_within(t)[:1]]
+        bad += [f"{f}: '{w}' twice" for f, t in draft.items() for w in repeated_within(t, theme)[:1]]
     return bad
 
 
@@ -208,17 +210,36 @@ def stem(word: str) -> str:
     return word[:6]
 
 
-def overused_words(draft: dict[str, str]) -> list[str]:
+def themes_of(kind: str, key: str) -> frozenset[str]:
+    """Stems an entry is *about* (the Moon's emotions and feelings): exempt from the word-repeat checks,
+    since the entry cannot avoid them (planets batch, 25 Nov: the Moon failed four drafts on them)."""
+    return frozenset(stem(w) for w in THEME_WORDS.get((kind, key), ()))
+
+
+def _watch(w: str) -> str | None:
+    """The stem a word counts under, or None when it is too common to count. Short words in
+    SHORT_WATCH ("deep", "deeper", "deeply") count too: Gemma leaned on them in five planet cores."""
+    for short in SHORT_WATCH:
+        if w.startswith(short) and len(w) <= len(short) + 2:
+            return short
+    if len(w) >= 6 and w not in _STOP and w not in _COMMON:
+        return stem(w)
+    return None
+
+
+def overused_words(draft: dict[str, str], theme: frozenset[str] = frozenset()) -> list[str]:
     """Distinctive words (six letters or more, not stop words) found in more than WORD_FIELD_LIMIT fields."""
     where: dict[str, list[str]] = {}
     for f, text in draft.items():
-        for w in {stem(w) for w in words(text) if len(w) >= 6 and w not in _STOP}:
+        for w in {k for k in map(_watch, words(text)) if k and k not in theme}:
             where.setdefault(w, []).append(f)
     return sorted(w for w, fs in where.items() if len(fs) > WORD_FIELD_LIMIT)
 
 
+THEME_WORDS: dict[tuple[str, str], tuple[str, ...]] = {("planet_deep", "Moon"): ("emotional", "feelings", "nurturing")}
+SHORT_WATCH = ("deep",)  # short words that still count as distinctive
 ACROSS_LIMIT = 3  # a distinctive word may appear in one field of at most three entries of a kind
-_COMMON = set("nature others people around through deeply feelings energy natural naturally "
+_COMMON = set("nature others people around through feelings energy natural naturally "
               "yourself presence create creates".split())  # fmt: skip
 
 
@@ -235,43 +256,47 @@ def word_usage(entries: dict[str, Any], fields: tuple[str, ...]) -> dict[str, di
 
 
 def _distinct(text: str) -> set[str]:
-    return {stem(w) for w in words(text) if len(w) >= 6 and w not in _STOP and w not in _COMMON}
+    return {k for k in map(_watch, words(text)) if k}
 
 
-def repeated_within(text: str) -> list[str]:
+def repeated_within(text: str, theme: frozenset[str] = frozenset()) -> list[str]:
     """Distinctive words used twice inside one field ("necessary shifts ... necessary evolution")."""
     seen: dict[str, int] = {}
     for w in words(text):
-        if len(w) >= 6 and w not in _STOP:
-            seen[stem(w)] = seen.get(stem(w), 0) + 1
+        k = _watch(w)
+        if k and k not in theme:
+            seen[k] = seen.get(k, 0) + 1
     return sorted(w for w, n in seen.items() if n > 1)
 
 
 def bad_fields(
-    draft: dict[str, str], used: dict[str, dict[str, int]], across: dict[str, dict[str, int]] | None = None
+    draft: dict[str, str],
+    used: dict[str, dict[str, int]],
+    across: dict[str, dict[str, int]] | None = None,
+    theme: frozenset[str] = frozenset(),
 ) -> dict[str, str]:
     """Each field that fails the voice check, with why. For a phrase shared by two fields, the later
     field is the one to reword."""
     out: dict[str, str] = {}
     for f, text in draft.items():
-        problems = voice_problems({f: text}, used)
+        problems = voice_problems({f: text}, used, theme)
         if problems:
             out[f] = problems[0]
     for phrase in shared_phrases(draft):
         holders = [f for f, t in draft.items() if phrase in " ".join(words(t))]
         if len(holders) > 1 and holders[-1] not in out:
             out[holders[-1]] = f"same phrase as another field: '{phrase}'"
-    for w in overused_words(draft):
-        holders = [f for f, t in draft.items() if any(stem(x) == w for x in words(t))]
+    for w in overused_words(draft, theme):
+        holders = [f for f, t in draft.items() if any(_watch(x) == w for x in words(t))]
         for f in holders[WORD_FIELD_LIMIT:]:
             out.setdefault(f, f"same word in too many fields: '{w}'")
     for f, text in draft.items():
         if guard.sentences(text) < MIN_SENTENCES:
             out.setdefault(f, "only one sentence: write two")
-        twice = repeated_within(text)
+        twice = repeated_within(text, theme)
         if twice:
             out.setdefault(f, f"same word twice in one field: '{twice[0]}'")
-        worn = sorted(w for w in _distinct(text) if (across or {}).get(f, {}).get(w, 0) >= ACROSS_LIMIT)
+        worn = sorted(w for w in _distinct(text) - theme if (across or {}).get(f, {}).get(w, 0) >= ACROSS_LIMIT)
         if worn:
             out.setdefault(f, f"word already used in this field by {ACROSS_LIMIT} entries: '{worn[0]}'")
     return out
@@ -347,6 +372,7 @@ def run(args: argparse.Namespace) -> int:
             have = intake.load_all(root)[args.kind]
             used = usage(have, fields)
             across = word_usage(have, fields)
+            theme = themes_of(args.kind, key)
             start = assign(fields, used, spread=i)
             ask = {"kind": args.kind, "facts": facts, "start_with": start}
             reason = ""
@@ -379,7 +405,7 @@ def run(args: argparse.Namespace) -> int:
                     continue
                 # reword just the failing fields (up to two rounds) before redrafting the whole star
                 for _round in range(2):
-                    bad = bad_fields(got, used, across)
+                    bad = bad_fields(got, used, across, theme)
                     if not bad:
                         break
                     for f, why in bad.items():
@@ -387,7 +413,7 @@ def run(args: argparse.Namespace) -> int:
                         fixed = repair_field(chain, f, got[f], opening, why)
                         if fixed:
                             got[f] = fixed
-                voice = voice_problems(got, used)
+                voice = voice_problems(got, used, theme)
                 if voice:
                     reason = "TEMPLATE_VOICE (" + "; ".join(voice[:2]) + ")"
                     continue

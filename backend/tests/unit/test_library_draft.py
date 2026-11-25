@@ -344,3 +344,26 @@ def test_template_practice_stems_are_banned() -> None:
 
     got = bad_fields({"practice": "Simply observe your thoughts today. This gentle pause helps you."}, {"practice": {}})
     assert "simply observe" in got["practice"]
+
+
+def test_theme_words_are_exempt_for_their_own_entry() -> None:
+    """The Moon must talk about emotions and feelings; four drafts failed on exactly that (planets batch)."""
+    from pranix.config.draft_cli import bad_fields, themes_of
+
+    moon = {
+        "core": "Your emotional tides shape how you meet each day. You respond first with feeling.",
+        "gifts": "You read emotional currents with ease. Others feel held when you listen.",
+        "practice": "When a mood rises, name the emotional weather aloud. Then choose your next step.",
+    }
+    assert "emotio" in bad_fields(moon, {f: {} for f in moon})["practice"]
+    assert bad_fields(moon, {f: {} for f in moon}, theme=themes_of("planet_deep", "Moon")) == {}
+    assert themes_of("planet_deep", "Sun") == frozenset()
+
+
+def test_short_word_deep_counts() -> None:
+    from pranix.config.draft_cli import overused_words, word_usage
+
+    draft = {"core": "A deep need guides you. You act.", "gifts": "Deeper meaning calls. You follow.",
+             "practice": "Breathe deeply each morning. Then begin."}  # fmt: skip
+    assert overused_words(draft) == ["deep"]
+    assert word_usage({"a": {"core": "Deep down, you seek. You wait."}}, ("core",))["core"]["deep"] == 1
