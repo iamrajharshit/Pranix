@@ -88,7 +88,7 @@ MAX_OPENER_USES = 2  # an opening may appear at most twice per field across a ki
 # Small models ignore "don't start like X" but follow "start with Y". Each field has a bank of natural
 # openings; every draft is given the least-used one, so openings spread evenly across all entries.
 OPENER_BANK: dict[str, tuple[str, ...]] = {
-    "core": ("At heart, you", "Your nature is", "Your way is", "This placement gives you", "You are someone who",
+    "core": ("At heart, you", "Your nature is", "Your instinct is", "This placement gives you", "You are someone who",
              "Deep down, you", "Your essence is", "You carry a", "By nature you", "You embody",
              "Above all, you", "What defines you", "Your spirit is", "Inside you lives"),
     "gifts": ("What comes easily is", "Your gift is", "People rely on your", "A natural strength is", "You bring a",
@@ -104,11 +104,11 @@ OPENER_BANK: dict[str, tuple[str, ...]] = {
                 "In study and work", "Your working style", "Teams value your", "Whatever you take on,",
                 "In demanding roles,"),
     "in_relationships": ("With people you love,", "In close bonds,", "Those close to you", "In friendship and love,",
-                         "With family and friends,", "In relationships, you", "The people near you",
+                         "With the people you love,", "In relationships, you", "The people near you",
                          "When you love someone,", "Close to home, you", "Your loved ones", "In love and friendship",
                          "With those dear to you,", "In your closest circle,", "People who know you"),
     "practice": ("Once this week,", "It can help to", "Each evening,", "Before you start something,",
-                 "For a few minutes",
+                 "The next time you",
                  "This week,", "When you notice", "A small step is", "Every morning,", "Next time you",
                  "Once a day,", "Set aside a", "Today, try to", "Choose one moment"),
 }  # fmt: skip
@@ -195,6 +195,7 @@ def voice_problems(draft: dict[str, str], used: dict[str, dict[str, int]]) -> li
     if len(draft) > 1:  # whole-entry checks (a single field is checked on its own during repair)
         bad += [f"same word in too many fields: '{w}'" for w in overused_words(draft)]
         bad += [f"{f}: only one sentence" for f, t in draft.items() if guard.sentences(t) < MIN_SENTENCES]
+        bad += [f"{f}: '{w}' twice" for f, t in draft.items() for w in repeated_within(t)[:1]]
     return bad
 
 
@@ -216,6 +217,15 @@ def overused_words(draft: dict[str, str]) -> list[str]:
     return sorted(w for w, fs in where.items() if len(fs) > WORD_FIELD_LIMIT)
 
 
+def repeated_within(text: str) -> list[str]:
+    """Distinctive words used twice inside one field ("necessary shifts ... necessary evolution")."""
+    seen: dict[str, int] = {}
+    for w in words(text):
+        if len(w) >= 6 and w not in _STOP:
+            seen[stem(w)] = seen.get(stem(w), 0) + 1
+    return sorted(w for w, n in seen.items() if n > 1)
+
+
 def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[str, str]:
     """Each field that fails the voice check, with why. For a phrase shared by two fields, the later
     field is the one to reword."""
@@ -235,6 +245,9 @@ def bad_fields(draft: dict[str, str], used: dict[str, dict[str, int]]) -> dict[s
     for f, text in draft.items():
         if guard.sentences(text) < MIN_SENTENCES:
             out.setdefault(f, "only one sentence: write two")
+        twice = repeated_within(text)
+        if twice:
+            out.setdefault(f, f"same word twice in one field: '{twice[0]}'")
     return out
 
 
@@ -250,7 +263,7 @@ def repair_field(chain: Any, field: str, text: str, begin_with: str, reason: str
 
     system = resources.files("pranix.prompts").joinpath(f"{REPAIR_PROMPT_ID}.md").read_text(encoding="utf-8")
     avoid = list(BANNED_STEMS)
-    if "same phrase" in reason or "same word" in reason:
+    if "same phrase" in reason or "same word" in reason or "twice" in reason:
         avoid.append(reason.split("'")[1])
     user = json.dumps(
         {"field": field, "text": text, "begin_with": begin_with, "avoid": avoid, "sentences": MIN_SENTENCES},

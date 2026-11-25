@@ -309,3 +309,16 @@ def test_sign_and_planet_seeds_use_only_approved_tables() -> None:
     rahu = seed("planet_deep", "Rahu")  # no dignity table for the nodes, and no empty fields sent
     assert set(rahu) == {"planet", "library"} and all(rahu["library"].values())
     assert not any("star" in o.lower().split() for bank in OPENER_BANK.values() for o in bank)
+
+
+def test_a_word_twice_in_one_field_is_reworded() -> None:
+    """Signs batch 1: "necessary shifts ... necessary evolution", "projects ... projects"."""
+    from pranix.config.draft_cli import OPENER_BANK, bad_fields, repeated_within
+
+    assert repeated_within("You resist necessary shifts. Holding on slows necessary evolution.") == ["necess"]
+    assert repeated_within("You build steady foundations. People feel safe with you.") == []
+    twice = {**GOOD, "at_work": "You handle projects with care. You build structures for teams and projects."}
+    assert bad_fields(twice, {}) == {"at_work": "same word twice in one field: 'projec'"}
+    openings = [o.lower() for bank in OPENER_BANK.values() for o in bank]
+    for gone in ("your way is", "with family and friends,", "for a few minutes"):
+        assert gone not in openings
