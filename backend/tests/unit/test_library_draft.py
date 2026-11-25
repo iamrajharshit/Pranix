@@ -216,3 +216,16 @@ def test_two_word_openings_are_counted_and_phrases_not_reused_across_fields() ->
     assert d.shared_phrases(clash) == ["unwavering loyalty"]
     assert "same phrase in two fields: 'unwavering loyalty'" in d.voice_problems(clash, {})
     assert d.shared_phrases({"a": "You are kind to people.", "b": "You are calm with people."}) == []  # stop words
+
+
+def test_openings_fit_every_reader_and_anxiety_is_refused() -> None:
+    """Batch 4: "When you learn", "At your desk" and "With a partner" assumed a student, a desk job, a partner."""
+    from pranix.config import draft_cli as d
+    from pranix.ingest import guard
+
+    all_openings = [o.lower() for bank in d.OPENER_BANK.values() for o in bank]
+    for narrow in ("when you learn,", "at your desk,", "with a partner, you", "colleagues and teachers notice"):
+        assert narrow not in all_openings
+    for word in ("anxiety", "anxieties"):
+        rules = {i.rule for i in guard.check("t", f"Release your {word} gently.", max_len=240, max_sentences=2)}
+        assert "MEDICAL_LEXICON" in rules

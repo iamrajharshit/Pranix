@@ -22,7 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .settings import Settings
 
-PROMPT_ID = "library-draft@3"
+PROMPT_ID = "library-draft@4"
 # Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
 BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life",
                 "you are defined by")  # fmt: skip
@@ -81,12 +81,13 @@ OPENER_BANK: dict[str, tuple[str, ...]] = {
                      "Left unchecked, your", "Be gentle when"),
     "at_work": ("At work and in", "In work and study,", "Where you work and", "Your best work comes",
                 "In your work and projects",
-                "You work best when", "Colleagues and teachers notice", "In any task, you", "Given a goal, you",
-                "In study and work", "Your working style", "Teams value your", "When you learn,", "At your desk,"),
+                "You work best when", "Colleagues and peers notice", "In any task, you", "Given a goal, you",
+                "In study and work", "Your working style", "Teams value your", "Whatever you take on,",
+                "In demanding roles,"),
     "in_relationships": ("With people you love,", "In close bonds,", "Those close to you", "In friendship and love,",
                          "With family and friends,", "In relationships, you", "The people near you",
                          "When you love someone,", "Close to home, you", "Your loved ones", "In love and friendship",
-                         "With those dear to you,", "With a partner, you", "People who know you"),
+                         "With those dear to you,", "In your closest circle,", "People who know you"),
     "practice": ("Once this week,", "It can help to", "Each evening,", "Before you start something,",
                  "For a few minutes",
                  "This week,", "When you notice", "A small step is", "Every morning,", "Next time you",
@@ -212,7 +213,7 @@ def run(args: argparse.Namespace) -> int:
             ask = {"kind": args.kind, "facts": facts, "start_with": start}
             reason = ""
             started = time.perf_counter()
-            for attempt in range(2):  # one retry, told what was wrong the first time
+            for attempt in range(3):  # two retries, each told what was wrong the time before
                 if attempt and reason:
                     ask["fix_this"] = (
                         f"Your previous draft was rejected: {reason}. Write it again, and begin each field "
