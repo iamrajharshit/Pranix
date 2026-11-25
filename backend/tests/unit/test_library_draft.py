@@ -142,8 +142,10 @@ def test_template_voice_is_redrafted_with_feedback(
     assert voice_problems({"at_work": "In your professional life you lead."}, {}) == [
         "at_work: 'in your professional life'"
     ]
-    assert voice_problems({"gifts": "Patience grows here."}, {"gifts": ["patience grows here"]}) == [
-        "gifts starts like another entry: 'patience grows here'"
+    # an opening may be used twice per field, not three times
+    assert voice_problems({"gifts": "Patience grows here."}, {"gifts": {"patience grows here": 1}}) == []
+    assert voice_problems({"gifts": "Patience grows here."}, {"gifts": {"patience grows here": 2}}) == [
+        "gifts starts like 2 other entries: 'patience grows here'"
     ]
 
     class FirstBadThenGood(RecordingStub):
@@ -154,14 +156,25 @@ def test_template_voice_is_redrafted_with_feedback(
     stub = use(monkeypatch, FirstBadThenGood(reply=GOOD))
     root = tmp_path / "r"
     assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Rohini", "--root", str(root)]) == 0
-    assert stub.calls == 2 and "fix_this" in stub.last_user and "you possess" in stub.last_user
+    assert stub.calls == 2 and "fix_this" in stub.last_user and "start_with" in stub.last_user
     assert intake.load_all(root)["nakshatra_deep"]["Rohini"]["core"] == GOOD["core"]
 
 
-def test_existing_openers_are_passed_to_avoid(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_openings_are_assigned_least_used_first(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from pranix.config.draft_cli import OPENER_BANK, assign, opener, usage
+
+    fields = KINDS["nakshatra_deep"].fields
+    a = assign(fields, usage({}, fields), spread=0)
+    b = assign(fields, usage({}, fields), spread=1)
+    assert all(a[f] in OPENER_BANK[f] for f in fields) and all(a[f] != b[f] for f in fields)  # neighbours differ
+    used = usage({"x": {f: OPENER_BANK[f][0] + " and more." for f in fields}}, fields)
+    assert all(assign(fields, used, spread=0)[f] != OPENER_BANK[f][0] for f in fields)  # used ones go last
+    assert all(opener(OPENER_BANK[f][0] + " x") in used[f] for f in fields)
+    # an opening already used twice is refused
     root = tmp_path / "r"
-    assert intake.add_draft(root, "nakshatra_deep", "Ashwini", GOOD) == []
-    stub = use(monkeypatch, RecordingStub(reply=GOOD))  # same text again: every opener repeats
-    assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Bharani", "--root", str(root)]) == 1
-    sent = json.loads(stub.last_user)
-    assert sent["avoid_openers"]["core"] == ["you carry a"] and "Bharani" not in intake.load_all(root)["nakshatra_deep"]
+    v = {f: "Same start here " + t for f, t in GOOD.items()}
+    assert intake.add_draft(root, "nakshatra_deep", "Ashwini", v) == []
+    assert intake.add_draft(root, "nakshatra_deep", "Bharani", v) == []
+    stub = use(monkeypatch, RecordingStub(reply=v))
+    assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Krittika", "--root", str(root)]) == 1
+    assert "start_with" in json.loads(stub.last_user) and "Krittika" not in intake.load_all(root)["nakshatra_deep"]
