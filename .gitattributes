@@ -1,0 +1,5 @@
+# Reviewed library and rule files are hashed (manifest.json, D79-style determinism). Keep them with
+# LF line endings on every OS, so Windows checkouts hash the same as Linux (owner's laptop, 25 Nov).
+backend/src/pranix/library/**/*.yaml text eol=lf
+backend/src/pranix/library/**/*.json text eol=lf
+backend/src/pranix/rulesets/*.yaml text eol=lf
