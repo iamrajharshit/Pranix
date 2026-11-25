@@ -35,6 +35,18 @@ class RecordingStub(Stub):
         return super().generate(system, user, timeout)
 
 
+STARTS = ("Steady", "Bright", "Quiet", "Open", "Warm", "Clear", "Gentle", "Bold", "Patient", "Lively")
+
+
+class VaryingStub(RecordingStub):
+    """Each answer starts its fields with a different word, as a good model would."""
+
+    def generate(self, system: str, user: str, timeout: float) -> Any:
+        w = STARTS[self.calls % len(STARTS)]
+        self.reply = {f: f"{w} {t[0].lower()}{t[1:]}" for f, t in GOOD.items()}
+        return super().generate(system, user, timeout)
+
+
 def use(monkeypatch: pytest.MonkeyPatch, stub: Stub) -> Stub:
     monkeypatch.setattr(build, "insights_chain", lambda s: Chain([Link(stub, TokenBucket(10_000))]))
     monkeypatch.setenv("PRANIX_ENV", "test")
@@ -49,7 +61,7 @@ def test_deep_kinds_cover_every_star_sign_and_planet() -> None:
 
 
 def test_draft_writes_drafts_then_the_sheet_loop_works(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    stub = use(monkeypatch, RecordingStub(reply=GOOD))
+    stub = use(monkeypatch, VaryingStub(reply=GOOD))
     root = tmp_path / "reviewed"
     assert (
         main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Rohini", "--key", "Hasta", "--root", str(root)])
@@ -111,10 +123,45 @@ def test_add_draft_never_replaces_an_entry(tmp_path: Path) -> None:
 def test_limit_and_no_provider(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    stub = use(monkeypatch, Stub(reply=GOOD))
+    stub = use(monkeypatch, VaryingStub(reply=GOOD))
     root = tmp_path / "r"
     assert main(["library", "draft", "--kind", "sign_deep", "--limit", "2", "--root", str(root)]) == 0
     assert list(intake.load_all(root)["sign_deep"]) == ["Aries", "Taurus"] and stub.calls == 2
     monkeypatch.setattr(build, "insights_chain", lambda s: Chain([]))
     assert main(["library", "draft", "--kind", "sign_deep", "--root", str(root)]) == 1
     assert "no AI provider configured" in capsys.readouterr().out
+
+
+def test_template_voice_is_redrafted_with_feedback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from pranix.config.draft_cli import opener, voice_problems
+
+    assert opener("You possess a nature marked by swift beginnings.") == "you possess a"
+    assert voice_problems({"core": "You possess a quiet fire."}, {}) == ["core: 'you possess'"]
+    assert voice_problems({"at_work": "In your professional life you lead."}, {}) == [
+        "at_work: 'in your professional life'"
+    ]
+    assert voice_problems({"gifts": "Patience grows here."}, {"gifts": ["patience grows here"]}) == [
+        "gifts starts like another entry: 'patience grows here'"
+    ]
+
+    class FirstBadThenGood(RecordingStub):
+        def generate(self, system: str, user: str, timeout: float) -> Any:
+            self.reply = {**GOOD, "core": "You possess a quiet fire."} if self.calls == 0 else GOOD
+            return super().generate(system, user, timeout)
+
+    stub = use(monkeypatch, FirstBadThenGood(reply=GOOD))
+    root = tmp_path / "r"
+    assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Rohini", "--root", str(root)]) == 0
+    assert stub.calls == 2 and "fix_this" in stub.last_user and "you possess" in stub.last_user
+    assert intake.load_all(root)["nakshatra_deep"]["Rohini"]["core"] == GOOD["core"]
+
+
+def test_existing_openers_are_passed_to_avoid(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "r"
+    assert intake.add_draft(root, "nakshatra_deep", "Ashwini", GOOD) == []
+    stub = use(monkeypatch, RecordingStub(reply=GOOD))  # same text again: every opener repeats
+    assert main(["library", "draft", "--kind", "nakshatra_deep", "--key", "Bharani", "--root", str(root)]) == 1
+    sent = json.loads(stub.last_user)
+    assert sent["avoid_openers"]["core"] == ["you carry a"] and "Bharani" not in intake.load_all(root)["nakshatra_deep"]
