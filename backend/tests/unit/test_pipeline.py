@@ -32,7 +32,7 @@ def test_ai_phrasing_is_used_and_cached() -> None:
     svc = InsightService(LIB, chain(s))
     c1 = svc.card("identity", M)
     c2 = svc.card("identity", M)
-    assert c1["badge"] == "ai" and c1["headline"] == GOOD["headline"] and c1["prompt_version"] == "insight@3"
+    assert c1["badge"] == "ai" and c1["headline"] == GOOD["headline"] and c1["prompt_version"] == "insight@4"
     assert c2 == c1 and s.calls == 1  # second card served from cache
     assert c1["fact_ids"] == svc.card("identity", M)["fact_ids"]
 
