@@ -192,7 +192,7 @@ def test_sheet_errors(root: Path, tmp_path: Path) -> None:
     assert "DUPLICATE_ROW" in _errors(root, tmp_path, [row(j1, OK_TEXT, "approve"), row(j1, OK_TEXT, "approve")])
 
 
-def test_multi_field_entries_need_one_decision_and_all_fields(root: Path, tmp_path: Path) -> None:
+def test_multi_field_entries_decide_per_field_and_need_all_fields(root: Path, tmp_path: Path) -> None:
     k = "houses/house_1"
     a, h, g = "Self and first impressions.", "Showing up as yourself.", "Learning to take space kindly."
     rows = [
@@ -200,9 +200,24 @@ def test_multi_field_entries_need_one_decision_and_all_fields(root: Path, tmp_pa
         row(k, h, "approve", field="healthy"),
         row(k, g, "approve", field="growth"),
     ]
-    assert "MIXED_DECISION" in _errors(root, tmp_path, [rows[0], rows[1], {**rows[2], "decision": "reject"}])
     assert "MISSING_FIELD_ROW" in _errors(root, tmp_path, rows[:2])
-    rep = library.import_sheet(root, make_sheet(tmp_path / "ok.csv", rows), write=True)
+    # approve + edit on one entry: edits applied, entry goes live (owner reviews field by field)
+    mixed = [rows[0], {**rows[1], "decision": "Edit", "edited": "Being yourself, kindly."}, rows[2]]
+    rep = library.import_sheet(root, make_sheet(tmp_path / "mixed.csv", mixed))
+    assert rep.ok and [c.decision for c in rep.changes] == ["edit"]
+    # any reject: edits kept, entry stays draft
+    rejecting = [rows[0], {**rows[1], "decision": "edit", "edited": "Being yourself, kindly."},
+                 {**rows[2], "decision": "reject"}]  # fmt: skip
+    rep = library.import_sheet(root, make_sheet(tmp_path / "rej.csv", rejecting), write=True)
+    assert rep.ok and [c.decision for c in rep.changes] == ["reject"]
+    h1 = library.load_all(root)["houses"]["house_1"]
+    assert h1["status"] == "draft" and h1["healthy"] == "Being yourself, kindly."
+    # a field-level mistake is reported against that field
+    oops = [rows[0], {**rows[1], "decision": "edit"}, rows[2]]
+    assert "EDIT_EMPTY" in _errors(root, tmp_path, [{**r, "draft": h1[r["field"]]} for r in oops])
+    rep = library.import_sheet(
+        root, make_sheet(tmp_path / "ok.csv", [{**r, "draft": h1[r["field"]]} for r in rows]), write=True
+    )
     assert rep.ok and library.load_all(root)["houses"]["house_1"]["status"] == "approved"
 
 

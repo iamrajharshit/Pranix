@@ -20,7 +20,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .settings import Settings
 
-PROMPT_ID = "library-draft@1"
+PROMPT_ID = "library-draft@2"
+# Stems the owner flagged as auto-generated-sounding (review of batch 1, 25 Nov); a draft using one is redone.
+BANNED_STEMS = ("you possess", "you have a natural gift", "invitations to", "in your professional life")
 
 
 class DeepDraft(BaseModel):
@@ -53,12 +55,42 @@ def seed(kind: str, key: str) -> dict[str, Any]:
     return {"planet": key, "library": {k: e[k] for k in ("motive", "period", "gift", "edge") if k in e}}
 
 
+def opener(text: str) -> str:
+    """The first three words, lower-case, without punctuation: how a sentence starts."""
+    words = [w.strip(".,;:!?\"'()").lower() for w in text.split()]
+    return " ".join(w for w in words[:3] if w)
+
+
+def openers(entries: dict[str, Any], fields: tuple[str, ...]) -> dict[str, list[str]]:
+    """How each field already starts across the kind's entries (reviewed or draft)."""
+    out: dict[str, set[str]] = {f: set() for f in fields}
+    for e in entries.values():
+        for f in fields:
+            if isinstance(e, dict) and e.get(f):
+                out[f].add(opener(str(e[f])))
+    return {f: sorted(v) for f, v in out.items() if v}
+
+
+def voice_problems(draft: dict[str, str], avoid: dict[str, list[str]]) -> list[str]:
+    """Repeated openers and flagged stems: the "template voice" the owner's review caught."""
+    bad = []
+    for f, text in draft.items():
+        low = text.lower()
+        stem = next((b for b in BANNED_STEMS if b in low), None)
+        if stem:
+            bad.append(f"{f}: '{stem}'")
+        elif opener(text) in avoid.get(f, []):
+            bad.append(f"{f} starts like another entry: '{opener(text)}'")
+    return bad
+
+
 def run(args: argparse.Namespace) -> int:
     import logging
 
     import structlog
 
     from ..ingest import library as intake
+    from ..ingest.kinds import KINDS
     from ..insight.entities import unknown_entities
     from ..llmgw.build import insights_chain
 
@@ -83,10 +115,15 @@ def run(args: argparse.Namespace) -> int:
     try:
         for i, key in enumerate(todo, start=1):
             facts = seed(args.kind, key)
-            user = json.dumps({"kind": args.kind, "facts": facts}, ensure_ascii=False)
+            fields = KINDS[args.kind].fields
+            avoid = openers(intake.load_all(root)[args.kind], fields)
+            ask = {"kind": args.kind, "facts": facts, "avoid_openers": avoid}
             reason = ""
             started = time.perf_counter()
-            for _attempt in range(2):  # one retry: a model's second try often passes
+            for attempt in range(2):  # one retry, told what was wrong the first time
+                if attempt and reason:
+                    ask["fix_this"] = f"Your previous draft was rejected: {reason}. Write it again without that."
+                user = json.dumps(ask, ensure_ascii=False)
                 got: dict[str, str] = {}
 
                 def accept(text: str, got: dict[str, str] = got) -> bool:
@@ -101,9 +138,14 @@ def run(args: argparse.Namespace) -> int:
                 if res is None:
                     reason = "no valid answer"
                     continue
-                names = unknown_entities(" ".join(got.values()), user)
+                # check against the facts only: the retry note quotes rejected names, which must not count as given
+                names = unknown_entities(" ".join(got.values()), json.dumps(facts, ensure_ascii=False))
                 if names:
                     reason = "UNKNOWN_ENTITY (" + ", ".join(names) + ")"
+                    continue
+                voice = voice_problems(got, avoid)
+                if voice:
+                    reason = "TEMPLATE_VOICE (" + "; ".join(voice[:2]) + ")"
                     continue
                 issues = intake.add_draft(root, args.kind, key, got)
                 if not issues:

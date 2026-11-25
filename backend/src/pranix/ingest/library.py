@@ -301,16 +301,15 @@ def import_sheet(root: Path, sheet_path: Path, write: bool = False) -> Report:
     for (kname, path), frows in groups.items():
         kind, key = KINDS[kname], f"{kname}/{'/'.join(path)}"
         entry = entry_at(new[kname], path)
+        # Decisions are per field (owner, 25 Nov: six independent fields are reviewed one by one).
+        # approve + edit -> the entry goes live with the edits; any reject -> edits kept, entry stays
+        # draft for a new draft; any hold (no reject) -> edits kept, status unchanged.
         try:
-            decisions = {sheet.decision_of(r["decision"]) for r in frows.values()}
+            dec = {f: sheet.decision_of(r["decision"]) for f, r in frows.items()}
         except sheet.SheetError as e:
             rep.errors.append(guard.Issue("BAD_DECISION", key, str(e)))
             continue
-        if len(decisions) > 1:
-            rep.errors.append(guard.Issue("MIXED_DECISION", key, "all fields of one entry need the same decision"))
-            continue
-        decision = decisions.pop()
-        if decision == "hold":
+        if set(dec.values()) == {"hold"}:
             rep.held.append(key)
             continue
         before = {f: str(entry.get(f, "")) for f in kind.fields}
@@ -324,27 +323,39 @@ def import_sheet(root: Path, sheet_path: Path, write: bool = False) -> Report:
             )
             continue
         edits = {f: sheet.squash(r.get("edited", "")) for f, r in frows.items() if sheet.squash(r.get("edited", ""))}
+        bad = [
+            guard.Issue("EDIT_WITH_APPROVE", f"{key}.{f}", "text in the edited column: use the decision edit")
+            for f in kind.fields
+            if dec[f] == "approve" and f in edits
+        ]
+        bad += [guard.Issue("EDIT_EMPTY", f"{key}.{f}", "decision edit but nothing in the edited column")
+                for f in kind.fields if dec[f] == "edit" and f not in edits]  # fmt: skip
+        if bad:
+            rep.errors += bad
+            continue
         note = "; ".join(r["note"] for r in frows.values() if r.get("note"))
-        if decision == "approve" and edits:
-            rep.errors.append(guard.Issue("EDIT_WITH_APPROVE", key, "text in the edited column: use the decision edit"))
+        after = {**before, **{f: t for f, t in edits.items() if dec[f] == "edit"}}
+        problems = [
+            i
+            for f in kind.fields
+            if after[f] != before[f] or "reject" not in dec.values()
+            for i in guard.check(f"{key}.{f}", after[f], max_len=kind.max_len, max_sentences=kind.max_sentences)
+        ]
+        if problems:
+            rep.errors += problems
             continue
-        if decision == "edit" and not edits:
-            rep.errors.append(guard.Issue("EDIT_EMPTY", key, "decision edit but nothing in the edited column"))
-            continue
-        after = {**before, **edits} if decision == "edit" else before
-        if decision == "reject":
+        entry.update(after)
+        if "reject" in dec.values():
             entry["status"] = "draft"
+            decision = "reject"
+        elif "hold" in dec.values():
+            rep.held.append(key)
+            decision = "edit" if after != before else "hold"
         else:
-            problems = [
-                i
-                for f in kind.fields
-                for i in guard.check(f"{key}.{f}", after[f], max_len=kind.max_len, max_sentences=kind.max_sentences)
-            ]
-            if problems:
-                rep.errors += problems
-                continue
-            entry.update(after)
             entry["status"] = "approved"
+            decision = "edit" if after != before else "approve"
+        if decision == "hold":
+            continue
         rep.changes.append(Change(key, decision, before, after, note))
 
     # the final state must be clean as a whole, whatever was untouched
