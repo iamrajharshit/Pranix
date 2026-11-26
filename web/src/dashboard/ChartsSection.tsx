@@ -38,6 +38,10 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
   useEffect(() => { if (target && tab !== "dasha" && tab !== target.chart && known) setTab(target.chart); }, [target?.chart]); // eslint-disable-line react-hooks/exhaustive-deps
   const effSelected = inspect ? (target?.kind === "planet" ? target.ref : null) : selected;
   const selectedHouse = inspect && target?.kind === "house" ? target.ref : null;
+  // I3: dashed outlines on the houses the selected planet looks at. Read from the engine's bundle, never computed here.
+  const seen = target?.kind === "planet" && load.state === "ready" && load.data.chart === target.chart
+    ? load.data.bundles[`planet:${target.ref}`]?.aspects_out : null;
+  const looks = target && seen?.length ? { from: String(target.ref), houses: seen.map((h) => h.house) } : null;
   const pickHouse = (h: number) => {
     if (target?.kind === "house" && target.ref === h) { open(null); return; }
     open({ chart: tab === "d9" ? "d9" : "d1", kind: "house", ref: h });
@@ -121,8 +125,8 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
           {known && m.d1.lagna ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {tab === "d1"
-                ? <NorthChart firstSign={m.d1.lagna.sign} planets={d1Planets} mark="ASC" selected={effSelected} onPick={pick} onPickHouse={inspect ? pickHouse : undefined} selectedHouse={selectedHouse} aria={`D1 birth chart, ${m.d1.lagna.sign} rising`} />
-                : <NorthChart firstSign={m.d9!.lagna.sign} planets={d9Planets} mark="ASC" selected={effSelected} onPick={pick} onPickHouse={inspect ? pickHouse : undefined} selectedHouse={selectedHouse} aria={`D9 navamsa chart, ${m.d9!.lagna.sign} rising`} />}
+                ? <NorthChart firstSign={m.d1.lagna.sign} planets={d1Planets} mark="ASC" selected={effSelected} onPick={pick} onPickHouse={inspect ? pickHouse : undefined} selectedHouse={selectedHouse} looks={tab === "d1" ? looks : null} aria={`D1 birth chart, ${m.d1.lagna.sign} rising`} />
+                : <NorthChart firstSign={m.d9!.lagna.sign} planets={d9Planets} mark="ASC" selected={effSelected} onPick={pick} onPickHouse={inspect ? pickHouse : undefined} selectedHouse={selectedHouse} looks={tab === "d9" ? looks : null} aria={`D9 navamsa chart, ${m.d9!.lagna.sign} rising`} />}
               <p className="hint" style={{ margin: 0, fontSize: 12, textAlign: "center" }}>Numbers in the chart are sign numbers (1 Aries … 12 Pisces). ℞ retrograde.</p>
             </div>
           ) : (

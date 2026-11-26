@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# jyotish-core@1: owner-approved rule tables for the Chart Inspector (plan 4.7, D72, D73, D75).
+# Written by `pranix-ctl rules import`. Any change needs a golden-snapshot diff
+# and owner approval (FR-REV-05).
+# graha_drishti: nth house counted from the planet (its own house is the 1st); whole-house, no orbs;
+# read in D1 and inside D9; with no birth time the same counts apply by sign (D81 4).
+id: "jyotish-core"
+version: 1
+status: "PARTIAL"
+reviewed_by: "owner"
+reviewed_at: "2026-11-26"
+tables:
+  graha_drishti:
+    Sun: [7]
+    Moon: [7]
+    Mars: [4, 7, 8]
+    Mercury: [7]
+    Jupiter: [5, 7, 9]
+    Venus: [7]
+    Saturn: [3, 7, 10]
+    Rahu: [5, 7, 9]
+    Ketu: [5, 7, 9]

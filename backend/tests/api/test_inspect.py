@@ -34,7 +34,8 @@ def test_set_for_both_charts(c: TestClient) -> None:
     jup = s["bundles"]["planet:Jupiter"]
     assert jup["summary"] == "Jupiter in your fifth house, in Sagittarius, its own sign."
     assert [h["house"] for h in jup["houses_ruled"]] == [5, 8] and jup["sits_with"] == ["Mercury"]
-    assert jup["other_chart"]["sign"] == "Libra" and jup["aspects_out"] is None
+    assert jup["other_chart"]["sign"] == "Libra" and [a["house"] for a in jup["aspects_out"]] == [9, 11, 1]
+    assert jup["aspects_in"] == ["Saturn"] and s["rules"]["id"] == "jyotish-core"
     d9 = c.get(f"/v1/profiles/{pid}/inspect/d9").json()
     assert d9["bundles"]["planet:Venus"]["dispositor"]["cycle_members"] == ["Venus", "Saturn", "Mercury"]
 

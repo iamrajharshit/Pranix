@@ -2,8 +2,15 @@
   "bundles": {
     "planet:Jupiter": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Saturn"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Aries",
+        "Gemini",
+        "Leo"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": null,
@@ -17,7 +24,8 @@
       "fact_ids": [
         "d1.jupiter.placement",
         "d1.jupiter.dispositor",
-        "d1.jupiter.same_sign"
+        "d1.jupiter.same_sign",
+        "d1.jupiter.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -64,17 +72,21 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     },
     "planet:Ketu": {
       "acts_through": "Mars",
-      "aspects_in": null,
+      "aspects_in": [
+        "Moon",
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Pisces",
+        "Taurus",
+        "Cancer"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -97,7 +109,8 @@
       "fact_ids": [
         "d1.ketu.placement",
         "d1.ketu.dispositor",
-        "d1.ketu.same_sign"
+        "d1.ketu.same_sign",
+        "d1.ketu.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -144,17 +157,20 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     },
     "planet:Mars": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Aries",
+        "Cancer",
+        "Leo"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -176,7 +192,8 @@
       "fact_ids": [
         "d1.mars.placement",
         "d1.mars.dispositor",
-        "d1.mars.same_sign"
+        "d1.mars.same_sign",
+        "d1.mars.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -228,10 +245,6 @@
           "what": "d9"
         },
         {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
-        },
-        {
           "reason": "CHANGES_DURING_DAY",
           "what": "nakshatra"
         }
@@ -239,8 +252,13 @@
     },
     "planet:Mercury": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Saturn"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Gemini"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": null,
@@ -255,7 +273,8 @@
       "fact_ids": [
         "d1.mercury.placement",
         "d1.mercury.dispositor",
-        "d1.mercury.same_sign"
+        "d1.mercury.same_sign",
+        "d1.mercury.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -302,17 +321,19 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     },
     "planet:Moon": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Sun",
+        "Ketu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Scorpio"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -334,7 +355,8 @@
       "fact_ids": [
         "d1.moon.placement",
         "d1.moon.dispositor",
-        "d1.moon.same_sign"
+        "d1.moon.same_sign",
+        "d1.moon.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -386,10 +408,6 @@
           "what": "d9"
         },
         {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
-        },
-        {
           "reason": "CHANGES_DURING_DAY",
           "what": "nakshatra"
         }
@@ -397,8 +415,16 @@
     },
     "planet:Rahu": {
       "acts_through": "Venus",
-      "aspects_in": null,
+      "aspects_in": [
+        "Sun",
+        "Ketu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Virgo",
+        "Scorpio",
+        "Capricorn"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -420,7 +446,8 @@
       "fact_ids": [
         "d1.rahu.placement",
         "d1.rahu.dispositor",
-        "d1.rahu.same_sign"
+        "d1.rahu.same_sign",
+        "d1.rahu.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -467,17 +494,18 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     },
     "planet:Saturn": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Sagittarius",
+        "Aries",
+        "Cancer"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -498,7 +526,8 @@
       "fact_ids": [
         "d1.saturn.placement",
         "d1.saturn.dispositor",
-        "d1.saturn.same_sign"
+        "d1.saturn.same_sign",
+        "d1.saturn.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -543,17 +572,19 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     },
     "planet:Sun": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Moon",
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Taurus"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -576,7 +607,8 @@
       "fact_ids": [
         "d1.sun.placement",
         "d1.sun.dispositor",
-        "d1.sun.same_sign"
+        "d1.sun.same_sign",
+        "d1.sun.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -623,17 +655,18 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     },
     "planet:Venus": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": [
+        "Cancer"
+      ],
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -654,7 +687,8 @@
       "fact_ids": [
         "d1.venus.placement",
         "d1.venus.dispositor",
-        "d1.venus.same_sign"
+        "d1.venus.same_sign",
+        "d1.venus.aspects_by_sign"
       ],
       "house": null,
       "houses_ruled": null,
@@ -701,16 +735,17 @@
         {
           "reason": "BIRTH_TIME_REQUIRED",
           "what": "d9"
-        },
-        {
-          "reason": "BIRTH_TIME_REQUIRED",
-          "what": "aspects"
         }
       ]
     }
   },
   "chart": "d1",
   "level": "sign",
+  "rules": {
+    "hash": "176e1669ab5efc38",
+    "id": "jyotish-core",
+    "version": 1
+  },
   "ruleset": {
     "hash": "9541a10df5ca6ffd",
     "id": "vedic-core",

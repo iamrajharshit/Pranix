@@ -2,8 +2,12 @@
   "bundles": {
     "house:1": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Mars",
+        "Jupiter"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -22,6 +26,7 @@
       "fact_ids": [
         "d1.house_1.occupants",
         "d1.house_1.lord",
+        "d1.house_1.aspects",
         "d1.house_1.other_chart",
         "d1.house_1.either_side"
       ],
@@ -50,7 +55,7 @@
       },
       "schema_version": "1",
       "sits_with": [],
-      "summary": "Your rising sign. House one is Leo. It is empty, so it is read through its lord.",
+      "summary": "Your rising sign. House one is Leo. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "1"
@@ -60,8 +65,12 @@
     },
     "house:10": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Sun",
+        "Ketu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -80,6 +89,7 @@
       "fact_ids": [
         "d1.house_10.occupants",
         "d1.house_10.lord",
+        "d1.house_10.aspects",
         "d1.house_10.other_chart",
         "d1.house_10.either_side"
       ],
@@ -122,8 +132,12 @@
     },
     "house:11": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Mercury",
+        "Jupiter"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -145,6 +159,7 @@
       "fact_ids": [
         "d1.house_11.occupants",
         "d1.house_11.lord",
+        "d1.house_11.aspects",
         "d1.house_11.other_chart",
         "d1.house_11.either_side"
       ],
@@ -171,7 +186,7 @@
       },
       "schema_version": "1",
       "sits_with": [],
-      "summary": "House eleven is Gemini. It is empty, so it is read through its lord.",
+      "summary": "House eleven is Gemini. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "11"
@@ -181,8 +196,14 @@
     },
     "house:12": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Mars",
+        "Venus",
+        "Saturn",
+        "Ketu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -201,6 +222,7 @@
       "fact_ids": [
         "d1.house_12.occupants",
         "d1.house_12.lord",
+        "d1.house_12.aspects",
         "d1.house_12.other_chart",
         "d1.house_12.either_side"
       ],
@@ -227,7 +249,7 @@
       },
       "schema_version": "1",
       "sits_with": [],
-      "summary": "House twelve is Cancer. It is empty, so it is read through its lord.",
+      "summary": "House twelve is Cancer. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "12"
@@ -237,8 +259,11 @@
     },
     "house:2": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -259,6 +284,7 @@
       "fact_ids": [
         "d1.house_2.occupants",
         "d1.house_2.lord",
+        "d1.house_2.aspects",
         "d1.house_2.other_chart",
         "d1.house_2.either_side"
       ],
@@ -285,7 +311,7 @@
       },
       "schema_version": "1",
       "sits_with": [],
-      "summary": "House two is Virgo. It is empty, so it is read through its lord.",
+      "summary": "House two is Virgo. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "2"
@@ -295,8 +321,9 @@
     },
     "house:3": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -318,6 +345,7 @@
       "fact_ids": [
         "d1.house_3.occupants",
         "d1.house_3.lord",
+        "d1.house_3.aspects",
         "d1.house_3.other_chart",
         "d1.house_3.either_side"
       ],
@@ -356,8 +384,12 @@
     },
     "house:4": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Moon",
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -381,6 +413,7 @@
       "fact_ids": [
         "d1.house_4.occupants",
         "d1.house_4.lord",
+        "d1.house_4.aspects",
         "d1.house_4.other_chart",
         "d1.house_4.either_side"
       ],
@@ -423,8 +456,11 @@
     },
     "house:5": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Saturn"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -449,6 +485,7 @@
       "fact_ids": [
         "d1.house_5.occupants",
         "d1.house_5.lord",
+        "d1.house_5.aspects",
         "d1.house_5.other_chart",
         "d1.house_5.either_side"
       ],
@@ -490,8 +527,11 @@
     },
     "house:6": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Rahu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -513,6 +553,7 @@
       "fact_ids": [
         "d1.house_6.occupants",
         "d1.house_6.lord",
+        "d1.house_6.aspects",
         "d1.house_6.other_chart",
         "d1.house_6.either_side"
       ],
@@ -552,8 +593,9 @@
     },
     "house:7": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -575,6 +617,7 @@
       "fact_ids": [
         "d1.house_7.occupants",
         "d1.house_7.lord",
+        "d1.house_7.aspects",
         "d1.house_7.other_chart",
         "d1.house_7.either_side"
       ],
@@ -611,8 +654,11 @@
     },
     "house:8": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Ketu"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -631,6 +677,7 @@
       "fact_ids": [
         "d1.house_8.occupants",
         "d1.house_8.lord",
+        "d1.house_8.aspects",
         "d1.house_8.other_chart",
         "d1.house_8.either_side"
       ],
@@ -660,7 +707,7 @@
       },
       "schema_version": "1",
       "sits_with": [],
-      "summary": "House eight is Pisces. It is empty, so it is read through its lord.",
+      "summary": "House eight is Pisces. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "8"
@@ -670,8 +717,13 @@
     },
     "house:9": {
       "acts_through": null,
-      "aspects_in": null,
+      "aspects_in": [
+        "Mars",
+        "Jupiter",
+        "Saturn"
+      ],
       "aspects_out": null,
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": null,
       "either_side": {
@@ -693,6 +745,7 @@
       "fact_ids": [
         "d1.house_9.occupants",
         "d1.house_9.lord",
+        "d1.house_9.aspects",
         "d1.house_9.other_chart",
         "d1.house_9.either_side"
       ],
@@ -721,7 +774,7 @@
       },
       "schema_version": "1",
       "sits_with": [],
-      "summary": "House nine is Aries. It is empty, so it is read through its lord.",
+      "summary": "House nine is Aries. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "9"
@@ -731,8 +784,27 @@
     },
     "planet:Jupiter": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Saturn"
+      ],
+      "aspects_out": [
+        {
+          "house": 9,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        {
+          "house": 11,
+          "occupants": [],
+          "sign": "Gemini"
+        },
+        {
+          "house": 1,
+          "occupants": [],
+          "sign": "Leo"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": null,
@@ -766,6 +838,7 @@
         "d1.jupiter.dispositor",
         "d1.jupiter.houses_ruled",
         "d1.jupiter.sits_with",
+        "d1.jupiter.aspects",
         "d1.jupiter.either_side",
         "d1.jupiter.other_chart"
       ],
@@ -822,8 +895,31 @@
     },
     "planet:Ketu": {
       "acts_through": "Mars",
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Moon",
+        "Rahu"
+      ],
+      "aspects_out": [
+        {
+          "house": 8,
+          "occupants": [],
+          "sign": "Pisces"
+        },
+        {
+          "house": 10,
+          "occupants": [
+            "Moon",
+            "Rahu"
+          ],
+          "sign": "Taurus"
+        },
+        {
+          "house": 12,
+          "occupants": [],
+          "sign": "Cancer"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -865,6 +961,7 @@
         "d1.ketu.dispositor",
         "d1.ketu.houses_ruled",
         "d1.ketu.sits_with",
+        "d1.ketu.aspects",
         "d1.ketu.either_side",
         "d1.ketu.other_chart"
       ],
@@ -907,8 +1004,27 @@
     },
     "planet:Mars": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Rahu"
+      ],
+      "aspects_out": [
+        {
+          "house": 9,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        {
+          "house": 12,
+          "occupants": [],
+          "sign": "Cancer"
+        },
+        {
+          "house": 1,
+          "occupants": [],
+          "sign": "Leo"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -947,6 +1063,7 @@
         "d1.mars.dispositor",
         "d1.mars.houses_ruled",
         "d1.mars.sits_with",
+        "d1.mars.aspects",
         "d1.mars.either_side",
         "d1.mars.other_chart"
       ],
@@ -1003,8 +1120,17 @@
     },
     "planet:Mercury": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Saturn"
+      ],
+      "aspects_out": [
+        {
+          "house": 11,
+          "occupants": [],
+          "sign": "Gemini"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": null,
@@ -1039,6 +1165,7 @@
         "d1.mercury.dispositor",
         "d1.mercury.houses_ruled",
         "d1.mercury.sits_with",
+        "d1.mercury.aspects",
         "d1.mercury.either_side",
         "d1.mercury.other_chart"
       ],
@@ -1092,8 +1219,21 @@
     },
     "planet:Moon": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Sun",
+        "Ketu"
+      ],
+      "aspects_out": [
+        {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Ketu"
+          ],
+          "sign": "Scorpio"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -1129,6 +1269,7 @@
         "d1.moon.dispositor",
         "d1.moon.houses_ruled",
         "d1.moon.sits_with",
+        "d1.moon.aspects",
         "d1.moon.either_side",
         "d1.moon.other_chart"
       ],
@@ -1177,8 +1318,34 @@
     },
     "planet:Rahu": {
       "acts_through": "Venus",
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Sun",
+        "Ketu"
+      ],
+      "aspects_out": [
+        {
+          "house": 2,
+          "occupants": [],
+          "sign": "Virgo"
+        },
+        {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Ketu"
+          ],
+          "sign": "Scorpio"
+        },
+        {
+          "house": 6,
+          "occupants": [
+            "Mars",
+            "Venus"
+          ],
+          "sign": "Capricorn"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -1214,6 +1381,7 @@
         "d1.rahu.dispositor",
         "d1.rahu.houses_ruled",
         "d1.rahu.sits_with",
+        "d1.rahu.aspects",
         "d1.rahu.either_side",
         "d1.rahu.other_chart"
       ],
@@ -1256,8 +1424,28 @@
     },
     "planet:Saturn": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [],
+      "aspects_out": [
+        {
+          "house": 5,
+          "occupants": [
+            "Mercury",
+            "Jupiter"
+          ],
+          "sign": "Sagittarius"
+        },
+        {
+          "house": 9,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        {
+          "house": 12,
+          "occupants": [],
+          "sign": "Cancer"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -1295,6 +1483,7 @@
         "d1.saturn.dispositor",
         "d1.saturn.houses_ruled",
         "d1.saturn.sits_with",
+        "d1.saturn.aspects",
         "d1.saturn.either_side",
         "d1.saturn.other_chart"
       ],
@@ -1349,8 +1538,21 @@
     },
     "planet:Sun": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Moon",
+        "Rahu"
+      ],
+      "aspects_out": [
+        {
+          "house": 10,
+          "occupants": [
+            "Moon",
+            "Rahu"
+          ],
+          "sign": "Taurus"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -1392,6 +1594,7 @@
         "d1.sun.dispositor",
         "d1.sun.houses_ruled",
         "d1.sun.sits_with",
+        "d1.sun.aspects",
         "d1.sun.either_side",
         "d1.sun.other_chart"
       ],
@@ -1440,8 +1643,17 @@
     },
     "planet:Venus": {
       "acts_through": null,
-      "aspects_in": null,
-      "aspects_out": null,
+      "aspects_in": [
+        "Rahu"
+      ],
+      "aspects_out": [
+        {
+          "house": 12,
+          "occupants": [],
+          "sign": "Cancer"
+        }
+      ],
+      "aspects_out_signs": null,
       "chart": "d1",
       "dispositor": {
         "cycle_members": [
@@ -1479,6 +1691,7 @@
         "d1.venus.dispositor",
         "d1.venus.houses_ruled",
         "d1.venus.sits_with",
+        "d1.venus.aspects",
         "d1.venus.either_side",
         "d1.venus.other_chart"
       ],
@@ -1538,6 +1751,11 @@
   },
   "chart": "d1",
   "level": "house",
+  "rules": {
+    "hash": "176e1669ab5efc38",
+    "id": "jyotish-core",
+    "version": 1
+  },
   "ruleset": {
     "hash": "9541a10df5ca6ffd",
     "id": "vedic-core",

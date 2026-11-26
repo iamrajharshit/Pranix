@@ -96,6 +96,11 @@ test("the Chart Inspector opens from the chart and keeps its target (I1)", async
   await axe(page);
   await panel.getByRole("button", { name: "Inspect Saturn" }).click();
   await expect(page).toHaveURL(/inspect=d1\.Saturn/);
+  // I3: Saturn looks at the 3rd, 7th and 10th from itself; the chart outlines those houses (dashed)
+  await expect(panel.getByText("Looks at", { exact: true })).toBeVisible();
+  await expect(page.locator(".ni svg .aspect")).toHaveCount(3);
+  await expect(page.getByRole("button", { name: /^House nine, .*Saturn looks at it$/ })).toBeAttached();
+  await axe(page);
 
   await page.goBack(); // Back closes the Inspector in one step, however many targets were visited
   await expect(page).not.toHaveURL(/inspect=/);

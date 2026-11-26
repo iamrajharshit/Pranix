@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from pranix.ephemeris.ruleset import load_ruleset
+from pranix.ephemeris.ruleset import Table, load_ruleset, load_table
 from pranix.insight.inspect_text import with_text
 from pranix.insight.validators import check_text
 from pranix.jyotish import build_set
@@ -43,7 +43,8 @@ def test_relations_match_the_verified_reference(chart: str, planet: str) -> None
     assert b.either_side is not None and h is not None
     assert b.house is None and b.lord is None  # planet target
     assert [b.either_side.before.house, b.either_side.after.house] == [step(h, 12), step(h, 2)]
-    assert b.aspects_out is None and b.aspects_in is None  # I3: waits for the jyotish-core@1 aspect table
+    assert [a.house for a in b.aspects_out or []] == r["Looks at"]  # I3: offset order from the approved table
+    assert b.aspects_in == r["Looked at by"] and b.aspects_out_signs is None
 
 
 def test_houses_ruled_carry_their_occupants() -> None:
@@ -78,10 +79,12 @@ def test_unknown_time_is_sign_level_and_never_guesses() -> None:
         assert p is not None
         assert p.house is None and p.deg_in_sign is None and p.vargottama is None
         assert b.houses_ruled is None and b.other_chart is None and b.either_side is None
-        assert {u.what for u in b.unavailable} >= {"house", "houses_ruled", "degree", "d9", "aspects"}
+        assert {u.what for u in b.unavailable} >= {"house", "houses_ruled", "degree", "d9"}
+        assert b.aspects_out is None  # houses need a birth time; aspects are read by sign instead
     moon = s.bundles["planet:Moon"]
     assert moon.placement.nakshatra is None and moon.placement.nakshatra_options == ["Rohini", "Mrigashira"]
     assert moon.sits_with == ["Rahu"]  # same sign at sign level
+    assert moon.aspects_out_signs == ["Scorpio"] and moon.aspects_in == ["Sun", "Ketu"]  # by sign (D81 4)
     with pytest.raises(ValueError):
         build_set(UNKNOWN, "d9", RS)
 
@@ -97,6 +100,8 @@ def test_sign_change_during_the_day_stops_the_chain() -> None:
     assert moon.placement.sign_options == ["Taurus", "Gemini"] and moon.sits_with == []
     assert moon.dispositor.end == "stops_uncertain"
     assert "Moon" not in s.bundles["planet:Rahu"].sits_with  # an uncertain sign is never a companion
+    assert moon.aspects_out_signs is None and moon.aspects_in is None  # nothing guessed for an uncertain sign
+    assert not any("Moon" in (b.aspects_in or []) for b in s.bundles.values())  # nor credited as a looker
     assert {u.what for u in moon.unavailable} >= {"sign", "dignity"}
 
 
@@ -142,17 +147,37 @@ def test_house_panels_match_the_verified_reference(chart: str, house: int) -> No
         o["sign"],
         o["Occupants"],
     )
-    assert b.aspects_in is None  # I3
+    assert b.aspects_in == r["Looked at by"]  # I3
 
 
 def test_house_wording() -> None:
     s = with_text(build_set(KNOWN, "d1", RS))
-    assert (
-        s.bundles["house:1"].summary
-        == "Your rising sign. House one is Leo. It is empty, so it is read through its lord."
+    assert s.bundles["house:1"].summary == (
+        "Your rising sign. House one is Leo. "
+        "It is empty, so it is read through its lord and the planets that look at it."
     )
     assert s.bundles["house:5"].summary == "House five is Sagittarius, with Mercury and Jupiter."
-    assert s.bundles["house:7"].summary == "House seven is Aquarius. It is empty, so it is read through its lord."
+    seven = "House seven is Aquarius. It is empty, so it is read through its lord."
+    assert s.bundles["house:7"].summary == seven  # no planet looks at house seven, so none is promised
     for b in s.bundles.values():
         assert b.summary
         check_text("summary", b.summary)
+
+
+def test_aspects_follow_the_approved_table_and_record_it() -> None:
+    """The set names the jyotish-core table it used, so a table change changes the ETag (FR-REV-05)."""
+    s = build_set(KNOWN, "d1", RS)
+    assert s.rules.id == "jyotish-core" and s.rules.version == 1 and len(s.rules.hash) == 16
+    mars = s.bundles["planet:Mars"]
+    h = mars.placement.house if mars.placement else None
+    assert h is not None and [a.house for a in mars.aspects_out or []] == [step(h, n) for n in (4, 7, 8)]
+    other = load_table("jyotish-core@1")
+    edited = Table(other.id, other.version, "0" * 16, other.data)
+    assert build_set(KNOWN, "d1", RS, edited).etag() != s.etag()
+
+
+def test_no_planet_looks_at_itself() -> None:
+    for chart in ("d1", "d9"):
+        for key, b in build_set(KNOWN, chart, RS).bundles.items():  # type: ignore[arg-type]
+            if key.startswith("planet:"):
+                assert key.split(":")[1] not in (b.aspects_in or [])

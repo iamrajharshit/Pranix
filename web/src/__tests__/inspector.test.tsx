@@ -21,18 +21,34 @@ const titles = (s: InspectionSet, p: string) => toSnapshot(s.bundles[`planet:${p
 afterEach(() => { cleanup(); clearInspectCache(); vi.restoreAllMocks(); window.history.replaceState(null, "", "/dashboard"); });
 
 describe("toSnapshot (D81 order, data only)", () => {
-  it("keeps the D81 order for every planet in both charts; aspects wait for I3", () => {
+  it("keeps the D81 order for every planet in both charts, aspects after Sits with", () => {
     for (const p of PLANETS) {
-      expect(titles(D1, p)).toEqual(["Placement", "Houses it rules", "Sits with", "In your D9", "Dispositor chain", "Either side"]);
-      expect(titles(D9, p)).toEqual(["Placement", "Houses it rules", "Sits with", "In your D1", "Dispositor chain", "Either side"]);
+      expect(titles(D1, p)).toEqual(["Placement", "Houses it rules", "Sits with", "Looks at", "Looked at by", "In your D9", "Dispositor chain", "Either side"]);
+      expect(titles(D9, p)).toEqual(["Placement", "Houses it rules", "Sits with", "Looks at", "Looked at by", "In your D1", "Dispositor chain", "Either side"]);
     }
+  });
+  it("aspects (I3): house chips in the table's order, one heading, lookers link to planets", () => {
+    const g = toSnapshot(D1.bundles["planet:Mars"]);
+    const looks = g.find((x) => x.id === "looks"), by = g.find((x) => x.id === "lookedby");
+    expect(looks?.head).toBe("Aspects · drishti");
+    expect(looks?.chips.map((c) => c.target?.ref)).toEqual([9, 12, 1]);   // 4th, 7th and 8th from Mars, as the server sent them
+    expect(by?.head).toBeUndefined();
+    expect(by?.chips.map((c) => c.label)).toEqual(["Rahu"]);
+    const sat = toSnapshot(D1.bundles["planet:Saturn"]).find((x) => x.id === "lookedby");
+    expect(sat?.chips).toEqual([]);
+    expect(sat?.note).toBe("No planet looks at its house.");
+  });
+  it("houses show who looks at them; an unlooked house says so", () => {
+    const twelve = toSnapshot(D1.bundles["house:12"]).find((x) => x.id === "lookedby");
+    expect(twelve?.chips.map((c) => c.label)).toEqual(["Mars", "Venus", "Saturn", "Ketu"]);
+    expect(toSnapshot(D1.bundles["house:7"]).find((x) => x.id === "lookedby")?.note).toBe("No planet looks at this house.");
   });
   it("shows Jupiter as the server sent it", () => {
     const g = toSnapshot(D1.bundles["planet:Jupiter"]);
     expect(g[0].chips.map((c) => c.label)).toEqual(["Sagittarius", "House 5", "own sign", "22°21′", "Purva Ashadha"]);
     expect(g[1].note).toBe("5th house, Sagittarius: Mercury and Jupiter · 8th house, Pisces: empty");
     expect(g[2].chips.map((c) => [c.label, c.target?.ref])).toEqual([["Mercury", "Mercury"]]);
-    expect(g[4].note).toBe("Jupiter is its own lord here: a final dispositor.");
+    expect(g.find((x) => x.id === "chain")?.note).toBe("Jupiter is its own lord here: a final dispositor.");
   });
   it("names the whole loop and the exchange", () => {
     expect(toSnapshot(D9.bundles["planet:Venus"]).find((g) => g.id === "chain")?.note).toBe("The chain ends in a loop: Venus → Saturn → Mercury → Venus.");
@@ -51,23 +67,26 @@ describe("toSnapshot (D81 order, data only)", () => {
   it("unknown time: sign level, both stars, nothing time-dependent", () => {
     for (const p of PLANETS) {
       // nodes still "act through" their sign lord: that needs only the sign, not the birth time
-      const expected = ["Rahu", "Ketu"].includes(p) ? ["Placement", "Houses it rules", "Same sign", "Dispositor chain"] : ["Placement", "Same sign", "Dispositor chain"];
+      const by = ["Looks at (by sign)", "Looked at by (by sign)"];   // D81 4: the same counts, by sign
+      const expected = ["Rahu", "Ketu"].includes(p) ? ["Placement", "Houses it rules", "Same sign", ...by, "Dispositor chain"] : ["Placement", "Same sign", ...by, "Dispositor chain"];
       expect(titles(U1, p)).toEqual(expected);
     }
     const moon = toSnapshot(U1.bundles["planet:Moon"]);
     expect(moon[0].chips.map((c) => c.label)).toEqual(["Taurus", "exalted", "Rohini", "Mrigashira"]);
     expect(moon[0].note).toContain("changes star during that day");
-    expect(needsTime(U1.bundles["planet:Moon"])).toBe("House, houses it rules, degree, the D9 and aspects. Add a birth time to see them.");
+    expect(moon.find((x) => x.id === "looks")?.chips.map((c) => c.label)).toEqual(["Scorpio"]);
+    expect(moon.find((x) => x.id === "looks")?.note).toBe("Counted by sign, because houses need a birth time.");
+    expect(needsTime(U1.bundles["planet:Moon"])).toBe("House, houses it rules, degree and the D9. Add a birth time to see them.");
     expect(JSON.stringify(moon)).not.toMatch(/House \d|°/);
   });
 });
 
 describe("houses (I2)", () => {
   const houses = Array.from({ length: 12 }, (_, i) => i + 1);
-  it("every house keeps the D81 house order in both charts; aspects wait for I3", () => {
+  it("every house keeps the D81 house order in both charts", () => {
     for (const h of houses) {
-      expect(toSnapshot(D1.bundles[`house:${h}`]).map((g) => g.title)).toEqual(["Occupants", "Its lord", `House ${h} in your D9`, "Either side"]);
-      expect(toSnapshot(D9.bundles[`house:${h}`]).map((g) => g.title)).toEqual(["Occupants", "Its lord", `House ${h} in your D1`, "Either side"]);
+      expect(toSnapshot(D1.bundles[`house:${h}`]).map((g) => g.title)).toEqual(["Occupants", "Its lord", "Looked at by", `House ${h} in your D9`, "Either side"]);
+      expect(toSnapshot(D9.bundles[`house:${h}`]).map((g) => g.title)).toEqual(["Occupants", "Its lord", "Looked at by", `House ${h} in your D1`, "Either side"]);
     }
     expect(Object.keys(U1.bundles).some((k) => k.startsWith("house:"))).toBe(false); // no houses without a birth time
   });
@@ -169,7 +188,16 @@ describe("ChartsSection with the Inspector on", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
     fireEvent.click(await screen.findByRole("button", { name: "Next: house one" }));
     expect(window.location.search).toBe("?inspect=d1.h1");
-    expect(await screen.findByText("Your rising sign. House one is Leo. It is empty, so it is read through its lord.")).toBeTruthy();
+    expect(await screen.findByText("Your rising sign. House one is Leo. It is empty, so it is read through its lord and the planets that look at it.")).toBeTruthy();
+  });
+  it("a selected planet outlines the houses it looks at, and the house buttons say so", async () => {
+    const { container } = render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: /^Mars in/ }));
+    await screen.findByText(/^Mars in your/);
+    await waitFor(() => expect(container.querySelectorAll("svg .aspect").length).toBe(3));
+    expect(screen.getByRole("button", { name: /^House nine, .*Mars looks at it$/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "House seven, Aquarius, empty" }));  // a house target: no outlines
+    await waitFor(() => expect(container.querySelectorAll("svg .aspect").length).toBe(0));
   });
   it("unknown time: a house link explains that houses need the birth time", async () => {
     window.history.replaceState(null, "", "/dashboard?inspect=d1.h7");
