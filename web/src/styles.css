@@ -97,6 +97,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .pl:hover { background: rgba(244,197,102,.18); }
 .pl.on { background: var(--gold); color: #1a1226; box-shadow: 0 0 12px rgba(244,197,102,.8); }
 .asc { font: 700 10px var(--sans); letter-spacing: .12em; color: var(--gold); }
+/* I2: clickable houses (behind the planet labels, which stay on top) */
+.hz { position: absolute; border: 0; background: transparent; cursor: pointer; padding: 0; transition: background var(--dur-1); }
+.hz:hover { background: rgba(244,197,102,.08); }
+.hz.on { background: rgba(244,197,102,.16); }
+.hz:focus-visible { outline: none; background: rgba(255,227,163,.22); }
+.ni .hs { z-index: 1; }
 .pt { width: 100%; border-collapse: collapse; font-size: 14px; }
 .pt th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
   padding: 8px; border-bottom: 1px solid rgba(255,255,255,.14); }

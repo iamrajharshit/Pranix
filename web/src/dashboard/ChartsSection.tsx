@@ -30,14 +30,20 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
   const [nonce, setNonce] = useState(0);
   const parsed = inspect ? parseTarget(raw) : null;
   const norm = parsed ? normaliseTarget(parsed, known) : null;
-  const target: InspectTarget | null = norm?.target && norm.target.kind === "planet" ? norm.target : null; // houses arrive in I2
+  const target: InspectTarget | null = norm?.target ?? null;
+  const housesNeedTime = norm?.note === "HOUSES_NEED_TIME" && parsed?.kind === "house" ? parsed : null; // D81 §5
   const load = useInspectSet(target ? profileId : null, target ? target.chart : null, nonce);
   const open = (t: InspectTarget | null) => setRaw(t ? formatTarget(t) : null);
   useEffect(() => { if (inspect) prefetchInspect(profileId, "d1"); }, [inspect, profileId]);       // instant first click
   useEffect(() => { if (target && tab !== "dasha" && tab !== target.chart && known) setTab(target.chart); }, [target?.chart]); // eslint-disable-line react-hooks/exhaustive-deps
-  const effSelected = inspect ? (target?.ref ?? null) : selected;
+  const effSelected = inspect ? (target?.kind === "planet" ? target.ref : null) : selected;
+  const selectedHouse = inspect && target?.kind === "house" ? target.ref : null;
+  const pickHouse = (h: number) => {
+    if (target?.kind === "house" && target.ref === h) { open(null); return; }
+    open({ chart: tab === "d9" ? "d9" : "d1", kind: "house", ref: h });
+  };
   // Phones: the half sheet covers the lower screen, so lift the chart above it (owner review, 26 Nov).
-  const sheetUp = !!target && narrow;
+  const sheetUp = !!(target || housesNeedTime) && narrow;
   useEffect(() => {
     if (!sheetUp) return;
     const chart = document.querySelector<HTMLElement>("#charts .ni");
@@ -58,9 +64,9 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
     if (t === "dasha") open(null);                       // plan §16.3: the Dasha tab closes the Inspector
     else open(withChart(target, t));                     // D1/D9 keeps the target (D81)
   };
-  const panel = target && (
+  const panel = (target || housesNeedTime) && (
     <Suspense fallback={<Skeleton label="Opening the inspector" widths={["50%", "90%", "70%"]} />}>
-    <InspectorPanel target={target} note={norm && norm.note === "D9_NEEDS_TIME" ? norm.note : null} load={load} size={size} onSize={setSize}
+    <InspectorPanel target={(target ?? housesNeedTime)!} needsTimeOnly={!!housesNeedTime} note={norm && norm.note === "D9_NEEDS_TIME" ? norm.note : null} load={load} size={size} onSize={setSize}
       onGo={(t) => open(t)} onClose={() => open(null)} onAddTime={onAddTime} onRetry={() => setNonce((n) => n + 1)} />
     </Suspense>
   );
@@ -115,8 +121,8 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
           {known && m.d1.lagna ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {tab === "d1"
-                ? <NorthChart firstSign={m.d1.lagna.sign} planets={d1Planets} mark="ASC" selected={effSelected} onPick={pick} aria={`D1 birth chart, ${m.d1.lagna.sign} rising`} />
-                : <NorthChart firstSign={m.d9!.lagna.sign} planets={d9Planets} mark="ASC" selected={effSelected} onPick={pick} aria={`D9 navamsa chart, ${m.d9!.lagna.sign} rising`} />}
+                ? <NorthChart firstSign={m.d1.lagna.sign} planets={d1Planets} mark="ASC" selected={effSelected} onPick={pick} onPickHouse={inspect ? pickHouse : undefined} selectedHouse={selectedHouse} aria={`D1 birth chart, ${m.d1.lagna.sign} rising`} />
+                : <NorthChart firstSign={m.d9!.lagna.sign} planets={d9Planets} mark="ASC" selected={effSelected} onPick={pick} onPickHouse={inspect ? pickHouse : undefined} selectedHouse={selectedHouse} aria={`D9 navamsa chart, ${m.d9!.lagna.sign} rising`} />}
               <p className="hint" style={{ margin: 0, fontSize: 12, textAlign: "center" }}>Numbers in the chart are sign numbers (1 Aries … 12 Pisces). ℞ retrograde.</p>
             </div>
           ) : (

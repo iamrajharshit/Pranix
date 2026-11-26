@@ -24,9 +24,28 @@ def _copy(locale: str = "en") -> dict[str, Any]:
     return dict(raw)
 
 
+def _names(xs: list[str]) -> str:
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+
+def house_summary(b: InspectionBundle, locale: str = "en") -> str:
+    """'House seven is Aquarius. It is empty, so it is read through its lord.' (prototype wording, approved)"""
+    c = _copy(locale)
+    t = c["summary"]
+    assert b.house is not None
+    occ = b.house.occupants
+    rest = str(t["house_target_with"]).format(names=_names(occ)) if occ else str(t["house_target_empty"])
+    rising = str(t["house_target_rising"]) if b.house.house == 1 else ""
+    word = c["house_words"][b.house.house - 1]
+    return str(t["house_target"]).format(rising=rising, word=word, sign=b.house.sign, occupants=rest)
+
+
 def summary(b: InspectionBundle, locale: str = "en") -> str:
+    if b.target.kind == "house":
+        return house_summary(b, locale)
     c = _copy(locale)
     p = b.placement
+    assert p is not None
     planet = b.target.ref
     dig = f", {c['dignity_phrase'][p.dignity]}" if p.dignity else ""
     if p.sign is None:
@@ -39,6 +58,8 @@ def summary(b: InspectionBundle, locale: str = "en") -> str:
 
 
 def gloss(b: InspectionBundle, locale: str = "en") -> str | None:
+    if b.placement is None:
+        return None
     g = _copy(locale)["glosses"]
     if b.target.ref in ("Rahu", "Ketu"):
         return str(g["node"])
@@ -51,13 +72,11 @@ def gloss(b: InspectionBundle, locale: str = "en") -> str | None:
 
 
 def with_text(s: InspectionSet, locale: str = "en") -> InspectionSet:
-    bundles = {
-        k: b.model_copy(
-            update={
-                "summary": summary(b, locale),
-                "placement": b.placement.model_copy(update={"dignity_gloss": gloss(b, locale)}),
-            }
-        )
-        for k, b in s.bundles.items()
-    }
+    def dress(b: InspectionBundle) -> InspectionBundle:
+        update: dict[str, object] = {"summary": summary(b, locale)}
+        if b.placement is not None:
+            update["placement"] = b.placement.model_copy(update={"dignity_gloss": gloss(b, locale)})
+        return b.model_copy(update=update)
+
+    bundles = {k: dress(b) for k, b in s.bundles.items()}
     return s.model_copy(update={"bundles": bundles})

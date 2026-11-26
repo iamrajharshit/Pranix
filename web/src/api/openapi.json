@@ -163,6 +163,50 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HouseLord": {
+        "additionalProperties": false,
+        "properties": {
+          "dignity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "exalted",
+                  "own",
+                  "friend",
+                  "neutral",
+                  "enemy",
+                  "debilitated"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dignity"
+          },
+          "house": {
+            "title": "House",
+            "type": "integer"
+          },
+          "planet": {
+            "title": "Planet",
+            "type": "string"
+          },
+          "sign": {
+            "title": "Sign",
+            "type": "string"
+          }
+        },
+        "required": [
+          "planet",
+          "house",
+          "sign",
+          "dignity"
+        ],
+        "title": "HouseLord",
+        "type": "object"
+      },
       "HouseRef": {
         "additionalProperties": false,
         "properties": {
@@ -241,7 +285,14 @@
             "type": "string"
           },
           "dispositor": {
-            "$ref": "#/components/schemas/Dispositor"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dispositor"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "either_side": {
             "anyOf": [
@@ -259,6 +310,16 @@
             },
             "title": "Fact Ids",
             "type": "array"
+          },
+          "house": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HouseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "houses_ruled": {
             "anyOf": [
@@ -282,6 +343,16 @@
             "title": "Level",
             "type": "string"
           },
+          "lord": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HouseLord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "modifiers": {
             "default": [],
             "items": {
@@ -301,7 +372,24 @@
             ]
           },
           "placement": {
-            "$ref": "#/components/schemas/Placement"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Placement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "same_house_other_chart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HouseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "schema_version": {
             "const": "1",
@@ -310,6 +398,7 @@
             "type": "string"
           },
           "sits_with": {
+            "default": [],
             "items": {
               "type": "string"
             },
@@ -350,12 +439,6 @@
           "target",
           "chart",
           "level",
-          "placement",
-          "houses_ruled",
-          "acts_through",
-          "sits_with",
-          "other_chart",
-          "dispositor",
           "either_side",
           "unavailable",
           "fact_ids"

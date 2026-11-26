@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // I1: the Inspector renders what the server sends, in the D81 order. Data comes from the fixtures the
 // backend exports (tools/export_contract.py), so both sides test the same bytes.
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Master } from "../api/types";
 import ChartsSection, { type ChartTab } from "../dashboard/ChartsSection";
 import { clearInspectCache, type InspectionSet } from "../features/inspector/api";
-import { needsTime, toSnapshot } from "../features/inspector/model";
+import { needsTime, titleOf, toSnapshot } from "../features/inspector/model";
 import sample from "../__fixtures__/sample_1984.json";
 import unknownSample from "../__fixtures__/sample_1984_unknown_time.json";
 import d1 from "../__fixtures__/inspect_1984_d1.json";
@@ -59,6 +59,31 @@ describe("toSnapshot (D81 order, data only)", () => {
     expect(moon[0].note).toContain("changes star during that day");
     expect(needsTime(U1.bundles["planet:Moon"])).toBe("House, houses it rules, degree, the D9 and aspects. Add a birth time to see them.");
     expect(JSON.stringify(moon)).not.toMatch(/House \d|°/);
+  });
+});
+
+describe("houses (I2)", () => {
+  const houses = Array.from({ length: 12 }, (_, i) => i + 1);
+  it("every house keeps the D81 house order in both charts; aspects wait for I3", () => {
+    for (const h of houses) {
+      expect(toSnapshot(D1.bundles[`house:${h}`]).map((g) => g.title)).toEqual(["Occupants", "Its lord", `House ${h} in your D9`, "Either side"]);
+      expect(toSnapshot(D9.bundles[`house:${h}`]).map((g) => g.title)).toEqual(["Occupants", "Its lord", `House ${h} in your D1`, "Either side"]);
+    }
+    expect(Object.keys(U1.bundles).some((k) => k.startsWith("house:"))).toBe(false); // no houses without a birth time
+  });
+  it("an empty house is read through its lord", () => {
+    const g = toSnapshot(D1.bundles["house:7"]);
+    expect(g[0].chips).toEqual([]);
+    expect(g[0].note).toContain("Empty house");
+    expect(g[1].chips.map((c) => c.label)).toEqual(["Saturn", "House 3"]);
+    expect(g[1].note).toBe("Saturn rules Aquarius and sits in the 3rd house, in Libra (exalted).");
+    expect(D1.bundles["house:7"].summary).toBe("House seven is Aquarius. It is empty, so it is read through its lord.");
+  });
+  it("titles use words; house chips link to houses", () => {
+    expect(titleOf(D1.bundles["house:1"], "house", 1)).toBe("House one · Leo");
+    expect(titleOf(undefined, "house", 12)).toBe("House twelve");
+    const place = toSnapshot(D1.bundles["planet:Jupiter"])[0].chips.find((c) => c.label === "House 5");
+    expect(place?.target).toEqual({ chart: "d1", kind: "house", ref: 5 });
   });
 });
 
@@ -130,5 +155,28 @@ describe("ChartsSection with the Inspector on", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Try again" }));
     await waitFor(() => expect(screen.getByText("Sun in your fourth house, in Scorpio, a friend's sign.")).toBeTruthy());
   });
+  it("houses are buttons: open, chip into a planet, Next wraps from twelve to one", async () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: "House seven, Aquarius, empty" }));
+    expect(window.location.search).toBe("?inspect=d1.h7");
+    expect(await screen.findByText("House seven is Aquarius. It is empty, so it is read through its lord.")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "House seven · Aquarius" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Inspect Saturn" }));
+    expect(window.location.search).toBe("?inspect=d1.Saturn");
+    fireEvent.click(screen.getByRole("button", { name: "Inspect house three" }));
+    expect(window.location.search).toBe("?inspect=d1.h3");
+    window.history.replaceState(null, "", "/dashboard?inspect=d1.h12");
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    fireEvent.click(await screen.findByRole("button", { name: "Next: house one" }));
+    expect(window.location.search).toBe("?inspect=d1.h1");
+    expect(await screen.findByText("Your rising sign. House one is Leo. It is empty, so it is read through its lord.")).toBeTruthy();
+  });
+  it("unknown time: a house link explains that houses need the birth time", async () => {
+    window.history.replaceState(null, "", "/dashboard?inspect=d1.h7");
+    render(<Harness m={unknownSample as unknown as Master} id="unknown" />);
+    expect(await screen.findByText(/Houses are counted from the rising sign/)).toBeTruthy();
+    const panel = screen.getByRole("region", { name: "Inspector" });
+    expect(within(panel).getByRole("button", { name: "Add a birth time" })).toBeTruthy();
+    expect(within(panel).queryByRole("button", { name: /^Next/ })).toBeNull();
+  });
 });
-

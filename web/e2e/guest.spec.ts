@@ -87,6 +87,16 @@ test("the Chart Inspector opens from the chart and keeps its target (I1)", async
   await expect(page).toHaveURL(/inspect=d9\.Mercury/);
   await expect(panel.getByText(/^Mercury in your eighth house, in Taurus/)).toBeVisible();
 
+  // I2: houses are buttons on the chart; an empty house is read through its lord
+  await page.getByRole("tab", { name: "D1 · Birth chart" }).click();
+  await page.getByRole("button", { name: "House seven, Aquarius, empty" }).click();
+  await expect(page).toHaveURL(/inspect=d1\.h7/);
+  await expect(panel.getByText("House seven is Aquarius. It is empty, so it is read through its lord.")).toBeVisible();
+  await expect(panel.getByRole("heading", { name: "House seven · Aquarius" })).toBeVisible();
+  await axe(page);
+  await panel.getByRole("button", { name: "Inspect Saturn" }).click();
+  await expect(page).toHaveURL(/inspect=d1\.Saturn/);
+
   await page.goBack(); // Back closes the Inspector in one step, however many targets were visited
   await expect(page).not.toHaveURL(/inspect=/);
   await expect(page.getByRole("region", { name: "Inspector" })).toHaveCount(0);

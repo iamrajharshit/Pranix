@@ -4,11 +4,12 @@
 import { Fragment } from "react";
 import { Chip, ChipLink, Sheet, Skeleton, type SheetSize } from "../../ui";
 import type { Load } from "./api";
-import { needsTime, toSnapshot } from "./model";
+import { HOUSE_WORDS, needsTime, titleOf, toSnapshot } from "./model";
 import { stepTarget, type InspectTarget } from "./urlState";
 
-export function InspectorPanel({ target, note, load, size, onSize, onGo, onClose, onAddTime, onRetry, forceLayout }: {
+export function InspectorPanel({ target, needsTimeOnly = false, note, load, size, onSize, onGo, onClose, onAddTime, onRetry, forceLayout }: {
   target: InspectTarget;
+  needsTimeOnly?: boolean;           // a house link on an unknown-time profile (D81 §5): no data, just the reason
   note: "D9_NEEDS_TIME" | null;
   load: Load;
   size: SheetSize;
@@ -21,17 +22,24 @@ export function InspectorPanel({ target, note, load, size, onSize, onGo, onClose
 }) {
   const bundle = load.state === "ready" ? load.data.bundles[`${target.kind}:${target.ref}`] : undefined;
   const signLevel = load.state === "ready" && load.data.level === "sign";
-  const name = target.kind === "planet" ? target.ref : `House ${target.ref}`;
+  const name = titleOf(bundle, target.kind, target.ref);
   const prev = stepTarget(target, -1), next = stepTarget(target, 1);
+  const label = (t: InspectTarget) => (t.kind === "planet" ? t.ref : `house ${HOUSE_WORDS[t.ref]}`);
   const arrow = (d: string) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d={d} /></svg>;
 
   return (
     <Sheet open title={name} label="Inspector" size={size} onSize={onSize} onClose={onClose} forceLayout={forceLayout}
-      eyebrow={`${target.kind === "planet" ? "Planet" : "House"} · ${signLevel ? "sign level" : target.chart.toUpperCase()}`}
-      actions={<>
-        <button type="button" className="iconbtn" aria-label={`Previous: ${prev.ref}`} onClick={() => onGo(prev)}>{arrow("M15 6l-6 6 6 6")}</button>
-        <button type="button" className="iconbtn" aria-label={`Next: ${next.ref}`} onClick={() => onGo(next)}>{arrow("M9 6l6 6-6 6")}</button>
+      eyebrow={`${target.kind === "planet" ? "Planet" : "House"} · ${signLevel || needsTimeOnly ? "sign level" : target.chart.toUpperCase()}`}
+      actions={needsTimeOnly ? undefined : <>
+        <button type="button" className="iconbtn" aria-label={`Previous: ${label(prev)}`} onClick={() => onGo(prev)}>{arrow("M15 6l-6 6 6 6")}</button>
+        <button type="button" className="iconbtn" aria-label={`Next: ${label(next)}`} onClick={() => onGo(next)}>{arrow("M9 6l6 6-6 6")}</button>
       </>}>
+      {needsTimeOnly ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start" }}>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "var(--text2)" }}>Houses are counted from the rising sign, which needs your birth time. Without it we would be guessing, so we do not show houses.</p>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onAddTime}>Add a birth time</button>
+        </div>
+      ) : <>
       {note === "D9_NEEDS_TIME" && <p className="hint" style={{ margin: 0 }}>The D9 needs your birth time, so this is what we can say from the sign alone.</p>}
       {load.state === "loading" || load.state === "idle" ? <Skeleton label={`Loading ${name}`} widths={["90%", "60%", "75%", "40%", "70%"]} heading={false} />
         : load.state === "error" ? (
@@ -67,6 +75,7 @@ export function InspectorPanel({ target, note, load, size, onSize, onGo, onClose
             )}
           </>
         )}
+      </>}
     </Sheet>
   );
 }
