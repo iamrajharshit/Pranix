@@ -276,6 +276,20 @@
             ],
             "title": "Aspects Out"
           },
+          "aspects_out_signs": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aspects Out Signs"
+          },
           "chart": {
             "enum": [
               "d1",
@@ -472,6 +486,9 @@
             "title": "Level",
             "type": "string"
           },
+          "rules": {
+            "$ref": "#/components/schemas/RulesetRef"
+          },
           "ruleset": {
             "$ref": "#/components/schemas/RulesetRef"
           }
@@ -480,6 +497,7 @@
           "chart",
           "level",
           "ruleset",
+          "rules",
           "bundles"
         ],
         "title": "InspectionSet",

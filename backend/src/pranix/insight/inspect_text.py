@@ -34,7 +34,8 @@ def house_summary(b: InspectionBundle, locale: str = "en") -> str:
     t = c["summary"]
     assert b.house is not None
     occ = b.house.occupants
-    rest = str(t["house_target_with"]).format(names=_names(occ)) if occ else str(t["house_target_empty"])
+    empty = "house_target_empty_looked" if b.aspects_in else "house_target_empty"  # only when a planet looks at it
+    rest = str(t["house_target_with"]).format(names=_names(occ)) if occ else str(t[empty])
     rising = str(t["house_target_rising"]) if b.house.house == 1 else ""
     word = c["house_words"][b.house.house - 1]
     return str(t["house_target"]).format(rising=rising, word=word, sign=b.house.sign, occupants=rest)

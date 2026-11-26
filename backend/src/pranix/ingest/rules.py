@@ -214,6 +214,8 @@ def import_sheet(path: Path, sheet_path: Path, reviewed_on: str | None = None, w
         f"{RULESET}: owner-approved rule tables for the Chart Inspector (plan 4.7, D72, D73, D75).",
         "Written by `pranix-ctl rules import`. Any change needs a golden-snapshot diff",
         "and owner approval (FR-REV-05).",
+        "graha_drishti: nth house counted from the planet (its own house is the 1st); whole-house, no orbs;",
+        "read in D1 and inside D9; with no birth time the same counts apply by sign (D81 4).",
     ]
     text = yamlio.dump({**meta, "tables": ordered}, header)
     rep.content_hash = hashlib.sha256(text.encode()).hexdigest()[:16]
@@ -231,11 +233,8 @@ def _order(table: str, key: str) -> tuple[int, str]:
 
 
 def _incomplete(tables: dict[str, Any]) -> bool:
-    return any(
-        TABLES[t].keys is not None and set(tables.get(t, {})) != set(TABLES[t].keys or ())
-        for t in TABLES
-        if t in tables
-    )
+    """PARTIAL until every fixed-key table is present and full (a missing table counts, plan 4.7)."""
+    return any(TABLES[t].keys is not None and set(tables.get(t, {})) != set(TABLES[t].keys or ()) for t in TABLES)
 
 
 def export_sheet(path: Path, out: Path) -> int:

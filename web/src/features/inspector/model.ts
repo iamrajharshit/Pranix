@@ -94,14 +94,19 @@ function planetSnapshot(b: InspectionBundle): GroupView[] {
   g.push({ id: "with", title: b.level === "house" ? "Sits with" : "Same sign", chips: b.sits_with.map((x) => planet(c, x)),
     note: b.sits_with.length ? undefined : `No other planet in this ${where}.` });
 
-  // 4. Aspects · drishti (I3: shown once the aspect table is approved; null = not yet available)
+  // 4. Aspects · drishti (I3, jyotish-core@1). House level counts houses; sign level counts signs (D81 4).
+  const by = b.level === "house" ? "" : " (by sign)";
   if (b.aspects_out) {
     g.push({ id: "looks", title: "Looks at", head: "Aspects · drishti", chips: b.aspects_out.map((h) => house(c, h.house)),
       note: b.aspects_out.map((h) => `${ORDN[h.house]}${h.occupants.length ? ` (${join(h.occupants)})` : ""}`).join(" · ") });
+  } else if (b.aspects_out_signs) {
+    g.push({ id: "looks", title: `Looks at${by}`, head: "Aspects · drishti", chips: b.aspects_out_signs.map(fact),
+      note: "Counted by sign, because houses need a birth time." });
   }
   if (b.aspects_in) {
-    g.push({ id: "lookedby", title: "Looked at by", head: b.aspects_out ? undefined : "Aspects · drishti", chips: b.aspects_in.map((x) => planet(c, x)),
-      note: b.aspects_in.length ? undefined : "No planet looks at this house." });
+    const first = !(b.aspects_out || b.aspects_out_signs);
+    g.push({ id: "lookedby", title: `Looked at by${by}`, head: first ? "Aspects · drishti" : undefined, chips: b.aspects_in.map((x) => planet(c, x)),
+      note: b.aspects_in.length ? undefined : `No planet looks at its ${b.level === "house" ? "house" : "sign"}.` });
   }
 
   // 5. In your D9 / D1
@@ -131,7 +136,7 @@ function planetSnapshot(b: InspectionBundle): GroupView[] {
   return g;
 }
 
-const NEEDS: Record<string, string> = { house: "house", houses_ruled: "houses it rules", degree: "degree", d9: "the D9", aspects: "aspects" };
+const NEEDS: Record<string, string> = { house: "house", houses_ruled: "houses it rules", degree: "degree", d9: "the D9" };
 
 /** Sign level (D56): what the birth time would add, in plain words. */
 export function needsTime(b: InspectionBundle): string | null {

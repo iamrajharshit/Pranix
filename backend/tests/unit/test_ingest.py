@@ -372,13 +372,17 @@ def test_rules_decision_rules(tmp_path: Path) -> None:
     assert "DUPLICATE_ROW" in {e.rule for e in rules.import_sheet(t, dup).errors}
 
 
-def test_complete_table_marks_ruleset_partial_false(tmp_path: Path) -> None:
-    rows = [
-        ("natural_nature", p, "benefic", "approve", "")
-        for p in ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu")
-    ]
+def test_status_is_complete_only_when_every_fixed_table_is_full(tmp_path: Path) -> None:
+    """One full table is not a complete ruleset: missing fixed tables keep it PARTIAL (plan 4.7)."""
+    planets = ("Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu")
     t = tmp_path / "r.yaml"
-    assert rules.import_sheet(t, rsheet(tmp_path / "s.csv", rows), write=True).ok
+    one = [("natural_nature", p, "benefic", "approve", "") for p in planets]
+    assert rules.import_sheet(t, rsheet(tmp_path / "s.csv", one), write=True).ok
+    assert yamlio.load(t.read_text())["status"] == "PARTIAL"
+    fixed = [n for n, tab in rules.TABLES.items() if tab.keys is not None]
+    value = {"graha_drishti": "7", "house_categories": "neutral", "natural_nature": "benefic"}
+    rows = [(n, k, value[n], "approve", "") for n in fixed for k in (rules.TABLES[n].keys or ())]
+    assert rules.import_sheet(t, rsheet(tmp_path / "all.csv", rows), write=True).ok
     assert yamlio.load(t.read_text())["status"] == "COMPLETE"
 
 

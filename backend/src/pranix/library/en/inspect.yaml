@@ -23,5 +23,6 @@ summary:
   house_target_rising: "Your rising sign. "
   house_target_with: ", with {names}"
   house_target_empty: ". It is empty, so it is read through its lord"
+  house_target_empty_looked: ". It is empty, so it is read through its lord and the planets that look at it"
   sign: "{planet} in {sign}{dignity}."
   sign_uncertain: "{planet} in {options}, depending on the birth time."

@@ -91,7 +91,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .ni { position: relative; width: 100%; max-width: 440px; aspect-ratio: 1/1; margin: 0 auto; }
 .ni svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hs { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 0; pointer-events: none; }
-.sn { position: absolute; transform: translate(-50%, -50%); font: 600 11px var(--sans); color: #8f8ab8; }
+.sn { position: absolute; transform: translate(-50%, -50%); font: 600 11px var(--sans); color: #8f8ab8;
+  text-shadow: 0 0 3px #12123a, 0 0 3px #12123a, 0 0 6px #12123a; } /* stays legible over aspect outlines (I3) */
 .pl { pointer-events: auto; min-height: 24px; min-width: 24px; /* WCAG 2.5.8 */ border: 0; background: transparent; color: var(--text); font: 600 12px/1.25 var(--sans); padding: 1px 5px;
   border-radius: 6px; cursor: pointer; white-space: nowrap; }
 .pl:hover { background: rgba(244,197,102,.18); }
@@ -102,6 +103,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .hz:hover { background: rgba(244,197,102,.08); }
 .hz.on { background: rgba(244,197,102,.16); }
 .hz:focus-visible { outline: none; background: rgba(255,227,163,.22); }
+/* I3: houses the selected planet looks at. Dashed and inset, so they read as "looked at", not "selected". */
+.ni .aspect { fill: rgba(139,124,246,.10); stroke: var(--lav); stroke-width: 1.6; stroke-dasharray: 6 5; stroke-linejoin: round;
+  animation: aspect-in var(--dur-3) var(--ease); }
+@keyframes aspect-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ni .aspect { animation: none; } }
+@media (forced-colors: active) { .ni .aspect { stroke: CanvasText; fill: none; } }
 .ni .hs { z-index: 1; }
 .pt { width: 100%; border-collapse: collapse; font-size: 14px; }
 .pt th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase;

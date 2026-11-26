@@ -241,6 +241,8 @@ export interface components {
             aspects_in?: string[] | null;
             /** Aspects Out */
             aspects_out?: components["schemas"]["HouseRef"][] | null;
+            /** Aspects Out Signs */
+            aspects_out_signs?: string[] | null;
             /**
              * Chart
              * @enum {string}
@@ -305,6 +307,7 @@ export interface components {
              * @enum {string}
              */
             level: "house" | "sign";
+            rules: components["schemas"]["RulesetRef"];
             ruleset: components["schemas"]["RulesetRef"];
         };
         /** OtherChart */
