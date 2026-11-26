@@ -9,7 +9,7 @@ module count. On reconnect the client asks again with modules= the ones it did n
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator, Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
@@ -47,17 +47,35 @@ def stream_insights(
     service = request.app.state.insights
     master = item.master
 
-    def run() -> Iterator[str]:
-        yield _event("plan", {"modules": plan, "chart_ref": profile_id})
-        degraded = False
-        with ThreadPoolExecutor(max_workers=4) as pool:
-            futures = {pool.submit(service.card, m, master): m for m in plan}
-            for f in as_completed(futures):
-                card = f.result()
-                degraded = degraded or card["degraded"]
-                yield _event("insight", {**card, "chart_ref": profile_id}, card["module_id"])
-        yield _event("done", {"degraded": degraded})
-
     return StreamingResponse(
-        run(), media_type="text/event-stream", headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"}
+        card_events(service.card, plan, master, profile_id),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
     )
+
+
+def card_events(
+    card: Callable[[str, Mapping[str, Any]], dict[str, Any]],
+    plan: list[str],
+    master: Mapping[str, Any],
+    chart_ref: str,
+) -> Iterator[str]:
+    """The card stream. Cards are worked out four at a time and sent as each one is ready.
+
+    The reader can leave mid-stream (Start over, Back). This generator is then closed on the server's
+    event-loop thread, so closing must never wait for a slow card: with a local model a card can take
+    minutes in line, and waiting froze every request (owner's laptop, 26 Nov: the oracle screen after
+    building charts two or three times). Queued cards are cancelled; running ones finish on their own
+    threads, and their results still fill the cache for next time."""
+    yield _event("plan", {"modules": plan, "chart_ref": chart_ref})
+    degraded = False
+    pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="cards")
+    try:
+        futures = {pool.submit(card, m, master): m for m in plan}
+        for f in as_completed(futures):
+            result = f.result()
+            degraded = degraded or result["degraded"]
+            yield _event("insight", {**result, "chart_ref": chart_ref}, result["module_id"])
+        yield _event("done", {"degraded": degraded})
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
