@@ -1,14 +1,15 @@
 {
-  "content_hash": "923d9f641369f3c3fd7767bbeabca6956d314798eba18677eaa9bb73f829d024",
+  "content_hash": "849e799ab812fc86983d9bd2e27d25140520c0fc943673cb9ea089160e81ef68",
   "counts": {
     "approved": 96,
-    "draft": 0
+    "draft": 108
   },
   "files": {
     "bridge.yaml": "510b398854fcae7939a808f19791cdf40f7ab29d52e705ece063798a9863c632",
     "houses.yaml": "839cfc85a8d30b12b4a5d7b1bfb5cd2d231037c497c3271798bf9c9642d429b3",
     "nakshatra_deep.yaml": "22576f4cdac0522c75824bc72b46ac0f92c2f53a14b3136bc886587efae49f59",
     "planet_deep.yaml": "9972aa2ea3853c169c1495c381aa3570e5dadf55c31fae113380ace5c11dcfba",
+    "planet_in_house.yaml": "70759ddb70bf120123dda2e91c2ca324d7b64415ecd3ec5fa8c77e6e6629497a",
     "sign_deep.yaml": "43e3242207332213955fe0af7b04b5d77e5eeaac1dda322a5b6af61e62d90975",
     "signals.yaml": "309aeaed4f4eb9554d2e7b231b5203c5beb4dc995c501e11d06e8373063a76ef"
   },
