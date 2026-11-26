@@ -3,7 +3,7 @@
 // SSE. Opening a card flips it into a full-page reading with its own history entry.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, ApiError } from "../api/client";
-import { streamInsights } from "../api/sse";
+import { streamGroup, type StreamGroup } from "../api/sse";
 import type { InsightCard, Profile } from "../api/types";
 import { Link, Toast, TopBar } from "../components/Shell";
 import { navigate } from "../lib/router";
@@ -43,7 +43,8 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
   const [confirmStart, setConfirmStart] = useState(false);
   const [failed, setFailed] = useState(false);
   const retries = useRef<Record<string, { n: number; at: number }>>({});
-  const stop = useRef<() => void>(() => {});
+  // Every stream for the current chart, retries included: all closed together (bug bounty, 26 Nov).
+  const streams = useRef<StreamGroup | null>(null);
   const name = draft?.name.trim() ?? "";
 
   // Load or refresh the chart: memory -> GET by id -> silent re-POST from the draft (FR-DASH-19).
@@ -56,6 +57,9 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
     } catch { setFailed(true); }
   }, [draft, onProfile]);
 
+  const refreshRef = useRef(refresh); // read by the stream's failure handler without restarting the stream
+  refreshRef.current = refresh;
+
   useEffect(() => {
     if (profile) return;
     const id = store.profileId();
@@ -65,23 +69,30 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
   }, [profile, refresh, onProfile, draft]);
 
   const startStream = useCallback((only?: string[]) => {
-    if (!profile) return;
-    stop.current = streamInsights(profile.profile_id, {
+    if (!profile || !streams.current) return;
+    streams.current.start({
       plan: (mods) => { setPlan(mods); setStatus((s) => ({ ...Object.fromEntries(mods.map((m) => [m, "streaming" as Status])), ...s })); },
       card: (c) => {
         setCards((x) => ({ ...x, [c.module_id]: c }));
         setStatus((s) => ({ ...s, [c.module_id]: c.state === "error" ? "error" : c.state === "unavailable" ? "unavailable" : "ready" }));
       },
       done: (d) => setDegraded((x) => x || d),
-      failed: (missing) => setStatus((s) => ({ ...s, ...Object.fromEntries(missing.map((m) => [m, "error" as Status])) })),
+      failed: (missing) => {
+        setStatus((s) => ({ ...s, ...Object.fromEntries(missing.map((m) => [m, "error" as Status])) }));
+        // A stream can't say why it failed. If the guest chart expired while the page was open,
+        // re-create it silently, as on load (FR-DASH-19), instead of leaving cards in error.
+        api.getProfile(profile.profile_id).catch((e: ApiError) => { if (e.status === 410) void refreshRef.current(); });
+      },
     }, only);
   }, [profile]);
 
   useEffect(() => {
     if (!profile) return;
     setCards({}); setStatus({}); setPlan([]); setDegraded(false); retries.current = {};
+    const group = streamGroup(profile.profile_id);
+    streams.current = group;
     startStream();
-    return () => stop.current();
+    return () => { group.closeAll(); if (streams.current === group) streams.current = null; };
   }, [profile, startStream]);
 
   // Reading history (FR-DASH-15): Back closes the reading.

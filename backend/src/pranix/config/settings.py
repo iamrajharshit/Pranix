@@ -64,6 +64,8 @@ class Settings(BaseSettings):
     rate_profiles_per_min: int = Field(default=30, ge=1)
     rate_places_per_min: int = Field(default=60, ge=1)
     rate_insights_per_min: int = Field(default=20, ge=1)
+    # Cards worked out at once across all dashboards (one shared pool; providers have their own buckets)
+    card_workers: int = Field(default=8, ge=1, le=64)
     rate_images_per_min: int = Field(default=10, ge=1)
     rate_inspect_per_min: int = Field(default=60, ge=1)  # cheap: built in milliseconds (plan §8)
     # Library: production serves approved entries only (FR-LIB-03); dev/test also serve drafts.
@@ -93,8 +95,10 @@ class Settings(BaseSettings):
     # Test-only fake provider (F1): replaces every real provider; refused in prod.
     llm_fake: FakeMode = "off"
     llm_fake_delay_ms: int = Field(default=0, ge=0, le=60_000)
-    # Behind Render's proxy the client IP is the first X-Forwarded-For entry; never trust it elsewhere.
+    # Behind our own proxy only: rate limits read X-Forwarded-For from the right, skipping
+    # proxy_hops - 1 trusted proxies (Caddy alone = 1). Never trust the header without a proxy.
     trust_proxy: bool = False
+    proxy_hops: int = Field(default=1, ge=1, le=5)
     map_tile_url: str = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
     # Secrets (required in prod, optional in dev/test)
@@ -152,6 +156,8 @@ class Settings(BaseSettings):
         out = []
         if self.llm_fake != "off":
             out.append("llm_fake must be off in prod")
+        if self.library_allow_drafts:  # FR-LIB-03: production serves owner-approved entries only
+            out.append("library_allow_drafts must be off in prod")
         if self.llm_chains == "dev":
             out.append("llm_chains=dev is for a developer machine, not prod")
         if self.local_llm_url and self.local_llm_api_key is None:

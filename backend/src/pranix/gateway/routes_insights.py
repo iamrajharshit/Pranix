@@ -8,9 +8,10 @@ module count. On reconnect the client asks again with modules= the ones it did n
 
 from __future__ import annotations
 
+import asyncio
 import json
-from collections.abc import Callable, Iterator, Mapping
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from collections.abc import AsyncIterator, Callable, Mapping
+from concurrent.futures import Executor
 from typing import Any
 
 from fastapi import APIRouter, Query, Request
@@ -48,34 +49,34 @@ def stream_insights(
     master = item.master
 
     return StreamingResponse(
-        card_events(service.card, plan, master, profile_id),
+        card_events(service.card, plan, master, profile_id, request.app.state.card_pool),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
     )
 
 
-def card_events(
+async def card_events(
     card: Callable[[str, Mapping[str, Any]], dict[str, Any]],
     plan: list[str],
     master: Mapping[str, Any],
     chart_ref: str,
-) -> Iterator[str]:
-    """The card stream. Cards are worked out four at a time and sent as each one is ready.
+    pool: Executor,
+) -> AsyncIterator[str]:
+    """The card stream: every card is handed to the shared card pool at once and sent as soon as it's ready.
 
-    The reader can leave mid-stream (Start over, Back). This generator is then closed on the server's
-    event-loop thread, so closing must never wait for a slow card: with a local model a card can take
-    minutes in line, and waiting froze every request (owner's laptop, 26 Nov: the oracle screen after
-    building charts two or three times). Queued cards are cancelled; running ones finish on their own
-    threads, and their results still fill the cache for next time."""
+    It waits on the event loop (asyncio), not in a request thread. A synchronous stream held one of the
+    server's 40 request threads while it waited, so forty dashboards waiting on a slow model stalled every
+    other request (bug bounty, 26 Nov). When the reader leaves (Start over, Back), cards still queued are
+    cancelled and nothing waits for the ones already running; their results still fill the cache."""
     yield _event("plan", {"modules": plan, "chart_ref": chart_ref})
+    futures = [asyncio.wrap_future(pool.submit(card, m, master)) for m in plan]
     degraded = False
-    pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="cards")
     try:
-        futures = {pool.submit(card, m, master): m for m in plan}
-        for f in as_completed(futures):
-            result = f.result()
+        for next_done in asyncio.as_completed(futures):
+            result = await next_done
             degraded = degraded or result["degraded"]
             yield _event("insight", {**result, "chart_ref": chart_ref}, result["module_id"])
         yield _event("done", {"degraded": degraded})
     finally:
-        pool.shutdown(wait=False, cancel_futures=True)
+        for f in futures:
+            f.cancel()  # a queued card never starts; a running one finishes on its own thread
