@@ -42,9 +42,11 @@ class _Timed:
     calls: list[tuple[float, int, str]] = dataclasses.field(default_factory=list)  # (seconds, tokens_out, outcome)
     name: str = ""
     model: str = ""
+    accepts: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
         self.name, self.model = str(self.inner.name), str(self.inner.model)
+        self.accepts = frozenset(getattr(self.inner, "accepts", {"facts"}))  # same routing as the real one
 
     def generate(self, system: str, user: str, timeout: float) -> Any:
         from ..llmgw.providers import ProviderError
@@ -65,12 +67,31 @@ def _chain(s: Settings) -> Any:
     return insights_chain(s)
 
 
+def _print_routing(s: Settings) -> bool:
+    """Which providers each AI task may use (D82). False when the routing is unsafe (start-up would fail)."""
+    from ..llmgw.build import router
+    from ..llmgw.tasks import TASKS, RoutingError
+
+    try:
+        r = router(s)
+    except RoutingError as e:
+        print(f"routing: REFUSED: {e}")
+        return False
+    print("routing (task, data, chain: providers in order; then curated text or prepared answers):")
+    for t in TASKS.values():
+        names = ", ".join(li.provider.name for li in r.chains[t.chain].links) or "none"
+        print(f"  {t.id:<16} {t.data_class:<10} {t.chain}: {names}")
+    return True
+
+
 def check(s: Settings) -> int:
     from ..llmgw.build import describe
     from ..llmgw.providers import ProviderError
 
     chain = _chain(s)
     print(f"chain: {s.llm_chains}" + (f" (fake: {s.llm_fake})" if s.llm_fake != "off" else ""))
+    if not _print_routing(s):
+        return 1
     from ..llmgw.build import background_chain, reword_gap_s
 
     bg = background_chain(s, chain)

@@ -1,10 +1,19 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-"""Build the insights chain from configuration (D19, D71, D77, §8.3).
+"""Build the AI chains from configuration (D19, D71, D77, D82, §8.3).
 
-    default: Gemini free models -> Groq -> local model -> (caller) curated library text
-    dev:     local model only (offline, zero cost; refused in prod)
-    cloud:   Gemini and Groq only
-    background (D77): the same local model, for re-wording curated serves later
+Chains by mode (`PRANIX_LLM_CHAINS`):
+
+    mode     reading (facts: cards, Inspector)        chat (typed text: VEDA, V1)
+    default  Gemini free -> Groq -> local model       Groq -> local model
+    cloud    Gemini free -> Groq                      Groq
+    dev      local model only                         local model only
+
+then the caller's own fallback (curated text, prepared answers). `background` (D77) is the local link
+alone, for re-wording curated serves later.
+
+Each provider's link is built once and shared by every chain, so its breaker and rate bucket are one.
+Groq's quota is split between chat and readings (`groq_chat_share`), so readings can't starve chat.
+`router()` checks the routing at start-up: Gemini free can never end up serving typed text (D32).
 
 The local model is one `OpenAICompatible` link whatever runs it: Ollama on the PC or llama.cpp on
 the Oracle VM. Moving from one to the other changes PRANIX_LOCAL_LLM_URL (and the key), nothing else.
@@ -12,10 +21,13 @@ the Oracle VM. Moving from one to the other changes PRANIX_LOCAL_LLM_URL (and th
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from ..config.settings import Settings
 from ..util.tokenbucket import TokenBucket
 from .chain import Chain, Link
 from .providers import Fake, Gemini, Groq, OpenAICompatible
+from .tasks import TASKS, RoutingError, check_routing
 
 
 def local_link(s: Settings) -> Link | None:
@@ -42,8 +54,41 @@ def cloud_links(s: Settings) -> list[Link]:
         key = s.gemini_api_key.get_secret_value()
         links += [Link(Gemini(key, m), TokenBucket(s.gemini_rpm)) for m in s.gemini_models]
     if s.groq_api_key is not None:
-        links.append(Link(Groq(s.groq_api_key.get_secret_value(), s.groq_model), TokenBucket(s.groq_rpm)))
+        links.append(groq_link(s))
     return links
+
+
+def groq_link(s: Settings) -> Link:
+    assert s.groq_api_key is not None
+    chat = round(s.groq_rpm * s.groq_chat_share)
+    shares = {"chat": TokenBucket(max(chat, 1)), "reading": TokenBucket(max(s.groq_rpm - chat, 1))}
+    return Link(Groq(s.groq_api_key.get_secret_value(), s.groq_model), TokenBucket(s.groq_rpm), shares=shares)
+
+
+@dataclass
+class Router:
+    """The named chains every AI task runs on (tasks.TASKS says which)."""
+
+    chains: dict[str, Chain]
+    background: Chain | None
+
+    def chain(self, task_id: str) -> Chain:
+        return self.chains[TASKS[task_id].chain]
+
+
+def router(s: Settings) -> Router:
+    reading = insights_chain(s)
+    if s.llm_fake != "off":
+        chat = Chain(list(reading.links))  # the same fake link
+    elif s.llm_chains == "dev":
+        chat = Chain(list(reading.links))
+    else:  # typed text: Groq, then our own model; never Gemini free (D32)
+        chat = Chain([li for li in reading.links if isinstance(li.provider, (Groq, OpenAICompatible))])
+    chains = {"reading": reading, "chat": chat}
+    problems = check_routing(chains)
+    if problems:
+        raise RoutingError("; ".join(problems))
+    return Router(chains, background_chain(s, reading))
 
 
 def insights_chain(s: Settings) -> Chain:

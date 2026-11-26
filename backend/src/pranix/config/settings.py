@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     gemini_rpm: int = Field(default=10, ge=1)
     groq_model: str = "llama-3.3-70b-versatile"
     groq_rpm: int = Field(default=30, ge=1)
+    # Share of Groq's free quota kept for VEDA chat; readings get the rest (D82 §2 budgets, §6)
+    groq_chat_share: float = Field(default=0.8, ge=0.0, le=1.0)
     # Local model (F5, D77): one setting group for both places it runs.
     #   PC:     PRANIX_LOCAL_LLM_URL=http://localhost:11434/v1   PRANIX_LOCAL_LLM_MODEL=gemma4:e2b   (Ollama)
     #   Oracle: PRANIX_LOCAL_LLM_URL=http://llm:8080/v1          + PRANIX_LOCAL_LLM_API_KEY          (llama.cpp)
