@@ -6,7 +6,7 @@ import type { InspectionBundle } from "./api";
 import type { ChartId, InspectTarget, PlanetId } from "./urlState";
 
 export interface ChipView { label: string; target?: InspectTarget; aria?: string }
-export interface GroupView { id: string; title: string; head?: string; chips: ChipView[]; note?: string }
+export interface GroupView { id: string; title: string; head?: string; chips: ChipView[]; note?: string; lines?: string[] }
 
 const DIG: Record<string, string> = {
   own: "own sign", exalted: "exalted", debilitated: "debilitated", friend: "friend's sign", enemy: "enemy's sign", neutral: "neutral sign",
@@ -29,8 +29,22 @@ export function titleOf(b: InspectionBundle | undefined, kind: "planet" | "house
 }
 
 export function toSnapshot(b: InspectionBundle): GroupView[] {
-  return b.target.kind === "house" ? houseSnapshot(b) : planetSnapshot(b);
+  const groups = b.target.kind === "house" ? houseSnapshot(b) : planetSnapshot(b);
+  return groups.map((g) => withLines(g, b));
 }
+
+// I5: the server's approved library lines go under the group they explain. Where a line says what a
+// group's own note said (empty house, nothing looks at it), the line replaces the note: one voice, reviewed.
+const REPLACES_NOTE = new Set(["occupants", "lookedby"]);
+function withLines(g: GroupView, b: InspectionBundle): GroupView {
+  const lines = (b.lines ?? []).filter((l) => l.group === g.id).map((l) => l.text);
+  if (!lines.length) return g;
+  const note = b.target.kind === "house" && REPLACES_NOTE.has(g.id) ? undefined : g.note;
+  return { ...g, note, lines };
+}
+
+/** I5: lines that belong right under the summary (a planet in its house). */
+export const summaryLines = (b: InspectionBundle): string[] => (b.lines ?? []).filter((l) => l.group === "summary").map((l) => l.text);
 
 /** House panel, D81 order: Occupants → Its lord → [Aspects: Looked at by, I3] → same house in the other chart → Either side. */
 function houseSnapshot(b: InspectionBundle): GroupView[] {

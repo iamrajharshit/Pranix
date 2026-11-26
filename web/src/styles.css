@@ -207,4 +207,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* D83: birth-minute note in the Inspector: quiet, informative, never an alarm */
 .minute-note { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px;
   border-left: 2px solid rgba(201,192,255,.55); background: rgba(201,192,255,.06); }
+/* I5: approved library text in the Inspector: readable, quieter than the facts it explains */
+.about { display: flex; flex-direction: column; gap: 6px; }
+.about p, .about-line { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text2); }
+.about .soft { color: var(--muted); font-size: 13.5px; }
+.group-line { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--text2); }
 

@@ -4,7 +4,7 @@
 import { Fragment } from "react";
 import { Chip, ChipLink, Sheet, Skeleton, type SheetSize } from "../../ui";
 import type { Load } from "./api";
-import { HOUSE_WORDS, needsTime, titleOf, toSnapshot } from "./model";
+import { HOUSE_WORDS, needsTime, summaryLines, titleOf, toSnapshot } from "./model";
 import { stepTarget, type InspectTarget } from "./urlState";
 
 export function InspectorPanel({ target, needsTimeOnly = false, note, load, size, onSize, onGo, onClose, onAddTime, onRetry, forceLayout }: {
@@ -50,6 +50,14 @@ export function InspectorPanel({ target, needsTimeOnly = false, note, load, size
         ) : !bundle ? <p style={{ margin: 0, color: "var(--text2)" }}>This view is not available yet.</p> : (
           <>
             {bundle.summary && <p style={{ margin: 0, fontSize: 16, lineHeight: 1.55, color: "var(--text)" }}>{bundle.summary}</p>}
+            {bundle.about && (
+              // I5: what this house is about (approved library, D78)
+              <div className="about" aria-label="About this house">
+                <p>{bundle.about.arena}</p>
+                <p className="soft">{bundle.about.healthy} {bundle.about.growth}</p>
+              </div>
+            )}
+            {summaryLines(bundle).map((t, i) => <p key={i} className="about-line">{t}</p>)}
             {load.state === "ready" && (load.data.minute_note || bundle.minute_note) && (
               // D83: calm and specific: what could differ within the birth time's own margin (server wording)
               <div className="minute-note" role="note">
@@ -72,6 +80,7 @@ export function InspectorPanel({ target, needsTimeOnly = false, note, load, size
                     </div>
                   )}
                   {g.note && <span style={{ fontSize: 13, lineHeight: 1.5, color: "var(--muted)" }}>{g.note}</span>}
+                  {g.lines?.map((t, i) => <p key={i} className="group-line">{t}</p>)}
                 </section>
               </Fragment>
             ))}

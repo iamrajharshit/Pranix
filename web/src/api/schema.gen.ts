@@ -213,6 +213,18 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * HouseAbout
+         * @description I5: what a house is about, from the approved Inspector library (added by insight.inspect_text).
+         */
+        HouseAbout: {
+            /** Arena */
+            arena: string;
+            /** Growth */
+            growth: string;
+            /** Healthy */
+            healthy: string;
+        };
         /** HouseLord */
         HouseLord: {
             /** Dignity */
@@ -235,6 +247,7 @@ export interface components {
         };
         /** InspectionBundle */
         InspectionBundle: {
+            about?: components["schemas"]["HouseAbout"] | null;
             /** Acts Through */
             acts_through?: string | null;
             /** Aspects In */
@@ -260,6 +273,11 @@ export interface components {
              * @enum {string}
              */
             level: "house" | "sign";
+            /**
+             * Lines
+             * @default []
+             */
+            lines: components["schemas"]["Line"][];
             lord?: components["schemas"]["HouseLord"] | null;
             lord_other_chart?: components["schemas"]["HouseLord"] | null;
             /**
@@ -326,6 +344,19 @@ export interface components {
             minute_window?: number | null;
             rules: components["schemas"]["RulesetRef"];
             ruleset: components["schemas"]["RulesetRef"];
+        };
+        /**
+         * Line
+         * @description I5: one approved library sentence, tagged with the Snapshot group it belongs under (D81 order).
+         *     `id` names the library entry ("dignity.own", "planet_in_house", "bridge.softer_in_d9").
+         */
+        Line: {
+            /** Group */
+            group: string;
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
         };
         /**
          * MayChange
