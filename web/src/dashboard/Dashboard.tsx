@@ -158,7 +158,9 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
 
   return (
     <div style={{ position: "relative", background: "radial-gradient(1200px 600px at 80% -10%,rgba(139,124,246,.18),transparent 60%),radial-gradient(900px 500px at -10% 30%,rgba(244,197,102,.07),transparent 60%),#0A0A1E", minHeight: "100vh" }}>
-      <div aria-hidden={reading ? true : undefined}>
+      {/* inert, not aria-hidden: hides the map from screen readers and takes focus out of it, so focus is never
+          left inside a hidden region (WAI-ARIA; Chrome warns otherwise) while the reading moves it to its heading */}
+      <div inert={reading ? true : undefined}>
       <TopBar right={<div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
         <button type="button" className="lnk" onClick={() => setConfirmStart(true)}>Start over</button>
         <span className="hint" title="Accounts are coming soon">Saving charts needs an account (coming soon)</span>
