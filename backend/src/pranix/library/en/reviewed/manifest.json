@@ -1,13 +1,16 @@
 {
-  "content_hash": "005f86e80207f0227e93223c7032dbc2af7930f18318c94402ab6ef5ef0f8211",
+  "content_hash": "89643437b9f614b83c654db612516d95237511db43c3108dc1c387e3065e21d9",
   "counts": {
     "approved": 48,
-    "draft": 0
+    "draft": 48
   },
   "files": {
+    "bridge.yaml": "189506573735f5a7bf4c2c00aedc51e6eb48804b4419ac0fe85e7870c0b3c9a8",
+    "houses.yaml": "bc4fcc8108b21839215bf381150531dd7c77da5ca32992c4eae148716ff25ea8",
     "nakshatra_deep.yaml": "22576f4cdac0522c75824bc72b46ac0f92c2f53a14b3136bc886587efae49f59",
     "planet_deep.yaml": "9972aa2ea3853c169c1495c381aa3570e5dadf55c31fae113380ace5c11dcfba",
-    "sign_deep.yaml": "43e3242207332213955fe0af7b04b5d77e5eeaac1dda322a5b6af61e62d90975"
+    "sign_deep.yaml": "43e3242207332213955fe0af7b04b5d77e5eeaac1dda322a5b6af61e62d90975",
+    "signals.yaml": "9cf90ea78daaaeb2c2b03d3fff3b94f647911382b313a51c4581dac16b3f0125"
   },
   "schema": 1
 }
