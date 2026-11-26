@@ -95,6 +95,23 @@ class MayChange(_Model):
     options: list[str]  # every sign it could be, in time order (the shown one included)
 
 
+class HouseAbout(_Model):
+    """I5: what a house is about, from the approved Inspector library (added by insight.inspect_text)."""
+
+    arena: str
+    healthy: str
+    growth: str
+
+
+class Line(_Model):
+    """I5: one approved library sentence, tagged with the Snapshot group it belongs under (D81 order).
+    `id` names the library entry ("dignity.own", "planet_in_house", "bridge.softer_in_d9")."""
+
+    id: str
+    group: str
+    text: str
+
+
 class Unavailable(_Model):
     what: Literal["house", "houses_ruled", "degree", "d9", "aspects", "sign", "nakshatra", "dignity", "retrograde"]
     reason: Literal["BIRTH_TIME_REQUIRED", "CHANGES_DURING_DAY"]
@@ -123,6 +140,8 @@ class InspectionBundle(_Model):
     lord_other_chart: HouseLord | None = None  # I4: where this house's lord sits in the other chart
     # both
     either_side: EitherSide | None
+    about: HouseAbout | None = None  # I5: house targets; added by insight.inspect_text
+    lines: list[Line] = []  # I5: approved library lines for this target; added by insight.inspect_text
     may_change: list[MayChange] = []  # D83: this planet's own D9 sign, if it could differ
     minute_note: str | None = None  # approved wording for may_change; added by insight.inspect_text
     top_signals: list[str] = []  # reserved for the I1+ resolver (D81 §5)

@@ -1,6 +1,7 @@
 {
   "bundles": {
     "planet:Jupiter": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [
         "Saturn"
@@ -30,6 +31,18 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.own",
+          "text": "Own sign: the planet is at home here, steady and self-directed, answering to no other lord in this sign."
+        },
+        {
+          "group": "chain",
+          "id": "dispositor.final",
+          "text": "Final dispositor: the chain of sign lords ends with this planet in its own sign, a quiet anchor for the others."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -79,6 +92,7 @@
       ]
     },
     "planet:Ketu": {
+      "about": null,
       "acts_through": "Mars",
       "aspects_in": [
         "Moon",
@@ -118,6 +132,7 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -167,6 +182,7 @@
       ]
     },
     "planet:Mars": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [
         "Rahu"
@@ -204,6 +220,13 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.exalted",
+          "text": "Exalted: the planet sits in the sign where its qualities come through most clearly and generously."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -260,6 +283,7 @@
       ]
     },
     "planet:Mercury": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [
         "Saturn"
@@ -288,6 +312,18 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.neutral",
+          "text": "Neutral sign: neither helped nor held back, the planet works on its own terms here."
+        },
+        {
+          "group": "placement",
+          "id": "retrograde",
+          "text": "Retrograde: the planet's energy turns inward first, often revisiting and refining before it acts."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -337,6 +373,7 @@
       ]
     },
     "planet:Moon": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [
         "Sun",
@@ -373,6 +410,13 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.exalted",
+          "text": "Exalted: the planet sits in the sign where its qualities come through most clearly and generously."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -429,6 +473,7 @@
       ]
     },
     "planet:Rahu": {
+      "about": null,
       "acts_through": "Venus",
       "aspects_in": [
         "Sun",
@@ -467,6 +512,7 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -516,6 +562,7 @@
       ]
     },
     "planet:Saturn": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [],
       "aspects_out": null,
@@ -550,6 +597,18 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.exalted",
+          "text": "Exalted: the planet sits in the sign where its qualities come through most clearly and generously."
+        },
+        {
+          "group": "chain",
+          "id": "dispositor.exchange",
+          "text": "Exchange (parivartana): two planets sit in each other's signs, so each strengthens and colours the other's affairs."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -597,6 +656,7 @@
       ]
     },
     "planet:Sun": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [
         "Moon",
@@ -634,6 +694,13 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.friend",
+          "text": "Friend's sign: the planet is a welcome guest, comfortable and cooperative with the lord of the sign."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],
@@ -683,6 +750,7 @@
       ]
     },
     "planet:Venus": {
+      "about": null,
       "acts_through": null,
       "aspects_in": [
         "Rahu"
@@ -717,6 +785,18 @@
       "house": null,
       "houses_ruled": null,
       "level": "sign",
+      "lines": [
+        {
+          "group": "placement",
+          "id": "dignity.friend",
+          "text": "Friend's sign: the planet is a welcome guest, comfortable and cooperative with the lord of the sign."
+        },
+        {
+          "group": "chain",
+          "id": "dispositor.exchange",
+          "text": "Exchange (parivartana): two planets sit in each other's signs, so each strengthens and colours the other's affairs."
+        }
+      ],
       "lord": null,
       "lord_other_chart": null,
       "may_change": [],

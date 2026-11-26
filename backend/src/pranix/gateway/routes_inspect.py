@@ -47,7 +47,8 @@ def inspect_chart(
                 load_ruleset(
                     item.master["meta"]["ruleset"]["id"] + "@" + str(item.master["meta"]["ruleset"]["version"])
                 ),
-            )
+            ),
+            allow_drafts=settings.allow_drafts,  # approved library text only in production (FR-LIB-03)
         )
     except ValueError:
         raise ProblemError(422, "BIRTH_TIME_REQUIRED", "The D9 chart needs your birth time.") from None

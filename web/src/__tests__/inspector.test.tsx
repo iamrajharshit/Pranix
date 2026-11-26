@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Master } from "../api/types";
 import ChartsSection, { type ChartTab } from "../dashboard/ChartsSection";
 import { clearInspectCache, type InspectionSet } from "../features/inspector/api";
-import { needsTime, titleOf, toSnapshot } from "../features/inspector/model";
+import { needsTime, summaryLines, titleOf, toSnapshot } from "../features/inspector/model";
 import sample from "../__fixtures__/sample_1984.json";
 import unknownSample from "../__fixtures__/sample_1984_unknown_time.json";
 import d1 from "../__fixtures__/inspect_1984_d1.json";
@@ -41,7 +41,9 @@ describe("toSnapshot (D81 order, data only)", () => {
   it("houses show who looks at them; an unlooked house says so", () => {
     const twelve = toSnapshot(D1.bundles["house:12"]).find((x) => x.id === "lookedby");
     expect(twelve?.chips.map((c) => c.label)).toEqual(["Mars", "Venus", "Saturn", "Ketu"]);
-    expect(toSnapshot(D1.bundles["house:7"]).find((x) => x.id === "lookedby")?.note).toBe("No planet looks at this house.");
+    const seven = toSnapshot(D1.bundles["house:7"]).find((x) => x.id === "lookedby");
+    expect(seven?.note).toBeUndefined();   // I5: the reviewed line replaces the frontend note
+    expect(seven?.lines).toEqual(["No planet looks at this house, so its lord and any planets in it speak for it without outside influence."]);
   });
   it("shows Jupiter as the server sent it", () => {
     const g = toSnapshot(D1.bundles["planet:Jupiter"]);
@@ -93,8 +95,8 @@ describe("houses (I2)", () => {
   it("an empty house is read through its lord", () => {
     const g = toSnapshot(D1.bundles["house:7"]);
     expect(g[0].chips).toEqual([]);
-    expect(g[0].note).toBe("Empty house: read it through its lord."); // nothing looks at house seven, so nothing is promised
-    expect(toSnapshot(D1.bundles["house:1"])[0].note).toBe("Empty house: read it through its lord and the planets that look at it.");
+    expect(g[0].note).toBeUndefined();   // I5: replaced by the approved line
+    expect(g[0].lines).toEqual(["An empty house is not an empty part of life: it is read through its lord and the planets that look at it."]);
     expect(g[1].chips.map((c) => c.label)).toEqual(["Saturn", "House 3"]);
     expect(g[1].note).toBe("Saturn rules Aquarius and sits in the 3rd house, in Libra (exalted). In your D9 it sits in the 9th house, in Gemini (friend's sign)."); // I4
     expect(D1.bundles["house:7"].summary).toBe("House seven is Aquarius. It is empty, so it is read through its lord.");
@@ -109,6 +111,19 @@ describe("houses (I2)", () => {
     expect(D1.minute_window).toBe(2);
     expect(D1.minute_note).toBe("Within your birth time's margin, your D9 rising sign could be Virgo or Libra, which would move the D9 houses.");
     expect(U1.minute_note).toBeNull();   // no birth time: nothing to check within a margin
+  });
+  it("I5: approved library lines sit under the group they explain", () => {
+    const ju = toSnapshot(D1.bundles["planet:Jupiter"]);
+    expect(summaryLines(D1.bundles["planet:Jupiter"])[0]).toMatch(/^Jupiter in the fifth house brings wisdom/);
+    expect(ju.find((x) => x.id === "placement")?.lines?.[0]).toMatch(/^Own sign:/);
+    expect(ju.find((x) => x.id === "chain")?.lines?.[0]).toMatch(/^Final dispositor:/);
+    expect(ju.find((x) => x.id === "other")?.lines?.[0]).toMatch(/^It has less dignity in the D9/);
+    const lord = toSnapshot(D1.bundles["house:7"]).find((x) => x.id === "lord");
+    expect(lord?.note).toContain("Saturn rules Aquarius");          // the facts stay
+    expect(lord?.lines?.[0]).toMatch(/^With the lord of the seventh house in the third/);
+    expect(D1.bundles["house:7"].about?.arena).toMatch(/^The seventh house is partnership/);
+    for (const h of houses) expect(D9.bundles[`house:${h}`].about).toBeTruthy();
+    expect(Object.values(U1.bundles).every((b) => summaryLines(b).length === 0)).toBe(true); // no houses without a birth time
   });
   it("titles use words; house chips link to houses", () => {
     expect(titleOf(D1.bundles["house:1"], "house", 1)).toBe("House one · Leo");
@@ -193,6 +208,7 @@ describe("ChartsSection with the Inspector on", () => {
     expect(window.location.search).toBe("?inspect=d1.h7");
     expect(await screen.findByText("House seven is Aquarius. It is empty, so it is read through its lord.")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "House seven · Aquarius" })).toBeTruthy();
+    expect(screen.getByLabelText("About this house").textContent).toMatch(/^The seventh house is partnership/); // I5
     fireEvent.click(screen.getByRole("button", { name: "Inspect Saturn" }));
     expect(window.location.search).toBe("?inspect=d1.Saturn");
     fireEvent.click(screen.getByRole("button", { name: "Inspect house three" }));

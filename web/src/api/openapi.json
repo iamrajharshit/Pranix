@@ -163,6 +163,31 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HouseAbout": {
+        "additionalProperties": false,
+        "description": "I5: what a house is about, from the approved Inspector library (added by insight.inspect_text).",
+        "properties": {
+          "arena": {
+            "title": "Arena",
+            "type": "string"
+          },
+          "growth": {
+            "title": "Growth",
+            "type": "string"
+          },
+          "healthy": {
+            "title": "Healthy",
+            "type": "string"
+          }
+        },
+        "required": [
+          "arena",
+          "healthy",
+          "growth"
+        ],
+        "title": "HouseAbout",
+        "type": "object"
+      },
       "HouseLord": {
         "additionalProperties": false,
         "properties": {
@@ -237,6 +262,16 @@
       "InspectionBundle": {
         "additionalProperties": false,
         "properties": {
+          "about": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HouseAbout"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "acts_through": {
             "anyOf": [
               {
@@ -356,6 +391,14 @@
             ],
             "title": "Level",
             "type": "string"
+          },
+          "lines": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "title": "Lines",
+            "type": "array"
           },
           "lord": {
             "anyOf": [
@@ -560,6 +603,31 @@
           "bundles"
         ],
         "title": "InspectionSet",
+        "type": "object"
+      },
+      "Line": {
+        "additionalProperties": false,
+        "description": "I5: one approved library sentence, tagged with the Snapshot group it belongs under (D81 order).\n`id` names the library entry (\"dignity.own\", \"planet_in_house\", \"bridge.softer_in_d9\").",
+        "properties": {
+          "group": {
+            "title": "Group",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "group",
+          "text"
+        ],
+        "title": "Line",
         "type": "object"
       },
       "MayChange": {
