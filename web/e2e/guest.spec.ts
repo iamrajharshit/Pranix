@@ -115,3 +115,48 @@ test("the Chart Inspector opens from the chart and keeps its target (I1)", async
   await expect(page.getByRole("region", { name: "Inspector" })).toHaveCount(0);
 });
 
+
+test("the birth form says which box is wrong, as soon as you leave it (owner, 26 Nov)", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("checkbox").first().check();
+  await page.getByRole("button", { name: "Start as guest" }).click();
+  await expect(page.locator("#dd")).toBeVisible();
+
+  // Typing in one box and moving on does not scold a gap still to fill.
+  await page.locator("#dd").fill("29");
+  await page.locator("#mm").focus();
+  await expect(page.locator("#dob-err")).toHaveCount(0);
+
+  // An impossible date: only the day box is marked, with the month's real length.
+  await page.locator("#mm").fill("02");
+  await page.locator("#yy").fill("1983");
+  await page.locator("#hh").focus();
+  await expect(page.locator("#dob-err")).toHaveText("February 1983 has 28 days, so the day cannot be 29.");
+  await expect(page.locator("#dd")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.locator("#mm")).toHaveAttribute("aria-invalid", "false");
+  await expect(page.locator("#dd")).toHaveAttribute("aria-describedby", "dob-err");
+
+  // A 24-hour time: told exactly what to enter instead.
+  await page.locator("#hh").fill("14");
+  await page.locator("#mi").fill("30");
+  await page.locator("#ap").focus();
+  await expect(page.locator("#time-err")).toHaveText("Use the 12-hour clock: for 14:30, enter 2 and choose PM.");
+  await expect(page.locator("#mi")).toHaveAttribute("aria-invalid", "false");
+
+  // Pasting a whole date into the day box fills all three and clears the error.
+  await page.locator("#dd").evaluate((el) => {
+    const dt = new DataTransfer(); dt.setData("text", "08/12/1984");
+    el.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
+  });
+  await expect(page.locator("#dd")).toHaveValue("08");
+  await expect(page.locator("#mm")).toHaveValue("12");
+  await expect(page.locator("#yy")).toHaveValue("1984");
+  await expect(page.locator("#dob-err")).toHaveCount(0);
+
+  // Fix the hour; submitting with no place lists the place gap, and the time is now fine.
+  await page.locator("#hh").fill("2");
+  await page.locator("#ap").selectOption("PM");
+  await expect(page.locator("#time-err")).toHaveCount(0);
+  await page.getByRole("button", { name: "Reveal my chart" }).click();
+  await expect(page.getByRole("link", { name: /birthplace/ })).toBeVisible();
+});

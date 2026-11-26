@@ -17,7 +17,7 @@ describe("validate", () => {
     expect(Object.keys(e).sort()).toEqual(["dob", "place", "time"]);
   });
   it("rejects impossible, future, pre-1800 and under-18 dates", () => {
-    expect(validate({ ...ok, dd: "31", mm: "02" }, today).dob).toMatch(/does not exist/);
+    expect(validate({ ...ok, dd: "31", mm: "02" }, today).dob).toMatch(/February 1984 has 29 days/);
     expect(validate({ ...ok, yy: "2030" }, today).dob).toMatch(/future/);
     expect(validate({ ...ok, yy: "1799" }, today).dob).toMatch(/1800/);
     expect(validate({ ...ok, dd: "16", mm: "11", yy: "2008" }, today).dob).toMatch(/18 or over/);

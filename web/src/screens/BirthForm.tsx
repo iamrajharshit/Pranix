@@ -8,7 +8,7 @@ import PlaceField from "../components/PlaceField";
 import { ErrIcon, Link, TopBar } from "../components/Shell";
 import { navigate } from "../lib/router";
 import { emptyDraft, store, type Draft } from "../lib/storage";
-import { toRequest, validate, type FormErrors } from "../lib/validate";
+import { checkDate, checkTime, splitDate, splitTime, toRequest, validate, type FormErrors } from "../lib/validate";
 import Loader from "./Loader";
 import { Resting, TimeWheel } from "./Oracle";
 
@@ -18,12 +18,21 @@ const FIELD_OF: Record<string, keyof FormErrors> = {
   OUT_OF_RANGE: "dob", UNDER_AGE_PROFILE: "dob", NONEXISTENT_LOCAL_TIME: "time", INVALID_PLACE: "place",
 };
 
-function field(label: string, id: string, value: string, set: (v: string) => void, max: number, bad: boolean, placeholder: string, disabled = false) {
+interface Box {
+  label: string; id: string; value: string; max: number; placeholder: string;
+  set(v: string): void; bad: boolean; errId?: string; disabled?: boolean;
+  onBlur(): void; onPaste(text: string): boolean; // true when the paste filled the boxes itself
+}
+
+function field(b: Box) {
   return (
-    <div style={{ flex: id === "yy" ? 1.4 : 1, display: "flex", flexDirection: "column", gap: 6 }}>
-      <label className="hint" htmlFor={id}>{label}</label>
-      <input className={`f ${bad ? "bad" : ""}`} id={id} inputMode="numeric" maxLength={max} placeholder={placeholder} value={value} disabled={disabled}
-        aria-invalid={bad} onChange={(e) => set(e.target.value.replace(/[^0-9]/g, "").slice(0, max))} />
+    <div style={{ flex: b.id === "yy" ? 1.4 : 1, display: "flex", flexDirection: "column", gap: 6 }}>
+      <label className="hint" htmlFor={b.id}>{b.label}</label>
+      <input className={`f ${b.bad ? "bad" : ""}`} id={b.id} inputMode="numeric" autoComplete="off" maxLength={b.max} placeholder={b.placeholder}
+        value={b.value} disabled={b.disabled} aria-invalid={b.bad} aria-describedby={b.bad ? b.errId : undefined}
+        onBlur={b.onBlur}
+        onPaste={(e) => { if (b.onPaste(e.clipboardData.getData("text"))) e.preventDefault(); }}
+        onChange={(e) => b.set(e.target.value.replace(/[^0-9]/g, "").slice(0, b.max))} />
     </div>
   );
 }
@@ -39,10 +48,23 @@ export default function BirthForm({ onReady }: { onReady(p: Profile, d: Draft): 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [result, setResult] = useState<Profile | null>(null);
   const summary = useRef<HTMLDivElement>(null);
+  // Boxes the person has left: a wrong value shows as soon as they leave its box; a gap waits for submit.
+  const [touched, setTouched] = useState<Set<string>>(() => new Set());
+  const touch = (id: string) => setTouched((t) => (t.has(id) ? t : new Set(t).add(id)));
 
   const set = (p: Partial<Draft>) => { setD((s) => { const n = { ...s, ...p }; store.setDraft(n); return n; }); setServer({}); };
   const errs = { ...validate(d), ...server };
   const shown: FormErrors = submitted ? errs : {};
+  const dateCheck = checkDate(d), timeCheck = checkTime(d);
+  const live = <F extends string>(c: { kind?: string; fields: F[] }) => submitted || (c.kind === "invalid" && c.fields.some((f) => touched.has(f)));
+  const dobMsg = server.dob ?? (live(dateCheck) ? dateCheck.msg : undefined);
+  const timeMsg = server.time ?? (live(timeCheck) ? timeCheck.msg : undefined);
+  const badDate = new Set<string>(server.dob ? ["dd", "mm", "yy"] : dobMsg ? dateCheck.fields : []);
+  const badTime = new Set<string>(server.time ? ["hh", "mi"] : timeMsg ? timeCheck.fields : []);
+  const pasteDate = (text: string) => { const x = splitDate(text); if (!x) return false; set(x); ["dd", "mm", "yy"].forEach(touch); return true; };
+  const pasteTime = (text: string) => { const x = splitTime(text); if (!x) return false; set(x); ["hh", "mi"].forEach(touch); return true; };
+  const firstBad = (k: keyof FormErrors) =>
+    k === "dob" ? (dateCheck.fields[0] ?? "dd") : k === "time" ? (timeCheck.fields[0] ?? "hh") : k === "place" ? (d.manual ? "lat" : "place") : "name";
   const list = (Object.entries(shown) as [keyof FormErrors, string][]).filter(([, v]) => v);
 
   const submit = useCallback(async (draft: Draft) => {
@@ -137,7 +159,7 @@ export default function BirthForm({ onReady }: { onReady(p: Profile, d: Draft): 
             <div ref={summary} role="alert" tabIndex={-1} style={{ background: "#2A1B3A", border: "2px solid #FF9D9D", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 10 }}>
               <strong style={{ fontSize: 17 }}>{list.length === 1 ? "One thing to check before we calculate:" : `${list.length} things to check before we calculate:`}</strong>
               <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6, fontSize: 15, lineHeight: 1.5 }}>
-                {list.map(([k, v]) => <li key={k}><a href={`#${k === "dob" ? "dd" : k === "time" ? "hh" : k === "place" ? (d.manual ? "lat" : "place") : "name"}`} style={{ color: "var(--err)" }}>{v}</a></li>)}
+                {list.map(([k, v]) => <li key={k}><a href={`#${firstBad(k)}`} style={{ color: "var(--err)" }}>{v}</a></li>)}
               </ul>
             </div>
           )}
@@ -165,29 +187,29 @@ export default function BirthForm({ onReady }: { onReady(p: Profile, d: Draft): 
             <fieldset style={{ border: 0, margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
               <legend className="lbl" style={{ padding: 0, marginBottom: 8 }}>Date of birth</legend>
               <div style={{ display: "flex", gap: 12 }}>
-                {field("Day", "dd", d.dd, (v) => set({ dd: v }), 2, !!shown.dob, "DD")}
-                {field("Month", "mm", d.mm, (v) => set({ mm: v }), 2, !!shown.dob, "MM")}
-                {field("Year", "yy", d.yy, (v) => set({ yy: v }), 4, !!shown.dob, "YYYY")}
+                {field({ label: "Day", id: "dd", value: d.dd, set: (v) => set({ dd: v }), max: 2, placeholder: "DD", bad: badDate.has("dd"), errId: "dob-err", onBlur: () => touch("dd"), onPaste: pasteDate })}
+                {field({ label: "Month", id: "mm", value: d.mm, set: (v) => set({ mm: v }), max: 2, placeholder: "MM", bad: badDate.has("mm"), errId: "dob-err", onBlur: () => touch("mm"), onPaste: pasteDate })}
+                {field({ label: "Year", id: "yy", value: d.yy, set: (v) => set({ yy: v }), max: 4, placeholder: "YYYY", bad: badDate.has("yy"), errId: "dob-err", onBlur: () => touch("yy"), onPaste: pasteDate })}
               </div>
               <span className="hint">Charts are made for people aged 18 or over.</span>
-              {shown.dob && <div className="err" role="alert"><ErrIcon /><span>{shown.dob}</span></div>}
+              {dobMsg && <div className="err" id="dob-err" role="alert"><ErrIcon /><span>{dobMsg}</span></div>}
             </fieldset>
 
             <fieldset style={{ border: 0, margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
               <legend className="lbl" style={{ padding: 0, marginBottom: 8 }}>Time of birth</legend>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, opacity: unknown ? 0.45 : 1 }}>
                 <div style={{ display: "flex", gap: 12 }}>
-                  {field("Hour", "hh", d.hh, (v) => set({ hh: v }), 2, !unknown && !!shown.time, "HH", unknown)}
-                  {field("Minute", "mi", d.mi, (v) => set({ mi: v }), 2, !unknown && !!shown.time, "MM", unknown)}
+                  {field({ label: "Hour", id: "hh", value: d.hh, set: (v) => set({ hh: v }), max: 2, placeholder: "HH", bad: !unknown && badTime.has("hh"), errId: "time-err", disabled: unknown, onBlur: () => touch("hh"), onPaste: pasteTime })}
+                  {field({ label: "Minute", id: "mi", value: d.mi, set: (v) => set({ mi: v }), max: 2, placeholder: "MM", bad: !unknown && badTime.has("mi"), errId: "time-err", disabled: unknown, onBlur: () => touch("mi"), onPaste: pasteTime })}
                   <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}><label className="hint" htmlFor="ap">AM / PM</label>
                     <select className="f" id="ap" value={d.ap} disabled={unknown} onChange={(e) => set({ ap: e.target.value as Draft["ap"] })}><option value="AM">AM</option><option value="PM">PM</option></select></div>
                 </div>
+                {!unknown && timeMsg && <div className="err" id="time-err" role="alert"><ErrIcon /><span>{timeMsg}</span></div>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}><label className="hint" htmlFor="acc">How sure are you of the time?</label>
                   <select className="f" id="acc" value={d.acc} disabled={unknown} onChange={(e) => set({ acc: e.target.value as Draft["acc"] })}>
                     <option value="exact">Exact, from a certificate</option><option value="approx_5m">Within 5 minutes</option><option value="approx_30m">Within 30 minutes</option><option value="approx_1h">Within an hour</option>
                   </select></div>
               </div>
-              {!unknown && shown.time && <div className="err" role="alert"><ErrIcon /><span>{shown.time}</span></div>}
               <label style={{ display: "flex", gap: 12, alignItems: "flex-start", fontSize: 15, lineHeight: 1.5, color: "var(--text2)", cursor: "pointer", marginTop: 4, minHeight: 44 }}>
                 <input type="checkbox" checked={unknown} onChange={(e) => set({ timeUnknown: e.target.checked, disambiguation: undefined })} style={{ width: 24, height: 24, accentColor: "#F4C566", flex: "none", marginTop: 1 }} />
                 <span>I do not know the birth time.</span>
