@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { navigate } from "../lib/router";
 
 export function Link({ to, className, children, style }: { to: string; className?: string; children: ReactNode; style?: React.CSSProperties }) {
@@ -44,7 +44,5 @@ export function SiteFooter() {
   );
 }
 
-export function Toast({ text, onDone }: { text: string; onDone: () => void }) {
-  useEffect(() => { const t = setTimeout(onDone, 4500); return () => clearTimeout(t); }, [text, onDone]);
-  return <div className="toast" role="status">{text}</div>;
-}
+// The toast moved to the UI kit (F4); re-exported so existing screens keep working.
+export { Toast } from "../ui/Toast";

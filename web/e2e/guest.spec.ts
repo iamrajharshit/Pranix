@@ -33,6 +33,12 @@ test("guest reaches a complete dashboard and every screen passes axe", async ({ 
   await expect(page.getByText("Leo").first()).toBeVisible();
   await axe(page);
 
+  // F4: the D9 tab describes the D9 chart, not the D1 rising sign
+  await page.getByRole("tab", { name: "D9 · Navamsa" }).click();
+  await expect(page.getByText("D9 rising sign Libra.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Rising sign Leo at", { exact: false })).toHaveCount(0);
+  await page.getByRole("tab", { name: "D1 · Birth chart" }).click();
+
   // D80: a rule-selected card now opens a structured AI reading (fake provider in e2e)
   await page.locator("#more-birthstar").click();
   await expect(page.getByRole("heading", { name: "What it means for you" })).toBeVisible();
