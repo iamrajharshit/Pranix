@@ -7,7 +7,7 @@ const signName = (first: string, house: number) => SIGNS[(SIGNS.indexOf(first) +
 export interface ChartPlanet { id: string; house: number; label: string; aria: string }
 
 // The twelve houses of the North Indian chart as polygons, in % of the square (house 1 = top diamond).
-const SHAPES: [number, number][][] = [
+export const SHAPES: [number, number][][] = [
   [[50, 0], [75, 25], [50, 50], [25, 25]], [[0, 0], [50, 0], [25, 25]], [[0, 0], [25, 25], [0, 50]],
   [[0, 50], [25, 25], [50, 50], [25, 75]], [[0, 50], [25, 75], [0, 100]], [[0, 100], [25, 75], [50, 100]],
   [[50, 100], [25, 75], [50, 50], [75, 75]], [[50, 100], [75, 75], [100, 100]], [[100, 100], [75, 75], [100, 50]],

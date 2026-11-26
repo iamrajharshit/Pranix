@@ -203,3 +203,24 @@ describe("D9 caption fix", () => {
     expect(document.body.textContent).toContain("Within ±60 minutes of your birth time, the rising sign could be Leo or Virgo");
   });
 });
+
+describe("North chart proportions (owner, 26 Nov: phone)", () => {
+  // point-in-polygon: the house's label anchor and sign number must sit inside the house's own shape
+  const inside = ([x, y]: [number, number], poly: [number, number][]) => {
+    let hit = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit;
+    }
+    return hit;
+  };
+  it("every house keeps its label and its sign number inside it, well apart", async () => {
+    const { POS } = await import("../lib/chart");
+    const { SHAPES } = await import("../dashboard/NorthChart");
+    POS.forEach(([x, y, sx, sy], i) => {
+      expect(inside([x, y], SHAPES[i])).toBe(true);
+      expect(inside([sx, sy], SHAPES[i])).toBe(true);
+      expect(Math.hypot(x - sx, y - sy)).toBeGreaterThanOrEqual(9); // % of the chart: room for a label between
+    });
+  });
+});

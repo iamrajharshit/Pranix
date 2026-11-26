@@ -130,7 +130,7 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
       </div>
 
       {tab === "dasha" ? <DashaTimeline profileId={profileId} onExpired={onExpired} /> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 28, alignItems: "start", background: "radial-gradient(80% 60% at 0% 0%,rgba(244,197,102,.07),transparent 60%),#12123A", border: "1px solid rgba(255,255,255,.14)", borderRadius: 24, padding: 24 }}>
+        <div className="chart-card">
           {known && m.d1.lagna ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {tab === "d1"
@@ -147,7 +147,7 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
           )}
           {panel && !narrow ? panel : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
-            <div style={{ overflowX: "auto" }} tabIndex={0} role="region" aria-label="Planet table">
+            <div className="tbl-scroll" tabIndex={0} role="region" aria-label="Planet table">
               <table className="pt">
                 <caption style={{ textAlign: "left", font: "600 20px var(--serif)", color: "#fff", paddingBottom: 8 }}>{tab === "d9" ? "Planets in your D9" : known ? "Planets in your D1" : "What held all day"}</caption>
                 <thead><tr><th scope="col">Planet</th><th scope="col">Sign</th>{known && tab === "d1" && <th scope="col">Degree</th>}{known && <th scope="col">House</th>}{tab !== "d9" && <th scope="col">Star</th>}<th scope="col">Dignity</th></tr></thead>
