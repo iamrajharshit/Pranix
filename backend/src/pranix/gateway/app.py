@@ -6,9 +6,12 @@ from __future__ import annotations
 import json
 import logging
 import time
+import traceback
+import uuid
 from collections.abc import AsyncIterator
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
 import structlog
@@ -37,11 +40,52 @@ access = structlog.get_logger("pranix.access")
 MAX_BODY_BYTES = 8_192
 
 
-def _too_large(status: int = 413) -> dict[str, Any]:
-    code, message = (
-        ("PAYLOAD_TOO_LARGE", "Request is too large.") if status == 413 else ("INVALID_REQUEST", "Bad request.")
-    )
+_PLAIN = {
+    413: ("PAYLOAD_TOO_LARGE", "Request is too large."),
+    500: ("INTERNAL_ERROR", "Something went wrong on our side. Please try again."),
+}
+
+
+def _plain_problem(status: int = 413) -> dict[str, Any]:
+    code, message = _PLAIN.get(status, ("INVALID_REQUEST", "Bad request."))
     return {"code": code, "message": message, "retry_after": None, "reset_at": None, "request_id": "-"}
+
+
+class Guard:
+    """Catches an unexpected error before it leaves the app (bug bounty, 26 Nov).
+
+    Answers problem+json INTERNAL_ERROR with a request id, and logs one line with the same id, the
+    error type, the route pattern and file:line frames. Never the message or local values: messages
+    can carry input values (pydantic adds `input_value=`), and rule 3 keeps birth data out of logs.
+    The error is not re-raised, so the server's own error log (which prints messages) never sees it."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        started = False
+
+        async def watch(message: Any) -> None:
+            nonlocal started
+            started = started or message["type"] == "http.response.start"
+            await send(message)
+
+        try:
+            await self.app(scope, receive, watch)
+        except Exception as e:
+            rid = uuid.uuid4().hex[:16]
+            frames = [f"{Path(f.filename).name}:{f.lineno}:{f.name}" for f in traceback.extract_tb(e.__traceback__)]
+            route = getattr(scope.get("route"), "path", "unmatched")
+            log.error("http.unhandled", error=type(e).__name__, route=route, request_id=rid, frames=frames[-12:])
+            if started:  # a stream already under way: nothing more can be said, the connection just ends
+                return
+            body = json.dumps({**_plain_problem(500), "request_id": rid}).encode()
+            headers = [(b"content-type", b"application/problem+json"), (b"content-length", str(len(body)).encode())]
+            await send({"type": "http.response.start", "status": 500, "headers": headers})
+            await send({"type": "http.response.body", "body": body})
 
 
 class BodyLimit:
@@ -95,7 +139,7 @@ class BodyLimit:
 
     @staticmethod
     async def _refuse(send: Any, status: int) -> None:
-        body = json.dumps(_too_large(status)).encode()
+        body = json.dumps(_plain_problem(status)).encode()
         headers = [(b"content-type", b"application/problem+json"), (b"content-length", str(len(body)).encode())]
         await send({"type": "http.response.start", "status": status, "headers": headers})
         await send({"type": "http.response.body", "body": body})
@@ -181,12 +225,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         reword_gap_s=reword_gap_s(settings),
     )
     install(app)
+    app.add_middleware(Guard)  # innermost of ours, so the access log below still sees the 500
 
     @app.middleware("http")
     async def access_log(request: Request, call_next: Any) -> Any:
         # Route pattern only (e.g. /v1/places/nearest): never the query string, ids or bodies.
         start = time.perf_counter()
         response = await call_next(request)
+        # API answers carry someone's chart or place: never stored by a browser or proxy cache unless
+        # a route says otherwise (bug bounty, 26 Nov). The card stream, Inspector and images set their own.
+        if request.url.path.startswith("/v1/") and "cache-control" not in response.headers:
+            response.headers["Cache-Control"] = "private, no-store"
         route = request.scope.get("route")
         access.info(
             "http.request",

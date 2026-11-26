@@ -51,3 +51,34 @@ export function streamInsights(profileId: string, h: StreamHandlers, modules?: s
   open(modules);
   return () => { closed = true; es?.close(); };
 }
+
+export interface StreamGroup {
+  start(h: StreamHandlers, modules?: string[]): void;
+  closeAll(): void;
+  size(): number;
+}
+
+/** Every stream one dashboard opens for one chart: the first, and one per card retry (bug bounty,
+ *  26 Nov). closeAll() closes them all, and whatever they still deliver is dropped, so nothing from
+ *  this chart can reach the next one. Finished streams leave the group. */
+export function streamGroup(profileId: string): StreamGroup {
+  const open = new Set<() => void>();
+  let alive = true;
+  const guard = (h: StreamHandlers, done: () => void): StreamHandlers => ({
+    plan: (m) => { if (alive) h.plan(m); },
+    card: (c) => { if (alive) h.card(c); },
+    done: (d) => { done(); if (alive) h.done(d); },
+    failed: (m, e) => { done(); if (alive) h.failed(m, e); },
+  });
+  return {
+    start(h, modules) {
+      if (!alive) return;
+      let close: () => void = () => {};
+      const leave = () => open.delete(close);
+      close = streamInsights(profileId, guard(h, leave), modules);
+      open.add(close);
+    },
+    closeAll() { alive = false; open.forEach((c) => c()); open.clear(); },
+    size: () => open.size,
+  };
+}

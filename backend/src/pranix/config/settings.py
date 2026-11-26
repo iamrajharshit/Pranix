@@ -156,6 +156,8 @@ class Settings(BaseSettings):
         out = []
         if self.llm_fake != "off":
             out.append("llm_fake must be off in prod")
+        if self.library_allow_drafts:  # FR-LIB-03: production serves owner-approved entries only
+            out.append("library_allow_drafts must be off in prod")
         if self.llm_chains == "dev":
             out.append("llm_chains=dev is for a developer machine, not prod")
         if self.local_llm_url and self.local_llm_api_key is None:

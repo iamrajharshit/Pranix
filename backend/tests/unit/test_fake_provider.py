@@ -53,3 +53,9 @@ def test_settings_wire_the_fake_and_prod_refuses_it() -> None:
     chain = insights_chain(Settings(env="test", llm_fake="down"))
     assert chain.configured and chain.links[0].provider.name == "fake"
     assert "llm_fake must be off in prod" in Settings(env="prod", llm_fake="ok").problems()
+
+
+def test_prod_refuses_draft_library_text() -> None:
+    """Bug bounty, 26 Nov: an explicit PRANIX_LIBRARY_ALLOW_DRAFTS=true used to be honoured in prod."""
+    assert "library_allow_drafts must be off in prod" in Settings(env="prod", library_allow_drafts=True).problems()
+    assert "library_allow_drafts must be off in prod" not in Settings(env="prod").problems()
