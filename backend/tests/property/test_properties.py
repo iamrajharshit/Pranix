@@ -125,3 +125,55 @@ def test_inspection_set_invariants(dt: datetime, lat: float, lon_: float, known:
                 assert b.target.ref not in b.sits_with
             else:
                 assert b.placement.house is None and b.placement.deg_in_sign is None and b.other_chart is None
+
+
+# Zones whose clocks have changed at or near midnight, plus ordinary ones (bug bounty, 26 Nov).
+_ZONES = [
+    "America/Sao_Paulo",
+    "America/Havana",
+    "America/Santiago",
+    "America/Asuncion",
+    "America/Toronto",
+    "America/Chicago",
+    "Africa/Khartoum",
+    "Pacific/Apia",
+    "Europe/London",
+    "Asia/Kolkata",
+    "Asia/Tehran",
+]
+
+
+@settings(max_examples=60, deadline=None)
+@given(
+    st.dates(min_value=date(1880, 1, 1), max_value=date(2025, 12, 31)),
+    st.sampled_from(_ZONES),
+    st.floats(min_value=-50, max_value=50),
+    st.floats(min_value=-179, max_value=179),
+)
+def test_unknown_time_shows_only_what_is_true_all_day(day: date, zone: str, lat: float, lon_: float) -> None:
+    """D56 in real zones: every sign and nakshatra an unknown-time chart shows is the same at the
+    first and the last second of the birth day; anything else is listed with both options."""
+    from pranix.ephemeris.timeconv import BirthTimeError, day_bounds_utc
+
+    try:
+        start, end = day_bounds_utc(day, zone)
+    except BirthTimeError:  # a day that never happened there (Samoa, 30 Dec 2011)
+        return
+    m = compute(
+        BirthInput(
+            datetime.combine(day, datetime.min.time()).replace(hour=12), zone, lat, lon_, birth_time_known=False
+        ).canonical(),
+        date(2026, 11, 14),
+    )
+    ends = [compute(BirthInput(u.replace(tzinfo=None), "UTC", lat, lon_), date(2026, 11, 14)) for u in (start, end)]
+    unsure = {t["fact_id"] for t in m["flags"]["time_sensitive"]}
+    for i, p in enumerate(m["d1"]["planets"]):
+        signs = {e["d1"]["planets"][i]["sign"] for e in ends}
+        if p["sign"] is not None:
+            assert signs == {p["sign"]}, (p["id"], signs)
+        else:
+            assert f"{p['id'].lower()}.sign" in unsure
+    if m["nakshatra"] is not None:
+        assert {e["nakshatra"]["name"] for e in ends} == {m["nakshatra"]["name"]}
+    else:
+        assert "moon.nakshatra" in unsure
