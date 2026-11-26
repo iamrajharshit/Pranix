@@ -261,6 +261,14 @@ export interface components {
              */
             level: "house" | "sign";
             lord?: components["schemas"]["HouseLord"] | null;
+            lord_other_chart?: components["schemas"]["HouseLord"] | null;
+            /**
+             * May Change
+             * @default []
+             */
+            may_change: components["schemas"]["MayChange"][];
+            /** Minute Note */
+            minute_note?: string | null;
             /**
              * Modifiers
              * @default []
@@ -307,8 +315,37 @@ export interface components {
              * @enum {string}
              */
             level: "house" | "sign";
+            /**
+             * May Change
+             * @default []
+             */
+            may_change: components["schemas"]["MayChange"][];
+            /** Minute Note */
+            minute_note?: string | null;
+            /** Minute Window */
+            minute_window?: number | null;
             rules: components["schemas"]["RulesetRef"];
             ruleset: components["schemas"]["RulesetRef"];
+        };
+        /**
+         * MayChange
+         * @description D83: a sign that could differ within the birth time's own margin (the value shown is unchanged).
+         */
+        MayChange: {
+            /**
+             * Chart
+             * @enum {string}
+             */
+            chart: "d1" | "d9";
+            /** Options */
+            options: string[];
+            /** Ref */
+            ref?: string | null;
+            /**
+             * What
+             * @enum {string}
+             */
+            what: "rising" | "planet";
         };
         /** OtherChart */
         OtherChart: {

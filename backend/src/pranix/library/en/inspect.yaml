@@ -26,3 +26,11 @@ summary:
   house_target_empty_looked: ". It is empty, so it is read through its lord and the planets that look at it"
   sign: "{planet} in {sign}{dignity}."
   sign_uncertain: "{planet} in {options}, depending on the birth time."
+# D83 (26 Nov 2026): signs that could differ within the birth time's own margin. Calm, no numerals.
+minute:
+  rising_d1: "Within your birth time's margin, your rising sign could be {options}, which would move every house."
+  rising_d9: "Within your birth time's margin, your D9 rising sign could be {options}, which would move the D9 houses."
+  planet_d9: "Within your birth time's margin, {planet}'s D9 sign could be {options}."
+  two: "{a} or {b}"
+  many: "any of several signs from {first} to {last}"
+

@@ -472,6 +472,8 @@
     }
   },
   "flags": {
+    "minute_sensitive": [],
+    "minute_window": null,
     "near_boundary": [],
     "time_sensitive": [
       {
@@ -545,7 +547,7 @@
         "version": 1
       }
     ],
-    "schema_version": "1.0.0",
+    "schema_version": "1.1.0",
     "swisseph_version": "2.10.03"
   },
   "nakshatra": null,

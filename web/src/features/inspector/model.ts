@@ -38,9 +38,11 @@ function houseSnapshot(b: InspectionBundle): GroupView[] {
   if (!h || !lord) return [];
   const g: GroupView[] = [];
   g.push({ id: "occupants", title: "Occupants", chips: h.occupants.map((x) => planet(c, x)),
-    note: h.occupants.length ? undefined : "Empty house: read it through its lord and the planets that look at it." });
+    note: h.occupants.length ? undefined
+      : b.aspects_in?.length ? "Empty house: read it through its lord and the planets that look at it." : "Empty house: read it through its lord." });
   g.push({ id: "lord", title: "Its lord", chips: [planet(c, lord.planet), house(c, lord.house)],
-    note: `${lord.planet} rules ${h.sign} and sits in the ${ORDN[lord.house]} house, in ${lord.sign}${lord.dignity ? ` (${DIG[lord.dignity]})` : ""}.` });
+    note: `${lord.planet} rules ${h.sign} and sits in the ${ORDN[lord.house]} house, in ${lord.sign}${lord.dignity ? ` (${DIG[lord.dignity]})` : ""}.`
+      + (b.lord_other_chart ? ` In your ${c === "d1" ? "D9" : "D1"} it sits in the ${ORDN[b.lord_other_chart.house]} house, in ${b.lord_other_chart.sign}${b.lord_other_chart.dignity ? ` (${DIG[b.lord_other_chart.dignity]})` : ""}.` : "") });  // I4
   if (b.aspects_in) {
     g.push({ id: "lookedby", title: "Looked at by", head: "Aspects · drishti", chips: b.aspects_in.map((x) => planet(c, x)),
       note: b.aspects_in.length ? undefined : "No planet looks at this house." });

@@ -204,3 +204,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; }
 }
 @media (max-width: 640px) { .wrap { padding: 16px 18px; } .panel { padding: 22px; } }
+/* D83: birth-minute note in the Inspector: quiet, informative, never an alarm */
+.minute-note { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px;
+  border-left: 2px solid rgba(201,192,255,.55); background: rgba(201,192,255,.06); }
+

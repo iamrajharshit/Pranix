@@ -86,6 +86,15 @@ class HouseLord(_Model):
     dignity: Dignity | None
 
 
+class MayChange(_Model):
+    """D83: a sign that could differ within the birth time's own margin (the value shown is unchanged)."""
+
+    what: Literal["rising", "planet"]
+    chart: Chart
+    ref: str | None = None  # the planet, for what == "planet"
+    options: list[str]  # every sign it could be, in time order (the shown one included)
+
+
 class Unavailable(_Model):
     what: Literal["house", "houses_ruled", "degree", "d9", "aspects", "sign", "nakshatra", "dignity", "retrograde"]
     reason: Literal["BIRTH_TIME_REQUIRED", "CHANGES_DURING_DAY"]
@@ -111,8 +120,11 @@ class InspectionBundle(_Model):
     house: HouseRef | None = None
     lord: HouseLord | None = None
     same_house_other_chart: HouseRef | None = None
+    lord_other_chart: HouseLord | None = None  # I4: where this house's lord sits in the other chart
     # both
     either_side: EitherSide | None
+    may_change: list[MayChange] = []  # D83: this planet's own D9 sign, if it could differ
+    minute_note: str | None = None  # approved wording for may_change; added by insight.inspect_text
     top_signals: list[str] = []  # reserved for the I1+ resolver (D81 §5)
     modifiers: list[str] = []  # reserved for V2 (neechabhanga, combustion, ...)
     unavailable: list[Unavailable]
@@ -130,6 +142,9 @@ class InspectionSet(_Model):
     level: Level
     ruleset: RulesetRef
     rules: RulesetRef  # jyotish-core (the aspect table)
+    minute_window: int | None = None  # D83: the birth time's margin in minutes; None without a birth time
+    may_change: list[MayChange] = []  # D83: rising signs (D1, D9) that could differ: every panel is affected
+    minute_note: str | None = None  # approved wording for may_change; added by insight.inspect_text
     bundles: dict[str, InspectionBundle]  # keys "planet:Jupiter" and, with a birth time, "house:7"
 
     def etag(self) -> str:
@@ -307,10 +322,40 @@ def house_bundle(ctx: ChartContext, other: ChartContext, house: int, rules: Tabl
         lord=HouseLord(planet=lord, house=lf.house, sign=lf.sign, dignity=lf.dignity),  # type: ignore[arg-type]
         aspects_in=looked_at_by(ctx, rules, house),
         same_house_other_chart=_house_ref(other, house),
+        lord_other_chart=_lord_in(other, lord),
         either_side=EitherSide(before=_house_ref(ctx, step(house, 12)), after=_house_ref(ctx, step(house, 2))),
         unavailable=[],
-        fact_ids=[f"{key}.occupants", f"{key}.lord", f"{key}.aspects", f"{key}.other_chart", f"{key}.either_side"],
+        fact_ids=[
+            f"{key}.occupants",
+            f"{key}.lord",
+            f"{key}.lord_other_chart",
+            f"{key}.aspects",
+            f"{key}.other_chart",
+            f"{key}.either_side",
+        ],
     )
+
+
+def _lord_in(other: ChartContext, lord: str) -> HouseLord:
+    o = other.planets[lord]
+    assert o.house is not None and o.sign is not None
+    return HouseLord(planet=lord, house=o.house, sign=o.sign, dignity=o.dignity)  # type: ignore[arg-type]
+
+
+def may_change(master: Mapping[str, Any]) -> tuple[list[MayChange], dict[str, list[MayChange]]]:
+    """D83: (rising signs that could differ, per-planet D9 signs that could differ) from the Master flags."""
+    rising: list[MayChange] = []
+    planets: dict[str, list[MayChange]] = {}
+    for item in master["flags"].get("minute_sensitive", []):  # absent in charts cached before 1.1.0
+        parts = item["fact_id"].split(".")
+        if parts == ["lagna", "sign"]:
+            rising.append(MayChange(what="rising", chart="d1", options=item["values"]))
+        elif parts == ["d9", "lagna", "sign"]:
+            rising.append(MayChange(what="rising", chart="d9", options=item["values"]))
+        elif len(parts) == 3 and parts[0] == "d9" and parts[2] == "sign":
+            name = parts[1].capitalize()
+            planets[name] = [MayChange(what="planet", chart="d9", ref=name, options=item["values"])]
+    return rising, planets
 
 
 ASPECT_RULES = "jyotish-core@1"
@@ -328,10 +373,16 @@ def build_set(master: Mapping[str, Any], chart: Chart, rs: Ruleset, rules: Table
     bundles = {f"planet:{p}": planet_bundle(ctx, other, varg.get(p), p, rules) for p in ctx.order}
     if other is not None:  # houses need a rising sign, so a birth time (D56)
         bundles.update({f"house:{h}": house_bundle(ctx, other, h, rules) for h in range(1, 13)})
+    rising, per_planet = may_change(master)
+    for name, changes in per_planet.items():
+        if f"planet:{name}" in bundles:
+            bundles[f"planet:{name}"] = bundles[f"planet:{name}"].model_copy(update={"may_change": changes})
     return InspectionSet(
         chart=chart,
         level=ctx.level,
         ruleset=RulesetRef(id=rs.id, version=rs.version, hash=rs.hash),
         rules=RulesetRef(id=rules.id, version=rules.version, hash=rules.hash),
+        minute_window=master["flags"].get("minute_window"),
+        may_change=rising,
         bundles=bundles,
     )

@@ -50,6 +50,15 @@ export function InspectorPanel({ target, needsTimeOnly = false, note, load, size
         ) : !bundle ? <p style={{ margin: 0, color: "var(--text2)" }}>This view is not available yet.</p> : (
           <>
             {bundle.summary && <p style={{ margin: 0, fontSize: 16, lineHeight: 1.55, color: "var(--text)" }}>{bundle.summary}</p>}
+            {load.state === "ready" && (load.data.minute_note || bundle.minute_note) && (
+              // D83: calm and specific: what could differ within the birth time's own margin (server wording)
+              <div className="minute-note" role="note">
+                <span className="eyebrow" style={{ color: "var(--lav)", fontSize: 11 }}>Depends on the birth minute</span>
+                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: "var(--text2)" }}>
+                  {[load.data.minute_note, bundle.minute_note].filter(Boolean).join(" ")}
+                </p>
+              </div>
+            )}
             {toSnapshot(bundle).map((g) => (
               <Fragment key={g.id}>
                 {g.head && <span style={{ font: "600 16px var(--serif)", color: "var(--lav)", borderTop: "1px solid rgba(255,255,255,.10)", paddingTop: 10 }}>{g.head}</span>}

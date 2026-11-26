@@ -26,6 +26,7 @@
       "fact_ids": [
         "d1.house_1.occupants",
         "d1.house_1.lord",
+        "d1.house_1.lord_other_chart",
         "d1.house_1.aspects",
         "d1.house_1.other_chart",
         "d1.house_1.either_side"
@@ -43,6 +44,14 @@
         "planet": "Sun",
         "sign": "Scorpio"
       },
+      "lord_other_chart": {
+        "dignity": "enemy",
+        "house": 4,
+        "planet": "Sun",
+        "sign": "Capricorn"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -89,6 +98,7 @@
       "fact_ids": [
         "d1.house_10.occupants",
         "d1.house_10.lord",
+        "d1.house_10.lord_other_chart",
         "d1.house_10.aspects",
         "d1.house_10.other_chart",
         "d1.house_10.either_side"
@@ -109,6 +119,14 @@
         "planet": "Venus",
         "sign": "Capricorn"
       },
+      "lord_other_chart": {
+        "dignity": "friend",
+        "house": 5,
+        "planet": "Venus",
+        "sign": "Aquarius"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -159,6 +177,7 @@
       "fact_ids": [
         "d1.house_11.occupants",
         "d1.house_11.lord",
+        "d1.house_11.lord_other_chart",
         "d1.house_11.aspects",
         "d1.house_11.other_chart",
         "d1.house_11.either_side"
@@ -176,6 +195,14 @@
         "planet": "Mercury",
         "sign": "Sagittarius"
       },
+      "lord_other_chart": {
+        "dignity": "friend",
+        "house": 8,
+        "planet": "Mercury",
+        "sign": "Taurus"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -222,6 +249,7 @@
       "fact_ids": [
         "d1.house_12.occupants",
         "d1.house_12.lord",
+        "d1.house_12.lord_other_chart",
         "d1.house_12.aspects",
         "d1.house_12.other_chart",
         "d1.house_12.either_side"
@@ -239,6 +267,14 @@
         "planet": "Moon",
         "sign": "Taurus"
       },
+      "lord_other_chart": {
+        "dignity": "exalted",
+        "house": 8,
+        "planet": "Moon",
+        "sign": "Taurus"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -284,6 +320,7 @@
       "fact_ids": [
         "d1.house_2.occupants",
         "d1.house_2.lord",
+        "d1.house_2.lord_other_chart",
         "d1.house_2.aspects",
         "d1.house_2.other_chart",
         "d1.house_2.either_side"
@@ -301,6 +338,14 @@
         "planet": "Mercury",
         "sign": "Sagittarius"
       },
+      "lord_other_chart": {
+        "dignity": "friend",
+        "house": 8,
+        "planet": "Mercury",
+        "sign": "Taurus"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -345,6 +390,7 @@
       "fact_ids": [
         "d1.house_3.occupants",
         "d1.house_3.lord",
+        "d1.house_3.lord_other_chart",
         "d1.house_3.aspects",
         "d1.house_3.other_chart",
         "d1.house_3.either_side"
@@ -364,6 +410,14 @@
         "planet": "Venus",
         "sign": "Capricorn"
       },
+      "lord_other_chart": {
+        "dignity": "friend",
+        "house": 5,
+        "planet": "Venus",
+        "sign": "Aquarius"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -413,6 +467,7 @@
       "fact_ids": [
         "d1.house_4.occupants",
         "d1.house_4.lord",
+        "d1.house_4.lord_other_chart",
         "d1.house_4.aspects",
         "d1.house_4.other_chart",
         "d1.house_4.either_side"
@@ -433,6 +488,14 @@
         "planet": "Mars",
         "sign": "Capricorn"
       },
+      "lord_other_chart": {
+        "dignity": "debilitated",
+        "house": 10,
+        "planet": "Mars",
+        "sign": "Cancer"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -485,6 +548,7 @@
       "fact_ids": [
         "d1.house_5.occupants",
         "d1.house_5.lord",
+        "d1.house_5.lord_other_chart",
         "d1.house_5.aspects",
         "d1.house_5.other_chart",
         "d1.house_5.either_side"
@@ -505,6 +569,14 @@
         "planet": "Jupiter",
         "sign": "Sagittarius"
       },
+      "lord_other_chart": {
+        "dignity": "enemy",
+        "house": 1,
+        "planet": "Jupiter",
+        "sign": "Libra"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -553,6 +625,7 @@
       "fact_ids": [
         "d1.house_6.occupants",
         "d1.house_6.lord",
+        "d1.house_6.lord_other_chart",
         "d1.house_6.aspects",
         "d1.house_6.other_chart",
         "d1.house_6.either_side"
@@ -573,6 +646,14 @@
         "planet": "Saturn",
         "sign": "Libra"
       },
+      "lord_other_chart": {
+        "dignity": "friend",
+        "house": 9,
+        "planet": "Saturn",
+        "sign": "Gemini"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -617,6 +698,7 @@
       "fact_ids": [
         "d1.house_7.occupants",
         "d1.house_7.lord",
+        "d1.house_7.lord_other_chart",
         "d1.house_7.aspects",
         "d1.house_7.other_chart",
         "d1.house_7.either_side"
@@ -634,6 +716,14 @@
         "planet": "Saturn",
         "sign": "Libra"
       },
+      "lord_other_chart": {
+        "dignity": "friend",
+        "house": 9,
+        "planet": "Saturn",
+        "sign": "Gemini"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -677,6 +767,7 @@
       "fact_ids": [
         "d1.house_8.occupants",
         "d1.house_8.lord",
+        "d1.house_8.lord_other_chart",
         "d1.house_8.aspects",
         "d1.house_8.other_chart",
         "d1.house_8.either_side"
@@ -694,6 +785,14 @@
         "planet": "Jupiter",
         "sign": "Sagittarius"
       },
+      "lord_other_chart": {
+        "dignity": "enemy",
+        "house": 1,
+        "planet": "Jupiter",
+        "sign": "Libra"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -745,6 +844,7 @@
       "fact_ids": [
         "d1.house_9.occupants",
         "d1.house_9.lord",
+        "d1.house_9.lord_other_chart",
         "d1.house_9.aspects",
         "d1.house_9.other_chart",
         "d1.house_9.either_side"
@@ -762,6 +862,14 @@
         "planet": "Mars",
         "sign": "Capricorn"
       },
+      "lord_other_chart": {
+        "dignity": "debilitated",
+        "house": 10,
+        "planet": "Mars",
+        "sign": "Cancer"
+      },
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": null,
@@ -860,6 +968,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -969,6 +1080,9 @@
       "houses_ruled": [],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "none",
@@ -1085,6 +1199,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -1184,6 +1301,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -1283,6 +1403,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "same",
@@ -1389,6 +1512,9 @@
       "houses_ruled": [],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "none",
@@ -1505,6 +1631,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -1608,6 +1737,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -1715,6 +1847,9 @@
       ],
       "level": "house",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": {
         "change": "same",
@@ -1751,6 +1886,19 @@
   },
   "chart": "d1",
   "level": "house",
+  "may_change": [
+    {
+      "chart": "d9",
+      "options": [
+        "Virgo",
+        "Libra"
+      ],
+      "ref": null,
+      "what": "rising"
+    }
+  ],
+  "minute_note": "Within your birth time's margin, your D9 rising sign could be Virgo or Libra, which would move the D9 houses.",
+  "minute_window": 2,
   "rules": {
     "hash": "176e1669ab5efc38",
     "id": "jyotish-core",
