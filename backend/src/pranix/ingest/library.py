@@ -230,22 +230,39 @@ def missing_keys(root: Path, kind_name: str) -> list[str]:
     return [k for k in level if k not in have]
 
 
-def add_draft(root: Path, kind_name: str, key: str, fields: dict[str, str]) -> list[guard.Issue]:
+def add_draft(root: Path, kind_name: str, key: str | tuple[str, ...], fields: dict[str, str]) -> list[guard.Issue]:
     """Add one new `status: draft` entry and refresh the manifest. Never replaces an existing entry,
-    so nothing reviewed is ever overwritten. Returns the problems (and writes nothing) if any check fails."""
+    so nothing reviewed is ever overwritten. Returns the problems (and writes nothing) if any check fails.
+
+    `key` is the entry's path: one segment ("Saturn", "dispositor.cycle") or several for two-level kinds
+    (("Jupiter", "house_5") in planet_in_house)."""
     kind = KINDS[kind_name]
+    path = (key,) if isinstance(key, str) else tuple(key)
     data = load_all(root)
-    if key in data[kind_name]:
-        return [guard.Issue("EXISTS", f"{kind_name}/{key}", "already drafted or reviewed; not replaced")]
+    if entry_at(data[kind_name], path) is not None:
+        return [guard.Issue("EXISTS", f"{kind_name}/{'/'.join(path)}", "already drafted or reviewed; not replaced")]
     entry = {"status": "draft", **{f: fields.get(f, "") for f in kind.fields}}
-    issues = _entry_issues(kind, (key,), entry)
+    issues = _entry_issues(kind, path, entry)
     if issues:
         return issues
-    data[kind_name][key] = entry
-    ordered = {k: data[kind_name][k] for k in (kind.levels[0] or ()) if k in data[kind_name]}
-    data[kind_name] = ordered
+    cur = data[kind_name]
+    for seg in path[:-1]:
+        cur = cur.setdefault(seg, {})
+    cur[path[-1]] = entry
+    data[kind_name] = _ordered(data[kind_name], kind.levels)
     _write_all(root, data)
     return []
+
+
+def _ordered(node: dict[str, Any], levels: tuple[tuple[str, ...] | None, ...]) -> dict[str, Any]:
+    """Keys in the kind's own order at fixed levels (Sun before Moon, house one before two); open
+    levels (signal and bridge ids) keep the order they were added in."""
+    if not levels:
+        return node
+    order = levels[0]
+    keys = [k for k in order if k in node] if order is not None else list(node)
+    deeper = levels[1:]
+    return {k: _ordered(node[k], deeper) if deeper and isinstance(node[k], dict) else node[k] for k in keys}
 
 
 # ---------- export ----------

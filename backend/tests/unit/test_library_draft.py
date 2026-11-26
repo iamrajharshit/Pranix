@@ -378,3 +378,25 @@ def test_short_and_common_words_twice_in_one_field() -> None:
     assert repeated_within("A small step is one small challenge. It helps.") == ["small"]
     moon = themes_of("planet_deep", "Moon")
     assert repeated_within("Your feelings shift; honor those feelings. You steady.", moon) == []
+
+
+def test_open_kinds_keep_every_entry_in_the_order_added(tmp_path: Path) -> None:
+    """I5: signal and bridge ids are open-ended; adding one must never drop the others."""
+    root = tmp_path / "lib"
+    for k in ("vargottama", "dignity.own", "dispositor.cycle"):
+        assert intake.add_draft(root, "signals", k, {"text": "A calm and simple line."}) == []
+    assert list(intake.load_all(root)["signals"]) == ["vargottama", "dignity.own", "dispositor.cycle"]
+
+
+def test_two_level_kinds_take_a_path_and_stay_in_table_order(tmp_path: Path) -> None:
+    root = tmp_path / "lib"
+    line = {"text": "A calm and simple line."}
+    assert intake.add_draft(root, "planet_in_house", ("Jupiter", "house_5"), line) == []
+    assert intake.add_draft(root, "planet_in_house", ("Sun", "house_9"), line) == []
+    assert intake.add_draft(root, "planet_in_house", ("Jupiter", "house_1"), line) == []
+    data = intake.load_all(root)["planet_in_house"]
+    assert list(data) == ["Sun", "Jupiter"] and list(data["Jupiter"]) == ["house_1", "house_5"]
+    again = intake.add_draft(root, "planet_in_house", ("Jupiter", "house_5"), {"text": "Different."})
+    assert [i.rule for i in again] == ["EXISTS"]
+    bad = intake.add_draft(root, "planet_in_house", ("Pluto", "house_5"), line)
+    assert [i.rule for i in bad] == ["INVALID_KEY"]
