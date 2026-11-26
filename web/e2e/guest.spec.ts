@@ -40,8 +40,14 @@ test("guest reaches a complete dashboard and every screen passes axe", async ({ 
   await page.getByRole("tab", { name: "D1 · Birth chart" }).click();
 
   // D80: a rule-selected card now opens a structured AI reading (fake provider in e2e)
+  const ariaWarnings: string[] = [];
+  page.on("console", (m) => { if (/aria-hidden/i.test(m.text())) ariaWarnings.push(m.text()); });
   await page.locator("#more-birthstar").click();
   await expect(page.getByRole("heading", { name: "What it means for you" })).toBeVisible();
+  // the map behind the reading is inert: focus never stays inside a hidden region (owner's console, 26 Nov)
+  await expect(page.locator("div[inert]")).toHaveCount(1);
+  await expect(page.locator("div[inert] :focus")).toHaveCount(0);
+  expect(ariaWarnings).toEqual([]);
   await expect(page.getByText("Reflect", { exact: true })).toBeVisible();
   await expect(page.locator(".page").getByText("AI-phrased")).toBeVisible();
   await expect(page.locator("article.card .b-ai")).toHaveCount(12); // every card is now AI-written
@@ -55,6 +61,8 @@ test("guest reaches a complete dashboard and every screen passes axe", async ({ 
   await expect(page).not.toHaveURL(/#reading=/);
   await expect(page.locator(".page")).toHaveCount(0);
   await expect(page.locator("article.card")).toHaveCount(12);
+  await expect(page.locator("div[inert]")).toHaveCount(0); // the map is usable again
+  expect(ariaWarnings).toEqual([]);
 });
 
 test("the API serves the security headers the app relies on", async ({ request }) => {
