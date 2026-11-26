@@ -10,6 +10,8 @@ import { navigate } from "../lib/router";
 import { store, type Draft } from "../lib/storage";
 import { toRequest } from "../lib/validate";
 import { Resting } from "../screens/Oracle";
+import { formatTarget, PARAM, parseTarget } from "../features/inspector/urlState";
+import { useQueryParam } from "../ui/useUrlState";
 import CardVisual from "./CardVisual";
 import ChartsSection, { type ChartTab } from "./ChartsSection";
 import { GROUPS, ORDER, withName } from "./config";
@@ -33,6 +35,9 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
   const [flipping, setFlipping] = useState<string | null>(null);
   const [tab, setTab] = useState<ChartTab>("d1");
   const [selected, setSelected] = useState<string | null>(null);
+  const [inspectOn, setInspectOn] = useState(false); // PRANIX_FEATURE_INSPECT, read from /version
+  const [, setInspect] = useQueryParam(PARAM);
+  useEffect(() => { api.version().then((v) => setInspectOn(!!v.feature_flags.inspect)).catch(() => setInspectOn(false)); }, []);
   const [toast, setToast] = useState("");
   const [expired, setExpired] = useState(false);
   const [confirmStart, setConfirmStart] = useState(false);
@@ -117,7 +122,12 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
     if (f.target.kind === "dasha") setTab("dasha");
     else {
       if (f.target.chart === "d9") setTab("d9"); else if (tab === "dasha") setTab("d1");
-      if (f.target.kind === "planet") setSelected(f.target.ref);
+      if (f.target.kind === "planet") {
+        setSelected(f.target.ref);
+        // plan §16.3: with the Inspector on, a card's evidence chip opens it on that planet
+        const t = parseTarget(`${f.target.chart === "d9" ? "d9" : "d1"}.${f.target.ref}`);
+        if (inspectOn && t) setInspect(formatTarget(t));
+      }
     }
     setTimeout(() => document.getElementById("charts")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
   };
@@ -181,7 +191,7 @@ export default function Dashboard({ profile, draft, onProfile }: { profile: Prof
           </nav>
         </section>
 
-        <ChartsSection m={m} profileId={profile.profile_id} tab={tab} setTab={setTab} selected={selected} setSelected={setSelected}
+        <ChartsSection m={m} profileId={profile.profile_id} tab={tab} setTab={setTab} selected={selected} setSelected={setSelected} inspect={inspectOn}
           onExpired={refresh} onAddTime={() => { if (draft) store.setDraft({ ...draft, timeUnknown: false }); navigate("/details"); }} />
 
         {GROUPS.map((g) => (

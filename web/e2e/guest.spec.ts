@@ -61,3 +61,34 @@ test("the API serves the security headers the app relies on", async ({ request }
   const r = await request.get("/");
   expect(r.headers()["content-security-policy"]).toBeTruthy();
 });
+
+test("the Chart Inspector opens from the chart and keeps its target (I1)", async ({ page, isMobile }) => {
+  await page.goto("/");
+  await page.getByRole("checkbox").first().check();
+  await page.getByRole("button", { name: "Start as guest" }).click();
+  await page.locator("#dd").fill("08"); await page.locator("#mm").fill("12"); await page.locator("#yy").fill("1984");
+  await page.locator("#hh").fill("12"); await page.locator("#mi").fill("20"); await page.locator("#ap").selectOption("AM");
+  await page.locator("#place").fill("Pune");
+  await page.locator("#places").getByRole("option", { name: /Pune/ }).click();
+  await page.getByRole("button", { name: "Reveal my chart" }).click();
+  await expect(page).toHaveURL(/dashboard/, { timeout: 30_000 });
+
+  await page.getByRole("button", { name: /^Jupiter in Sagittarius/ }).click();
+  await expect(page).toHaveURL(/\?inspect=d1\.Jupiter/);
+  const panel = page.getByRole("region", { name: "Inspector" });
+  await expect(panel.getByText("Jupiter in your fifth house, in Sagittarius, its own sign.")).toBeVisible();
+  await expect(panel.getByText("Dispositor chain")).toBeVisible();
+  if (isMobile) await expect(panel.getByRole("button", { name: "Full", exact: true })).toBeVisible(); // bottom sheet on phones
+  await axe(page);
+
+  await panel.getByRole("button", { name: "Inspect Mercury" }).click();
+  await expect(page).toHaveURL(/inspect=d1\.Mercury/);
+  await page.getByRole("tab", { name: "D9 · Navamsa" }).click();
+  await expect(page).toHaveURL(/inspect=d9\.Mercury/);
+  await expect(panel.getByText(/^Mercury in your eighth house, in Taurus/)).toBeVisible();
+
+  await page.goBack(); // Back closes the Inspector in one step, however many targets were visited
+  await expect(page).not.toHaveURL(/inspect=/);
+  await expect(page.getByRole("region", { name: "Inspector" })).toHaveCount(0);
+});
+

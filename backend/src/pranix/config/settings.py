@@ -56,6 +56,7 @@ class Settings(BaseSettings):
     # Meaning-keyed AI cache (D70): a SQLite file on a writable volume; empty = in-memory only.
     cache_path: str = ""
     feature_chat: bool = False
+    feature_inspect: bool = False  # Chart Inspector (plan §15.7 launch gate); turn on in .env to try it
     feature_passkeys: bool = False
     max_profiles_per_user: int = Field(default=5, ge=1, le=20)
     guest_ttl_seconds: int = Field(default=86_400, ge=60, le=86_400)
@@ -64,6 +65,7 @@ class Settings(BaseSettings):
     rate_places_per_min: int = Field(default=60, ge=1)
     rate_insights_per_min: int = Field(default=20, ge=1)
     rate_images_per_min: int = Field(default=10, ge=1)
+    rate_inspect_per_min: int = Field(default=60, ge=1)  # cheap: built in milliseconds (plan §8)
     # Library: production serves approved entries only (FR-LIB-03); dev/test also serve drafts.
     library_allow_drafts: bool | None = None
     # AI providers (insights chain, FR-LLM). Model names change: verify against each console.

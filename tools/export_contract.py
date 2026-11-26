@@ -6,6 +6,7 @@ Writes, from the running code (never by hand):
   web/src/api/openapi.json                 the app's OpenAPI document
   web/src/__fixtures__/sample_1984.json    engine output for the invented sample chart
   web/src/__fixtures__/sample_1984_unknown_time.json   the same birth with the time unknown
+  web/src/__fixtures__/inspect_1984_{d1,d9,unknown_d1}.json   Chart Inspector sets for the same chart (I1)
 
 `--check` writes nothing and exits 1 if any file is out of date (CI drift gate). The fixtures
 use a fixed `as_of` date so they change only when the engine, rulesets or contract change.
@@ -56,13 +57,25 @@ def outputs() -> dict[Path, str]:
 
     if swe.init(os.environ["PRANIX_EPHE_PATH"]) != "swieph":
         sys.exit("export_contract: Swiss Ephemeris files missing; run tools/fetch_ephe.sh first")
+    from pranix.ephemeris.ruleset import load_ruleset
+    from pranix.insight.inspect_text import with_text
+    from pranix.jyotish import build_set
+
     web = ROOT / "web" / "src"
+    known = compute(GOLDEN, AS_OF)
+    unknown = compute(dataclasses.replace(GOLDEN, birth_time_known=False), AS_OF)
+    rs = load_ruleset()
+
+    def inspect(master: dict, chart: str) -> str:
+        return _dump(with_text(build_set(master, chart, rs)).model_dump(mode="json"), quantize=True)  # type: ignore[arg-type]
+
     return {
         web / "api" / "openapi.json": _dump(create_app().openapi()),
-        web / "__fixtures__" / "sample_1984.json": _dump(compute(GOLDEN, AS_OF), quantize=True),
-        web / "__fixtures__" / "sample_1984_unknown_time.json": _dump(
-            compute(dataclasses.replace(GOLDEN, birth_time_known=False), AS_OF), quantize=True
-        ),
+        web / "__fixtures__" / "sample_1984.json": _dump(known, quantize=True),
+        web / "__fixtures__" / "sample_1984_unknown_time.json": _dump(unknown, quantize=True),
+        web / "__fixtures__" / "inspect_1984_d1.json": inspect(known, "d1"),
+        web / "__fixtures__" / "inspect_1984_d9.json": inspect(known, "d9"),
+        web / "__fixtures__" / "inspect_1984_unknown_d1.json": inspect(unknown, "d1"),
     }
 
 

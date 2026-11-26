@@ -14,14 +14,18 @@ export function writeParam(name: string, value: string | null, mode: "push" | "r
   if (next === window.location.pathname + window.location.search + window.location.hash) return;
   if (mode === "push") window.history.pushState(window.history.state, "", next);
   else window.history.replaceState(window.history.state, "", next);
+  window.dispatchEvent(new Event(SYNC)); // other components reading the same parameter follow
 }
+
+const SYNC = "pranix:url";
 
 export function useQueryParam(name: string): [string | null, (value: string | null) => void] {
   const [value, setValue] = useState<string | null>(() => readParam(name));
   useEffect(() => {
     const on = () => setValue(readParam(name));
     window.addEventListener("popstate", on);
-    return () => window.removeEventListener("popstate", on);
+    window.addEventListener(SYNC, on);
+    return () => { window.removeEventListener("popstate", on); window.removeEventListener(SYNC, on); };
   }, [name]);
   const set = useCallback((next: string | null) => {
     const current = readParam(name);

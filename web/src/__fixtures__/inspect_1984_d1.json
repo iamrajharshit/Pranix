@@ -1,0 +1,790 @@
+{
+  "bundles": {
+    "planet:Jupiter": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": null,
+        "end": "final",
+        "pair": null,
+        "steps": [
+          "Jupiter"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 6,
+          "occupants": [
+            "Mars",
+            "Venus"
+          ],
+          "sign": "Capricorn"
+        },
+        "before": {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Ketu"
+          ],
+          "sign": "Scorpio"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.jupiter.placement",
+        "d1.jupiter.dispositor",
+        "d1.jupiter.houses_ruled",
+        "d1.jupiter.sits_with",
+        "d1.jupiter.either_side",
+        "d1.jupiter.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 5,
+          "occupants": [
+            "Mercury",
+            "Jupiter"
+          ],
+          "sign": "Sagittarius"
+        },
+        {
+          "house": 8,
+          "occupants": [],
+          "sign": "Pisces"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "changed",
+        "chart": "d9",
+        "dignity": "enemy",
+        "house": 1,
+        "sign": "Libra"
+      },
+      "placement": {
+        "deg_in_sign": 22.351795,
+        "dignity": "own",
+        "dignity_gloss": null,
+        "house": 5,
+        "nakshatra": "Purva Ashadha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Sagittarius",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Mercury"
+      ],
+      "summary": "Jupiter in your fifth house, in Sagittarius, its own sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Jupiter"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Ketu": {
+      "acts_through": "Mars",
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Ketu",
+          "Mars",
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 5,
+          "occupants": [
+            "Mercury",
+            "Jupiter"
+          ],
+          "sign": "Sagittarius"
+        },
+        "before": {
+          "house": 3,
+          "occupants": [
+            "Saturn"
+          ],
+          "sign": "Libra"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.ketu.placement",
+        "d1.ketu.dispositor",
+        "d1.ketu.houses_ruled",
+        "d1.ketu.sits_with",
+        "d1.ketu.either_side",
+        "d1.ketu.other_chart"
+      ],
+      "houses_ruled": [],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "none",
+        "chart": "d9",
+        "dignity": null,
+        "house": 10,
+        "sign": "Cancer"
+      },
+      "placement": {
+        "deg_in_sign": 2.787418,
+        "dignity": null,
+        "dignity_gloss": "Shadow node: read through the lord of its sign.",
+        "house": 4,
+        "nakshatra": "Vishakha",
+        "nakshatra_options": null,
+        "retrograde": true,
+        "sign": "Scorpio",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Sun"
+      ],
+      "summary": "Ketu in your fourth house, in Scorpio.",
+      "target": {
+        "kind": "planet",
+        "ref": "Ketu"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Mars": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Mars",
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 7,
+          "occupants": [],
+          "sign": "Aquarius"
+        },
+        "before": {
+          "house": 5,
+          "occupants": [
+            "Mercury",
+            "Jupiter"
+          ],
+          "sign": "Sagittarius"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.mars.placement",
+        "d1.mars.dispositor",
+        "d1.mars.houses_ruled",
+        "d1.mars.sits_with",
+        "d1.mars.either_side",
+        "d1.mars.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Ketu"
+          ],
+          "sign": "Scorpio"
+        },
+        {
+          "house": 9,
+          "occupants": [],
+          "sign": "Aries"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "changed",
+        "chart": "d9",
+        "dignity": "debilitated",
+        "house": 10,
+        "sign": "Cancer"
+      },
+      "placement": {
+        "deg_in_sign": 23.007805,
+        "dignity": "exalted",
+        "dignity_gloss": null,
+        "house": 6,
+        "nakshatra": "Shravana",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Capricorn",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Venus"
+      ],
+      "summary": "Mars in your sixth house, in Capricorn, where it is exalted.",
+      "target": {
+        "kind": "planet",
+        "ref": "Mars"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Mercury": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": null,
+        "end": "final",
+        "pair": null,
+        "steps": [
+          "Mercury",
+          "Jupiter"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 6,
+          "occupants": [
+            "Mars",
+            "Venus"
+          ],
+          "sign": "Capricorn"
+        },
+        "before": {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Ketu"
+          ],
+          "sign": "Scorpio"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.mercury.placement",
+        "d1.mercury.dispositor",
+        "d1.mercury.houses_ruled",
+        "d1.mercury.sits_with",
+        "d1.mercury.either_side",
+        "d1.mercury.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 2,
+          "occupants": [],
+          "sign": "Virgo"
+        },
+        {
+          "house": 11,
+          "occupants": [],
+          "sign": "Gemini"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "changed",
+        "chart": "d9",
+        "dignity": "friend",
+        "house": 8,
+        "sign": "Taurus"
+      },
+      "placement": {
+        "deg_in_sign": 6.423287,
+        "dignity": "neutral",
+        "dignity_gloss": null,
+        "house": 5,
+        "nakshatra": "Mula",
+        "nakshatra_options": null,
+        "retrograde": true,
+        "sign": "Sagittarius",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Jupiter"
+      ],
+      "summary": "Mercury in your fifth house, in Sagittarius, a neutral sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Mercury"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Moon": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Venus",
+          "Saturn"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Saturn",
+          "Venus"
+        ],
+        "steps": [
+          "Moon",
+          "Venus",
+          "Saturn"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 11,
+          "occupants": [],
+          "sign": "Gemini"
+        },
+        "before": {
+          "house": 9,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.moon.placement",
+        "d1.moon.dispositor",
+        "d1.moon.houses_ruled",
+        "d1.moon.sits_with",
+        "d1.moon.either_side",
+        "d1.moon.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 12,
+          "occupants": [],
+          "sign": "Cancer"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "same",
+        "chart": "d9",
+        "dignity": "exalted",
+        "house": 8,
+        "sign": "Taurus"
+      },
+      "placement": {
+        "deg_in_sign": 14.413999,
+        "dignity": "exalted",
+        "dignity_gloss": null,
+        "house": 10,
+        "nakshatra": "Rohini",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Taurus",
+        "sign_options": null,
+        "vargottama": true
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Rahu"
+      ],
+      "summary": "Moon in your tenth house, in Taurus, where it is exalted.",
+      "target": {
+        "kind": "planet",
+        "ref": "Moon"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Rahu": {
+      "acts_through": "Venus",
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Venus",
+          "Saturn"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Saturn",
+          "Venus"
+        ],
+        "steps": [
+          "Rahu",
+          "Venus",
+          "Saturn"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 11,
+          "occupants": [],
+          "sign": "Gemini"
+        },
+        "before": {
+          "house": 9,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.rahu.placement",
+        "d1.rahu.dispositor",
+        "d1.rahu.houses_ruled",
+        "d1.rahu.sits_with",
+        "d1.rahu.either_side",
+        "d1.rahu.other_chart"
+      ],
+      "houses_ruled": [],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "none",
+        "chart": "d9",
+        "dignity": null,
+        "house": 4,
+        "sign": "Capricorn"
+      },
+      "placement": {
+        "deg_in_sign": 2.787418,
+        "dignity": null,
+        "dignity_gloss": "Shadow node: read through the lord of its sign.",
+        "house": 10,
+        "nakshatra": "Krittika",
+        "nakshatra_options": null,
+        "retrograde": true,
+        "sign": "Taurus",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Moon"
+      ],
+      "summary": "Rahu in your tenth house, in Taurus.",
+      "target": {
+        "kind": "planet",
+        "ref": "Rahu"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Saturn": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Ketu"
+          ],
+          "sign": "Scorpio"
+        },
+        "before": {
+          "house": 2,
+          "occupants": [],
+          "sign": "Virgo"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.saturn.placement",
+        "d1.saturn.dispositor",
+        "d1.saturn.houses_ruled",
+        "d1.saturn.sits_with",
+        "d1.saturn.either_side",
+        "d1.saturn.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 6,
+          "occupants": [
+            "Mars",
+            "Venus"
+          ],
+          "sign": "Capricorn"
+        },
+        {
+          "house": 7,
+          "occupants": [],
+          "sign": "Aquarius"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "changed",
+        "chart": "d9",
+        "dignity": "friend",
+        "house": 9,
+        "sign": "Gemini"
+      },
+      "placement": {
+        "deg_in_sign": 28.542972,
+        "dignity": "exalted",
+        "dignity_gloss": null,
+        "house": 3,
+        "nakshatra": "Vishakha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Libra",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "Saturn in your third house, in Libra, where it is exalted.",
+      "target": {
+        "kind": "planet",
+        "ref": "Saturn"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Sun": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Sun",
+          "Mars",
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 5,
+          "occupants": [
+            "Mercury",
+            "Jupiter"
+          ],
+          "sign": "Sagittarius"
+        },
+        "before": {
+          "house": 3,
+          "occupants": [
+            "Saturn"
+          ],
+          "sign": "Libra"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.sun.placement",
+        "d1.sun.dispositor",
+        "d1.sun.houses_ruled",
+        "d1.sun.sits_with",
+        "d1.sun.either_side",
+        "d1.sun.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 1,
+          "occupants": [],
+          "sign": "Leo"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "changed",
+        "chart": "d9",
+        "dignity": "enemy",
+        "house": 4,
+        "sign": "Capricorn"
+      },
+      "placement": {
+        "deg_in_sign": 22.219118,
+        "dignity": "friend",
+        "dignity_gloss": null,
+        "house": 4,
+        "nakshatra": "Jyeshtha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Scorpio",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Ketu"
+      ],
+      "summary": "Sun in your fourth house, in Scorpio, a friend's sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Sun"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "planet:Venus": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Venus",
+          "Saturn"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Saturn",
+          "Venus"
+        ],
+        "steps": [
+          "Venus",
+          "Saturn"
+        ]
+      },
+      "either_side": {
+        "after": {
+          "house": 7,
+          "occupants": [],
+          "sign": "Aquarius"
+        },
+        "before": {
+          "house": 5,
+          "occupants": [
+            "Mercury",
+            "Jupiter"
+          ],
+          "sign": "Sagittarius"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d1.venus.placement",
+        "d1.venus.dispositor",
+        "d1.venus.houses_ruled",
+        "d1.venus.sits_with",
+        "d1.venus.either_side",
+        "d1.venus.other_chart"
+      ],
+      "houses_ruled": [
+        {
+          "house": 3,
+          "occupants": [
+            "Saturn"
+          ],
+          "sign": "Libra"
+        },
+        {
+          "house": 10,
+          "occupants": [
+            "Moon",
+            "Rahu"
+          ],
+          "sign": "Taurus"
+        }
+      ],
+      "level": "house",
+      "modifiers": [],
+      "other_chart": {
+        "change": "same",
+        "chart": "d9",
+        "dignity": "friend",
+        "house": 5,
+        "sign": "Aquarius"
+      },
+      "placement": {
+        "deg_in_sign": 4.757248,
+        "dignity": "friend",
+        "dignity_gloss": null,
+        "house": 6,
+        "nakshatra": "Uttara Ashadha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Capricorn",
+        "sign_options": null,
+        "vargottama": false
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Mars"
+      ],
+      "summary": "Venus in your sixth house, in Capricorn, a friend's sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Venus"
+      },
+      "top_signals": [],
+      "unavailable": []
+    }
+  },
+  "chart": "d1",
+  "level": "house",
+  "ruleset": {
+    "hash": "9541a10df5ca6ffd",
+    "id": "vedic-core",
+    "version": 1
+  }
+}

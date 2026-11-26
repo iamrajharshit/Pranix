@@ -91,6 +91,12 @@ source_modules = ["pranix.ephemeris"]
 forbidden_modules = ["pranix.gateway", "pranix.config", "pranix.obs", "pranix.geo"]
 
 [[tool.importlinter.contracts]]
+name = "Jyotish is pure: it reads the engine's ruleset only, never the web, AI, text, storage, config or geo (plan §3)"
+type = "forbidden"
+source_modules = ["pranix.jyotish"]
+forbidden_modules = ["pranix.gateway", "pranix.llmgw", "pranix.insight", "pranix.store", "pranix.config", "pranix.obs", "pranix.geo", "pranix.ingest", "swisseph"]
+
+[[tool.importlinter.contracts]]
 name = "Geo is identity-agnostic and independent of the engine and gateway (ARCH-05)"
 type = "forbidden"
 source_modules = ["pranix.geo"]

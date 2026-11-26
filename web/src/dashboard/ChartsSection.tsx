@@ -1,19 +1,69 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Charts section (FR-DASH-22): D1 / D9 / Dasha tabs; North Indian chart with two-way highlight and
 // a planet table. Unknown birth time (D56): no charts, only what held all day, both options shown.
+import { lazy, Suspense, useEffect, useState } from "react";
 import type { Master } from "../api/types";
+import { useInspectSet, prefetchInspect } from "../features/inspector/api";
+import { formatTarget, normaliseTarget, PARAM, parseTarget, withChart, type InspectTarget } from "../features/inspector/urlState";
 import { ABBR, dm } from "../lib/format";
+import { Skeleton } from "../ui/Skeleton";
+import type { SheetSize } from "../ui/Sheet";
+import { NARROW, useMediaQuery } from "../ui/useMediaQuery";
+import { useQueryParam } from "../ui/useUrlState";
+
+// The panel, its model and the sheet load on first open, so the dashboard stays light (owner, 26 Nov).
+const InspectorPanel = lazy(() => import("../features/inspector/InspectorPanel").then((x) => ({ default: x.InspectorPanel })));
 import DashaTimeline from "./DashaTimeline";
 import NorthChart, { type ChartPlanet } from "./NorthChart";
 
 export type ChartTab = "d1" | "d9" | "dasha";
 
-export default function ChartsSection({ m, profileId, tab, setTab, selected, setSelected, onExpired, onAddTime }: {
+export default function ChartsSection({ m, profileId, tab, setTab, selected, setSelected, onExpired, onAddTime, inspect = false }: {
   m: Master; profileId: string; tab: ChartTab; setTab(t: ChartTab): void; selected: string | null; setSelected(id: string | null): void;
-  onExpired(): void; onAddTime(): void;
+  onExpired(): void; onAddTime(): void; inspect?: boolean;
 }) {
   const known = m.meta.birth_time_known;
-  const pick = (id: string) => setSelected(selected === id ? null : id);
+  // Chart Inspector (I1, behind PRANIX_FEATURE_INSPECT): the open target lives in the address bar.
+  const narrow = useMediaQuery(NARROW);
+  const [raw, setRaw] = useQueryParam(PARAM);
+  const [size, setSize] = useState<SheetSize>("half");
+  const [nonce, setNonce] = useState(0);
+  const parsed = inspect ? parseTarget(raw) : null;
+  const norm = parsed ? normaliseTarget(parsed, known) : null;
+  const target: InspectTarget | null = norm?.target && norm.target.kind === "planet" ? norm.target : null; // houses arrive in I2
+  const load = useInspectSet(target ? profileId : null, target ? target.chart : null, nonce);
+  const open = (t: InspectTarget | null) => setRaw(t ? formatTarget(t) : null);
+  useEffect(() => { if (inspect) prefetchInspect(profileId, "d1"); }, [inspect, profileId]);       // instant first click
+  useEffect(() => { if (target && tab !== "dasha" && tab !== target.chart && known) setTab(target.chart); }, [target?.chart]); // eslint-disable-line react-hooks/exhaustive-deps
+  const effSelected = inspect ? (target?.ref ?? null) : selected;
+  // Phones: the half sheet covers the lower screen, so lift the chart above it (owner review, 26 Nov).
+  const sheetUp = !!target && narrow;
+  useEffect(() => {
+    if (!sheetUp) return;
+    const chart = document.querySelector<HTMLElement>("#charts .ni");
+    if (!chart) return;
+    const top = chart.getBoundingClientRect().top + window.scrollY - 12;
+    const free = window.innerHeight * 0.54 - 24;               // the part of the screen above a half sheet
+    const lift = Math.max(0, chart.offsetHeight - free);        // a tall chart: keep its lower half in view
+    window.scrollTo({ top: top + lift, behavior: "smooth" });
+  }, [sheetUp, target?.ref]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pick = (id: string) => {
+    if (!inspect) { setSelected(selected === id ? null : id); return; }
+    if (target?.ref === id) { open(null); return; }
+    open({ chart: tab === "d9" ? "d9" : "d1", kind: "planet", ref: id as InspectTarget["ref"] } as InspectTarget);
+  };
+  const changeTab = (t: ChartTab) => {
+    setTab(t);
+    if (!target) return;
+    if (t === "dasha") open(null);                       // plan §16.3: the Dasha tab closes the Inspector
+    else open(withChart(target, t));                     // D1/D9 keeps the target (D81)
+  };
+  const panel = target && (
+    <Suspense fallback={<Skeleton label="Opening the inspector" widths={["50%", "90%", "70%"]} />}>
+    <InspectorPanel target={target} note={norm && norm.note === "D9_NEEDS_TIME" ? norm.note : null} load={load} size={size} onSize={setSize}
+      onGo={(t) => open(t)} onClose={() => open(null)} onAddTime={onAddTime} onRetry={() => setNonce((n) => n + 1)} />
+    </Suspense>
+  );
   const ts = Object.fromEntries(m.flags.time_sensitive.map((t) => [t.fact_id, t.values]));
 
   const d1Planets: ChartPlanet[] = known ? m.d1.planets.map((p) => ({
@@ -55,9 +105,9 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
         </p>
       </div>
       <div role="tablist" aria-label="Chart" style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-        <button type="button" role="tab" className="tab" aria-selected={tab === "d1"} onClick={() => setTab("d1")}>{known ? "D1 · Birth chart" : "Signs and stars"}</button>
-        {known && <button type="button" role="tab" className="tab" aria-selected={tab === "d9"} onClick={() => setTab("d9")}>D9 · Navamsa</button>}
-        <button type="button" role="tab" className="tab" aria-selected={tab === "dasha"} onClick={() => setTab("dasha")}>Dasha timeline</button>
+        <button type="button" role="tab" className="tab" aria-selected={tab === "d1"} onClick={() => changeTab("d1")}>{known ? "D1 · Birth chart" : "Signs and stars"}</button>
+        {known && <button type="button" role="tab" className="tab" aria-selected={tab === "d9"} onMouseEnter={() => inspect && prefetchInspect(profileId, "d9")} onFocus={() => inspect && prefetchInspect(profileId, "d9")} onClick={() => changeTab("d9")}>D9 · Navamsa</button>}
+        <button type="button" role="tab" className="tab" aria-selected={tab === "dasha"} onClick={() => changeTab("dasha")}>Dasha timeline</button>
       </div>
 
       {tab === "dasha" ? <DashaTimeline profileId={profileId} onExpired={onExpired} /> : (
@@ -65,8 +115,8 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
           {known && m.d1.lagna ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {tab === "d1"
-                ? <NorthChart firstSign={m.d1.lagna.sign} planets={d1Planets} mark="ASC" selected={selected} onPick={pick} aria={`D1 birth chart, ${m.d1.lagna.sign} rising`} />
-                : <NorthChart firstSign={m.d9!.lagna.sign} planets={d9Planets} mark="ASC" selected={selected} onPick={pick} aria={`D9 navamsa chart, ${m.d9!.lagna.sign} rising`} />}
+                ? <NorthChart firstSign={m.d1.lagna.sign} planets={d1Planets} mark="ASC" selected={effSelected} onPick={pick} aria={`D1 birth chart, ${m.d1.lagna.sign} rising`} />
+                : <NorthChart firstSign={m.d9!.lagna.sign} planets={d9Planets} mark="ASC" selected={effSelected} onPick={pick} aria={`D9 navamsa chart, ${m.d9!.lagna.sign} rising`} />}
               <p className="hint" style={{ margin: 0, fontSize: 12, textAlign: "center" }}>Numbers in the chart are sign numbers (1 Aries … 12 Pisces). ℞ retrograde.</p>
             </div>
           ) : (
@@ -76,6 +126,7 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
               <button type="button" className="btn btn-ghost" onClick={onAddTime}>Add a birth time</button>
             </div>
           )}
+          {panel && !narrow ? panel : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
             <div style={{ overflowX: "auto" }} tabIndex={0} role="region" aria-label="Planet table">
               <table className="pt">
@@ -88,7 +139,7 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
                       house: p.house, star: p.nakshatra ? `${p.nakshatra}${p.pada ? ` ${p.pada}` : ""}` : (ts[`${p.id.toLowerCase()}.nakshatra`] ?? []).join(" or "),
                       dignity: p.dignity, retro: p.retrograde,
                     }))).map((r) => (
-                    <tr key={r.id} className={`rowbtn ${selected === r.id ? "on" : ""}`} onClick={() => known && pick(r.id)}>
+                    <tr key={r.id} className={`rowbtn ${effSelected === r.id ? "on" : ""}`} onClick={() => (known || inspect) && pick(r.id)}>
                       <td><strong style={{ color: "#fff" }}>{r.id}</strong> {r.retro && r.id !== "Rahu" && r.id !== "Ketu" ? "℞" : ""}</td>
                       <td>{r.sign}</td>{known && tab === "d1" && <td>{r.deg}</td>}{known && <td>{r.house}</td>}{tab !== "d9" && <td>{r.star}</td>}<td>{r.dignity ?? "—"}</td>
                     </tr>
@@ -99,6 +150,9 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
             {notes.length > 0 && <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 6, fontSize: 14, lineHeight: 1.55, color: "var(--text2)" }}>{notes.map((n) => <li key={n}>{n}</li>)}</ul>}
             <p className="hint" style={{ margin: 0, fontSize: 12 }}>Sidereal zodiac, Lahiri ayanamsa {dm(m.meta.ayanamsa_value)} · whole-sign houses · mean node · degrees truncated, never rounded.</p>
           </div>
+          )}
+          {panel && narrow ? panel : null}
+          {sheetUp && <div aria-hidden="true" style={{ height: "var(--sheet-half)" }} />}
         </div>
       )}
     </section>

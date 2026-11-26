@@ -13,5 +13,6 @@ export PRANIX_GEO_DB_PATH="$TMP/geonames.sqlite"
 export PRANIX_EPHE_PATH="${PRANIX_EPHE_PATH:-$ROOT/data/ephe}"
 export PRANIX_FONTS_DIR="${PRANIX_FONTS_DIR:-$ROOT/data/fonts}"
 export PRANIX_LLM_FAKE="${PRANIX_LLM_FAKE:-ok}"
+export PRANIX_FEATURE_INSPECT="${PRANIX_FEATURE_INSPECT:-true}"   # Chart Inspector (I1) under test
 cd "$ROOT/backend"
 exec python3 -m uvicorn pranix.gateway.app:app --host 127.0.0.1 --port "$PORT" --log-level warning

@@ -71,6 +71,85 @@
         "title": "BirthInputModel",
         "type": "object"
       },
+      "Dispositor": {
+        "additionalProperties": false,
+        "properties": {
+          "cycle_members": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cycle Members"
+          },
+          "end": {
+            "enum": [
+              "final",
+              "exchange",
+              "cycle",
+              "stops_uncertain"
+            ],
+            "title": "End",
+            "type": "string"
+          },
+          "pair": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pair"
+          },
+          "steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "steps",
+          "end",
+          "pair",
+          "cycle_members"
+        ],
+        "title": "Dispositor",
+        "type": "object"
+      },
+      "EitherSide": {
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "$ref": "#/components/schemas/HouseRef"
+          },
+          "before": {
+            "$ref": "#/components/schemas/HouseRef"
+          },
+          "kartari": {
+            "title": "Kartari",
+            "type": "null"
+          }
+        },
+        "required": [
+          "before",
+          "after"
+        ],
+        "title": "EitherSide",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -82,6 +161,303 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HouseRef": {
+        "additionalProperties": false,
+        "properties": {
+          "house": {
+            "title": "House",
+            "type": "integer"
+          },
+          "occupants": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Occupants",
+            "type": "array"
+          },
+          "sign": {
+            "title": "Sign",
+            "type": "string"
+          }
+        },
+        "required": [
+          "house",
+          "sign",
+          "occupants"
+        ],
+        "title": "HouseRef",
+        "type": "object"
+      },
+      "InspectionBundle": {
+        "additionalProperties": false,
+        "properties": {
+          "acts_through": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acts Through"
+          },
+          "aspects_in": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aspects In"
+          },
+          "aspects_out": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/HouseRef"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aspects Out"
+          },
+          "chart": {
+            "enum": [
+              "d1",
+              "d9"
+            ],
+            "title": "Chart",
+            "type": "string"
+          },
+          "dispositor": {
+            "$ref": "#/components/schemas/Dispositor"
+          },
+          "either_side": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EitherSide"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fact_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fact Ids",
+            "type": "array"
+          },
+          "houses_ruled": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/HouseRef"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Houses Ruled"
+          },
+          "level": {
+            "enum": [
+              "house",
+              "sign"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "modifiers": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Modifiers",
+            "type": "array"
+          },
+          "other_chart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OtherChart"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "placement": {
+            "$ref": "#/components/schemas/Placement"
+          },
+          "schema_version": {
+            "const": "1",
+            "default": "1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sits_with": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sits With",
+            "type": "array"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "target": {
+            "$ref": "#/components/schemas/Target"
+          },
+          "top_signals": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Top Signals",
+            "type": "array"
+          },
+          "unavailable": {
+            "items": {
+              "$ref": "#/components/schemas/Unavailable"
+            },
+            "title": "Unavailable",
+            "type": "array"
+          }
+        },
+        "required": [
+          "target",
+          "chart",
+          "level",
+          "placement",
+          "houses_ruled",
+          "acts_through",
+          "sits_with",
+          "other_chart",
+          "dispositor",
+          "either_side",
+          "unavailable",
+          "fact_ids"
+        ],
+        "title": "InspectionBundle",
+        "type": "object"
+      },
+      "InspectionSet": {
+        "additionalProperties": false,
+        "properties": {
+          "bundles": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/InspectionBundle"
+            },
+            "title": "Bundles",
+            "type": "object"
+          },
+          "chart": {
+            "enum": [
+              "d1",
+              "d9"
+            ],
+            "title": "Chart",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "house",
+              "sign"
+            ],
+            "title": "Level",
+            "type": "string"
+          },
+          "ruleset": {
+            "$ref": "#/components/schemas/RulesetRef"
+          }
+        },
+        "required": [
+          "chart",
+          "level",
+          "ruleset",
+          "bundles"
+        ],
+        "title": "InspectionSet",
+        "type": "object"
+      },
+      "OtherChart": {
+        "additionalProperties": false,
+        "properties": {
+          "change": {
+            "enum": [
+              "same",
+              "changed",
+              "none"
+            ],
+            "title": "Change",
+            "type": "string"
+          },
+          "chart": {
+            "enum": [
+              "d1",
+              "d9"
+            ],
+            "title": "Chart",
+            "type": "string"
+          },
+          "dignity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "exalted",
+                  "own",
+                  "friend",
+                  "neutral",
+                  "enemy",
+                  "debilitated"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dignity"
+          },
+          "house": {
+            "title": "House",
+            "type": "integer"
+          },
+          "sign": {
+            "title": "Sign",
+            "type": "string"
+          }
+        },
+        "required": [
+          "chart",
+          "sign",
+          "house",
+          "dignity",
+          "change"
+        ],
+        "title": "OtherChart",
         "type": "object"
       },
       "PlaceByCoords": {
@@ -120,6 +496,229 @@
           "place_id"
         ],
         "title": "PlaceById",
+        "type": "object"
+      },
+      "Placement": {
+        "additionalProperties": false,
+        "properties": {
+          "deg_in_sign": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deg In Sign"
+          },
+          "dignity": {
+            "anyOf": [
+              {
+                "enum": [
+                  "exalted",
+                  "own",
+                  "friend",
+                  "neutral",
+                  "enemy",
+                  "debilitated"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dignity"
+          },
+          "dignity_gloss": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dignity Gloss"
+          },
+          "house": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House"
+          },
+          "nakshatra": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nakshatra"
+          },
+          "nakshatra_options": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nakshatra Options"
+          },
+          "retrograde": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrograde"
+          },
+          "sign": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sign"
+          },
+          "sign_options": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sign Options"
+          },
+          "vargottama": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vargottama"
+          }
+        },
+        "required": [
+          "sign",
+          "sign_options",
+          "house",
+          "dignity",
+          "vargottama",
+          "deg_in_sign",
+          "nakshatra",
+          "nakshatra_options",
+          "retrograde"
+        ],
+        "title": "Placement",
+        "type": "object"
+      },
+      "RulesetRef": {
+        "additionalProperties": false,
+        "properties": {
+          "hash": {
+            "title": "Hash",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "hash"
+        ],
+        "title": "RulesetRef",
+        "type": "object"
+      },
+      "Target": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "planet",
+              "house"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "ref": {
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "title": "Target",
+        "type": "object"
+      },
+      "Unavailable": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "enum": [
+              "BIRTH_TIME_REQUIRED",
+              "CHANGES_DURING_DAY"
+            ],
+            "title": "Reason",
+            "type": "string"
+          },
+          "what": {
+            "enum": [
+              "house",
+              "houses_ruled",
+              "degree",
+              "d9",
+              "aspects",
+              "sign",
+              "nakshatra",
+              "dignity",
+              "retrograde"
+            ],
+            "title": "What",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what",
+          "reason"
+        ],
+        "title": "Unavailable",
         "type": "object"
       },
       "ValidationError": {
@@ -603,6 +1202,77 @@
         "summary": "Stream Insights",
         "tags": [
           "insights"
+        ]
+      }
+    },
+    "/v1/profiles/{profile_id}/inspect/{chart}": {
+      "get": {
+        "operationId": "inspect_chart_v1_profiles__profile_id__inspect__chart__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "profile_id",
+            "required": true,
+            "schema": {
+              "title": "Profile Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "chart",
+            "required": true,
+            "schema": {
+              "enum": [
+                "d1",
+                "d9"
+              ],
+              "title": "Chart",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "If-None-Match"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionSet"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inspect Chart",
+        "tags": [
+          "inspect"
         ]
       }
     },
