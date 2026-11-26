@@ -22,7 +22,7 @@ from ..ephemeris.ruleset import load_ruleset
 from ..geo.index import GeoIndex
 from ..insight.library import Library
 from ..insight.pipeline import InsightService
-from ..llmgw.build import background_chain, insights_chain, reword_gap_s
+from ..llmgw.build import reword_gap_s, router
 from ..obs.logging import configure
 from ..store.cache import open_cache, start_purger
 from . import routes_charts, routes_geo, routes_insights, routes_inspect, routes_profiles, web
@@ -101,12 +101,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.image_cache = {}
     app.state.library = Library(allow_drafts=settings.allow_drafts)
     app.state.cache = open_cache(settings.cache_path)
-    live = insights_chain(settings)
+    app.state.llm = router(settings)  # raises RoutingError on a config that could leak typed text (D82)
     app.state.insights = InsightService(
         app.state.library,
-        live,
+        app.state.llm.chain("card_reading"),
         cache=app.state.cache,
-        background=background_chain(settings, live),
+        background=app.state.llm.background,
         reword_max=settings.background_reword_max,
         reword_gap_s=reword_gap_s(settings),
     )

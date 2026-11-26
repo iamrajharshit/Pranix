@@ -24,6 +24,7 @@ import structlog
 from pydantic import ValidationError
 
 from ..llmgw.chain import Chain
+from ..llmgw.tasks import TASKS
 from ..store.cache import CacheStore, MemoryCacheStore
 from . import cards
 from .entities import unknown_entities
@@ -166,5 +167,5 @@ class InsightService:
             out.update(cand)
             return True
 
-        result = chain.generate(SYSTEM_PROMPT, job.user, module=module, accept=accept)
+        result = chain.generate(SYSTEM_PROMPT, job.user, module=module, accept=accept, task=TASKS["card_reading"])
         return out if result is not None else None
