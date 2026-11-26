@@ -1,29 +1,29 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # signals: written by `pranix-ctl library import`.
 # Change text through the review sheet, not by hand (plan section 18).
-dignity.exalted: {status: "draft", text: "Exalted: the planet sits in the sign where its qualities come through most clearly and generously."}
-dignity.own: {status: "draft", text: "Own sign: the planet is at home here, steady and self-directed, answering to no other lord in this sign."}
-dignity.friend: {status: "draft", text: "Friend's sign: the planet is a welcome guest, comfortable and cooperative with the lord of the sign."}
-dignity.neutral: {status: "draft", text: "Neutral sign: neither helped nor held back, the planet works on its own terms here."}
-dignity.enemy: {status: "draft", text: "Enemy's sign: less natural comfort here, so it takes more conscious effort."}
-dignity.debilitated: {status: "draft", text: "Debilitated: unfamiliar ground. Read it alongside the D9 and the support of its dispositor before drawing conclusions."}
-vargottama: {status: "draft", text: "Vargottama: the planet holds the same sign in the D1 and the D9, which steadies and deepens what it shows."}
-retrograde: {status: "draft", text: "Retrograde: the planet's energy turns inward first, often revisiting and refining before it acts."}
-node.acts_through: {status: "draft", text: "Rahu and Ketu own no sign, so they act through the lord of the sign they occupy and colour its results."}
-dispositor.final: {status: "draft", text: "Final dispositor: the chain of sign lords ends with this planet in its own sign, a quiet anchor for the others."}
-dispositor.exchange: {status: "draft", text: "Exchange (parivartana): two planets sit in each other's signs, so each strengthens and colours the other's affairs."}
-dispositor.cycle: {status: "draft", text: "A loop of sign lords: several planets depend on one another in a circle, so their themes are best read together."}
-dispositor.stops_uncertain: {status: "draft", text: "The chain stops here because this planet's sign depends on the birth time, so nothing beyond it is guessed."}
-house.empty: {status: "draft", text: "An empty house is not an empty part of life: it is read through its lord and the planets that look at it."}
-house.stellium: {status: "draft", text: "Several planets share this house, so its themes carry extra weight and many energies meet here."}
-conjunction: {status: "draft", text: "Planets in the same house blend their qualities, so each one's expression is coloured by its companions."}
-aspect.looks_at: {status: "draft", text: "Looks at (drishti): the planet lends its qualities to the houses it looks at, adding to their themes."}
-aspect.looked_at_by: {status: "draft", text: "Looked at by: other planets lend their qualities to this house, shaping how its themes unfold."}
-aspect.none: {status: "draft", text: "No planet looks at this house, so its lord and occupants speak for it without outside influence."}
-house.kendra: {status: "draft", text: "Kendra (angular house): one of the pillars of the chart, where planets act visibly and with strength."}
-house.trikona: {status: "draft", text: "Trikona (house of grace): a house of purpose, learning and support for whatever sits here."}
-house.dusthana: {status: "draft", text: "Dusthana: a house of effort and inner work, where growth comes through meeting difficulty patiently."}
-house.upachaya: {status: "draft", text: "Upachaya (house of growth): its results improve over time with effort, so patience here is rewarded."}
-lord.rising: {status: "draft", text: "Lord of the rising sign: the planet that rules the first house, so its condition colours the whole chart."}
-birth_minute: {status: "draft", text: "This depends on the exact birth minute, so it is shown with what else it could be within your birth time's margin."}
-sign_level: {status: "draft", text: "Without a birth time, only what holds for the whole day is shown: signs and stars, never houses or degrees."}
+dignity.exalted: {status: "approved", text: "Exalted: the planet sits in the sign where its qualities come through most clearly and generously."}
+dignity.own: {status: "approved", text: "Own sign: the planet is at home here, steady and self-directed, answering to no other lord in this sign."}
+dignity.friend: {status: "approved", text: "Friend's sign: the planet is a welcome guest, comfortable and cooperative with the lord of the sign."}
+dignity.neutral: {status: "approved", text: "Neutral sign: neither helped nor held back, the planet works on its own terms here."}
+dignity.enemy: {status: "approved", text: "Enemy's sign: less natural comfort here, so it takes more conscious effort."}
+dignity.debilitated: {status: "approved", text: "Debilitated: unfamiliar ground. Read it alongside the D9 and the support of its dispositor before drawing conclusions."}
+vargottama: {status: "approved", text: "Vargottama: the planet holds the same sign in the D1 and the D9, which steadies and deepens what it shows."}
+retrograde: {status: "approved", text: "Retrograde: the planet's energy turns inward first, often revisiting and refining before it acts."}
+node.acts_through: {status: "approved", text: "Rahu and Ketu own no sign, so they act through the lord of the sign they occupy and colour its results."}
+dispositor.final: {status: "approved", text: "Final dispositor: the chain of sign lords ends with this planet in its own sign, a quiet anchor for the others."}
+dispositor.exchange: {status: "approved", text: "Exchange (parivartana): two planets sit in each other's signs, so each strengthens and colours the other's affairs."}
+dispositor.cycle: {status: "approved", text: "A loop of sign lords: several planets depend on one another in a circle, so their themes are best read together."}
+dispositor.stops_uncertain: {status: "approved", text: "The chain stops here because this planet's sign depends on the birth time, so nothing beyond it is guessed."}
+house.empty: {status: "approved", text: "An empty house is not an empty part of life: it is read through its lord and the planets that look at it."}
+house.stellium: {status: "approved", text: "Several planets share this house, so its themes carry extra weight and many energies meet here."}
+conjunction: {status: "approved", text: "Planets in the same house blend their qualities, so each one's expression is coloured by its companions."}
+aspect.looks_at: {status: "approved", text: "Looks at (drishti): the planet lends its qualities to the houses it looks at, adding to their themes."}
+aspect.looked_at_by: {status: "approved", text: "Looked at by (drishti): other planets lend their qualities to this house and any planet in it, shaping how its themes unfold."}
+aspect.none: {status: "approved", text: "No planet looks at this house, so its lord and any planets in it speak for it without outside influence."}
+house.kendra: {status: "approved", text: "Kendra (angular house): one of the pillars of the chart, where planets act visibly and with strength."}
+house.trikona: {status: "approved", text: "Trikona (house of grace): a house of purpose, learning and support for whatever sits here."}
+house.dusthana: {status: "approved", text: "Dusthana: a house of effort and inner work, where growth comes through meeting difficulty patiently."}
+house.upachaya: {status: "approved", text: "Upachaya (house of growth): its results improve over time with effort, so patience here is rewarded."}
+lord.rising: {status: "approved", text: "Lord of the rising sign: the planet that rules the first house, so its condition colours the whole chart."}
+birth_minute: {status: "approved", text: "This depends on the exact birth minute, so it is shown with what else it could be within your birth time's margin."}
+sign_level: {status: "approved", text: "Without a birth time, only day-level facts are shown: signs and stars (with both options if one shifts), never houses or degrees."}

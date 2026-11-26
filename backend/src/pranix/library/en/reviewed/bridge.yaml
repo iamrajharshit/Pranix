@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # bridge: written by `pranix-ctl library import`.
 # Change text through the review sheet, not by hand (plan section 18).
-bridge.vargottama: {status: "draft", text: "The planet keeps the same sign in both charts, so what the D1 shows is confirmed in the deeper layer of the D9."}
-bridge.same_dignity: {status: "draft", text: "Its dignity is the same in both charts, so the D9 echoes the D1 rather than changing its picture."}
-bridge.stronger_in_d9: {status: "draft", text: "It gains dignity in the D9, a sign that its qualities mature and strengthen with time and inner work."}
-bridge.softer_in_d9: {status: "draft", text: "It has less dignity in the D9, so the strength it shows outwardly asks for conscious care to stay steady over time."}
-bridge.exalted_in_d9: {status: "draft", text: "Exalted in the D9: whatever its D1 condition, this planet has a strong inner foundation to grow from."}
-bridge.own_in_d9: {status: "draft", text: "In its own sign in the D9: the planet is at home in its deeper layer and grows more self-assured over time."}
-bridge.debilitated_in_d9: {status: "draft", text: "Debilitated in the D9: its deeper layer is unfamiliar ground, so read it alongside its D1 strength and the support of its dispositor."}
-bridge.debilitated_supported: {status: "draft", text: "Debilitated in the D1 but comfortable in the D9: the early unease of this placement can give way to real strength."}
-bridge.node: {status: "draft", text: "Rahu and Ketu carry no dignity of their own, so read them through their sign lords in each chart."}
-bridge.lord_in_other_chart: {status: "draft", text: "Where a house's lord stands in the other chart adds a second view of that house, deepening what the first chart says."}
+bridge.vargottama: {status: "approved", text: "The planet keeps the same sign in both charts, so what the D1 shows is confirmed in the deeper layer of the D9."}
+bridge.same_dignity: {status: "approved", text: "Its dignity is the same in both charts, so the D9 echoes the D1 rather than changing its picture."}
+bridge.stronger_in_d9: {status: "approved", text: "It gains dignity in the D9, a sign that its qualities mature and strengthen with time and inner work."}
+bridge.softer_in_d9: {status: "approved", text: "It has less dignity in the D9, so what it expresses outwardly asks for conscious care to stay steady over time."}
+bridge.exalted_in_d9: {status: "approved", text: "Exalted in the D9: whatever its D1 condition, this planet has a strong inner foundation to grow from."}
+bridge.own_in_d9: {status: "approved", text: "In its own sign in the D9: the planet is at home in its deeper layer and grows more self-assured over time."}
+bridge.debilitated_in_d9: {status: "approved", text: "Debilitated in the D9: its deeper layer is unfamiliar ground, so read it alongside its D1 condition and the support of its dispositor."}
+bridge.debilitated_supported: {status: "approved", text: "Debilitated in the D1 but comfortable in the D9: the early unease of this placement can give way to real strength."}
+bridge.node: {status: "approved", text: "Rahu and Ketu carry no dignity of their own, so read them through their sign lords in each chart."}
+bridge.lord_in_other_chart: {status: "approved", text: "Where a house's lord stands in the other chart adds a second view of that house, deepening what this chart shows."}
