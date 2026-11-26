@@ -1,0 +1,692 @@
+{
+  "bundles": {
+    "planet:Jupiter": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": null,
+        "end": "final",
+        "pair": null,
+        "steps": [
+          "Jupiter"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.jupiter.placement",
+        "d1.jupiter.dispositor",
+        "d1.jupiter.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "own",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": "Purva Ashadha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Sagittarius",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Mercury"
+      ],
+      "summary": "Jupiter in Sagittarius, its own sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Jupiter"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    },
+    "planet:Ketu": {
+      "acts_through": "Mars",
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Ketu",
+          "Mars",
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.ketu.placement",
+        "d1.ketu.dispositor",
+        "d1.ketu.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": null,
+        "dignity_gloss": "Shadow node: read through the lord of its sign.",
+        "house": null,
+        "nakshatra": "Vishakha",
+        "nakshatra_options": null,
+        "retrograde": true,
+        "sign": "Scorpio",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Sun"
+      ],
+      "summary": "Ketu in Scorpio.",
+      "target": {
+        "kind": "planet",
+        "ref": "Ketu"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    },
+    "planet:Mars": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Mars",
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.mars.placement",
+        "d1.mars.dispositor",
+        "d1.mars.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "exalted",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": null,
+        "nakshatra_options": [
+          "Shravana",
+          "Dhanishta"
+        ],
+        "retrograde": false,
+        "sign": "Capricorn",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Venus"
+      ],
+      "summary": "Mars in Capricorn, where it is exalted.",
+      "target": {
+        "kind": "planet",
+        "ref": "Mars"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        },
+        {
+          "reason": "CHANGES_DURING_DAY",
+          "what": "nakshatra"
+        }
+      ]
+    },
+    "planet:Mercury": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": null,
+        "end": "final",
+        "pair": null,
+        "steps": [
+          "Mercury",
+          "Jupiter"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.mercury.placement",
+        "d1.mercury.dispositor",
+        "d1.mercury.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "neutral",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": "Mula",
+        "nakshatra_options": null,
+        "retrograde": true,
+        "sign": "Sagittarius",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Jupiter"
+      ],
+      "summary": "Mercury in Sagittarius, a neutral sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Mercury"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    },
+    "planet:Moon": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Venus",
+          "Saturn"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Saturn",
+          "Venus"
+        ],
+        "steps": [
+          "Moon",
+          "Venus",
+          "Saturn"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.moon.placement",
+        "d1.moon.dispositor",
+        "d1.moon.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "exalted",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": null,
+        "nakshatra_options": [
+          "Rohini",
+          "Mrigashira"
+        ],
+        "retrograde": false,
+        "sign": "Taurus",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Rahu"
+      ],
+      "summary": "Moon in Taurus, where it is exalted.",
+      "target": {
+        "kind": "planet",
+        "ref": "Moon"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        },
+        {
+          "reason": "CHANGES_DURING_DAY",
+          "what": "nakshatra"
+        }
+      ]
+    },
+    "planet:Rahu": {
+      "acts_through": "Venus",
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Venus",
+          "Saturn"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Saturn",
+          "Venus"
+        ],
+        "steps": [
+          "Rahu",
+          "Venus",
+          "Saturn"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.rahu.placement",
+        "d1.rahu.dispositor",
+        "d1.rahu.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": null,
+        "dignity_gloss": "Shadow node: read through the lord of its sign.",
+        "house": null,
+        "nakshatra": "Krittika",
+        "nakshatra_options": null,
+        "retrograde": true,
+        "sign": "Taurus",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Moon"
+      ],
+      "summary": "Rahu in Taurus.",
+      "target": {
+        "kind": "planet",
+        "ref": "Rahu"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    },
+    "planet:Saturn": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.saturn.placement",
+        "d1.saturn.dispositor",
+        "d1.saturn.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "exalted",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": "Vishakha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Libra",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "Saturn in Libra, where it is exalted.",
+      "target": {
+        "kind": "planet",
+        "ref": "Saturn"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    },
+    "planet:Sun": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Saturn",
+          "Venus"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Venus",
+          "Saturn"
+        ],
+        "steps": [
+          "Sun",
+          "Mars",
+          "Saturn",
+          "Venus"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.sun.placement",
+        "d1.sun.dispositor",
+        "d1.sun.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "friend",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": "Jyeshtha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Scorpio",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Ketu"
+      ],
+      "summary": "Sun in Scorpio, a friend's sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Sun"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    },
+    "planet:Venus": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d1",
+      "dispositor": {
+        "cycle_members": [
+          "Venus",
+          "Saturn"
+        ],
+        "end": "exchange",
+        "pair": [
+          "Saturn",
+          "Venus"
+        ],
+        "steps": [
+          "Venus",
+          "Saturn"
+        ]
+      },
+      "either_side": null,
+      "fact_ids": [
+        "d1.venus.placement",
+        "d1.venus.dispositor",
+        "d1.venus.same_sign"
+      ],
+      "houses_ruled": null,
+      "level": "sign",
+      "modifiers": [],
+      "other_chart": null,
+      "placement": {
+        "deg_in_sign": null,
+        "dignity": "friend",
+        "dignity_gloss": null,
+        "house": null,
+        "nakshatra": "Uttara Ashadha",
+        "nakshatra_options": null,
+        "retrograde": false,
+        "sign": "Capricorn",
+        "sign_options": null,
+        "vargottama": null
+      },
+      "schema_version": "1",
+      "sits_with": [
+        "Mars"
+      ],
+      "summary": "Venus in Capricorn, a friend's sign.",
+      "target": {
+        "kind": "planet",
+        "ref": "Venus"
+      },
+      "top_signals": [],
+      "unavailable": [
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "house"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "houses_ruled"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "degree"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "d9"
+        },
+        {
+          "reason": "BIRTH_TIME_REQUIRED",
+          "what": "aspects"
+        }
+      ]
+    }
+  },
+  "chart": "d1",
+  "level": "sign",
+  "ruleset": {
+    "hash": "9541a10df5ca6ffd",
+    "id": "vedic-core",
+    "version": 1
+  }
+}

@@ -84,3 +84,36 @@ def test_master_invariants(dt: datetime, lat: float, lon_: float, known: bool) -
         assert sorted(p["house"] for p in m["d1"]["houses"]) == list(range(1, 13))
     else:
         assert m["d9"] is None and m["d1"]["lagna"] is None
+
+
+@settings(max_examples=40, deadline=None)
+@given(
+    st.datetimes(min_value=datetime(1900, 1, 1), max_value=datetime(2020, 12, 31)),
+    st.floats(min_value=-60, max_value=60),
+    st.floats(min_value=-179, max_value=179),
+    st.booleans(),
+)
+def test_inspection_set_invariants(dt: datetime, lat: float, lon_: float, known: bool) -> None:
+    """I1: on any chart, every planet has a bundle, chains end, houses stay in range, ruled houses
+    are sorted, sign level never shows time-dependent data, and the bytes are deterministic."""
+    from pranix.insight.inspect_text import with_text
+    from pranix.jyotish import build_set
+    from pranix.jyotish.bundle import canonical
+
+    m = compute(BirthInput(dt, "UTC", lat, lon_, birth_time_known=known), date(2026, 11, 14))
+    for chart in ("d1", "d9") if known else ("d1",):
+        s = with_text(build_set(m, chart, RS))  # type: ignore[arg-type]
+        assert len(s.bundles) == 9 and canonical(s) == canonical(with_text(build_set(m, chart, RS)))  # type: ignore[arg-type]
+        for b in s.bundles.values():
+            d = b.dispositor
+            assert 1 <= len(d.steps) <= 9 and d.end in ("final", "exchange", "cycle", "stops_uncertain")
+            if d.end == "exchange":
+                assert d.cycle_members and len(d.cycle_members) == 2
+            assert b.summary and not any(ch.isdigit() for ch in b.summary.replace("D1", "").replace("D9", ""))
+            if known:
+                assert b.placement.house is not None and 1 <= b.placement.house <= 12
+                houses = [h.house for h in b.houses_ruled or []]
+                assert houses == sorted(houses) and all(1 <= h <= 12 for h in houses)
+                assert b.target.ref not in b.sits_with
+            else:
+                assert b.placement.house is None and b.placement.deg_in_sign is None and b.other_chart is None

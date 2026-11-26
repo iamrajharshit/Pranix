@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: AGPL-3.0-only
+# Chart Inspector wording (I1). Approved by the owner: the summary line in the prototype review
+# (25 Nov 2026) and the dignity glosses in D81 §3 (26 Nov 2026). No numerals (rule 2); calm tone (rule 13).
+status: approved
+reviewed: "D81"
+ordinals: [first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelfth]
+dignity_phrase:
+  own: "its own sign"
+  exalted: "where it is exalted"
+  debilitated: "where it is debilitated"
+  friend: "a friend's sign"
+  enemy: "an enemy's sign"
+  neutral: "a neutral sign"
+glosses:
+  enemy: "Enemy's sign: less natural comfort here, so it takes more conscious effort."
+  debilitated: "Debilitated: unfamiliar ground. Always read it alongside the {other} and its dispositor support."
+  debilitated_sign_level: "Debilitated: unfamiliar ground. Always read it alongside its dispositor support."
+  node: "Shadow node: read through the lord of its sign."
+summary:
+  house: "{planet} in your {ordinal} house, in {sign}{dignity}."
+  sign: "{planet} in {sign}{dignity}."
+  sign_uncertain: "{planet} in {options}, depending on the birth time."

@@ -25,7 +25,7 @@ from ..insight.pipeline import InsightService
 from ..llmgw.build import background_chain, insights_chain, reword_gap_s
 from ..obs.logging import configure
 from ..store.cache import open_cache, start_purger
-from . import routes_charts, routes_geo, routes_insights, routes_profiles, web
+from . import routes_charts, routes_geo, routes_insights, routes_inspect, routes_profiles, web
 from .guest_store import GuestStore
 from .problems import install
 from .ratelimit import TokenBucket
@@ -95,6 +95,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         "profiles": TokenBucket(settings.rate_profiles_per_min),
         "insights": TokenBucket(settings.rate_insights_per_min),
         "images": TokenBucket(settings.rate_images_per_min),
+        "inspect": TokenBucket(settings.rate_inspect_per_min),
     }
     app.state.renderer = None
     app.state.image_cache = {}
@@ -161,7 +162,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "schema_version": SCHEMA_VERSION,
             "ruleset": {"id": rs.id, "version": rs.version, "hash": rs.hash},
             "ephemeris_mode": swe.mode(),
-            "feature_flags": {"chat": settings.feature_chat, "passkeys": settings.feature_passkeys},
+            "feature_flags": {
+                "chat": settings.feature_chat,
+                "inspect": settings.feature_inspect,
+                "passkeys": settings.feature_passkeys,
+            },
             "ai_providers": sorted(
                 {PROVIDER_LABELS.get(li.provider.name, li.provider.name) for li in app.state.insights.chain.links}
             ),
@@ -171,6 +176,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(routes_profiles.router)
     app.include_router(routes_insights.router)
     app.include_router(routes_charts.router)
+    app.include_router(routes_inspect.router)
     app.state.spa = web.install(app, settings.web_dist)  # after the API routes so they win
     return app
 

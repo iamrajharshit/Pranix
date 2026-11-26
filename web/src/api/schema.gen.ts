@@ -131,6 +131,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/profiles/{profile_id}/inspect/{chart}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inspect Chart */
+        get: operations["inspect_chart_v1_profiles__profile_id__inspect__chart__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/version": {
         parameters: {
             query?: never;
@@ -170,10 +187,127 @@ export interface components {
             /** Time Accuracy */
             time_accuracy?: ("exact" | "approx_5m" | "approx_30m" | "approx_1h") | null;
         };
+        /** Dispositor */
+        Dispositor: {
+            /** Cycle Members */
+            cycle_members: string[] | null;
+            /**
+             * End
+             * @enum {string}
+             */
+            end: "final" | "exchange" | "cycle" | "stops_uncertain";
+            /** Pair */
+            pair: string[] | null;
+            /** Steps */
+            steps: string[];
+        };
+        /** EitherSide */
+        EitherSide: {
+            after: components["schemas"]["HouseRef"];
+            before: components["schemas"]["HouseRef"];
+            /** Kartari */
+            kartari?: null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HouseRef */
+        HouseRef: {
+            /** House */
+            house: number;
+            /** Occupants */
+            occupants: string[];
+            /** Sign */
+            sign: string;
+        };
+        /** InspectionBundle */
+        InspectionBundle: {
+            /** Acts Through */
+            acts_through: string | null;
+            /** Aspects In */
+            aspects_in?: string[] | null;
+            /** Aspects Out */
+            aspects_out?: components["schemas"]["HouseRef"][] | null;
+            /**
+             * Chart
+             * @enum {string}
+             */
+            chart: "d1" | "d9";
+            dispositor: components["schemas"]["Dispositor"];
+            either_side: components["schemas"]["EitherSide"] | null;
+            /** Fact Ids */
+            fact_ids: string[];
+            /** Houses Ruled */
+            houses_ruled: components["schemas"]["HouseRef"][] | null;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "house" | "sign";
+            /**
+             * Modifiers
+             * @default []
+             */
+            modifiers: string[];
+            other_chart: components["schemas"]["OtherChart"] | null;
+            placement: components["schemas"]["Placement"];
+            /**
+             * Schema Version
+             * @default 1
+             * @constant
+             */
+            schema_version: "1";
+            /** Sits With */
+            sits_with: string[];
+            /** Summary */
+            summary?: string | null;
+            target: components["schemas"]["Target"];
+            /**
+             * Top Signals
+             * @default []
+             */
+            top_signals: string[];
+            /** Unavailable */
+            unavailable: components["schemas"]["Unavailable"][];
+        };
+        /** InspectionSet */
+        InspectionSet: {
+            /** Bundles */
+            bundles: {
+                [key: string]: components["schemas"]["InspectionBundle"];
+            };
+            /**
+             * Chart
+             * @enum {string}
+             */
+            chart: "d1" | "d9";
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "house" | "sign";
+            ruleset: components["schemas"]["RulesetRef"];
+        };
+        /** OtherChart */
+        OtherChart: {
+            /**
+             * Change
+             * @enum {string}
+             */
+            change: "same" | "changed" | "none";
+            /**
+             * Chart
+             * @enum {string}
+             */
+            chart: "d1" | "d9";
+            /** Dignity */
+            dignity: ("exalted" | "own" | "friend" | "neutral" | "enemy" | "debilitated") | null;
+            /** House */
+            house: number;
+            /** Sign */
+            sign: string;
         };
         /** PlaceByCoords */
         PlaceByCoords: {
@@ -186,6 +320,61 @@ export interface components {
         PlaceById: {
             /** Place Id */
             place_id: string;
+        };
+        /** Placement */
+        Placement: {
+            /** Deg In Sign */
+            deg_in_sign: number | null;
+            /** Dignity */
+            dignity: ("exalted" | "own" | "friend" | "neutral" | "enemy" | "debilitated") | null;
+            /** Dignity Gloss */
+            dignity_gloss?: string | null;
+            /** House */
+            house: number | null;
+            /** Nakshatra */
+            nakshatra: string | null;
+            /** Nakshatra Options */
+            nakshatra_options: string[] | null;
+            /** Retrograde */
+            retrograde: boolean | null;
+            /** Sign */
+            sign: string | null;
+            /** Sign Options */
+            sign_options: string[] | null;
+            /** Vargottama */
+            vargottama: boolean | null;
+        };
+        /** RulesetRef */
+        RulesetRef: {
+            /** Hash */
+            hash: string;
+            /** Id */
+            id: string;
+            /** Version */
+            version: number;
+        };
+        /** Target */
+        Target: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "planet" | "house";
+            /** Ref */
+            ref: string;
+        };
+        /** Unavailable */
+        Unavailable: {
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "BIRTH_TIME_REQUIRED" | "CHANGES_DURING_DAY";
+            /**
+             * What
+             * @enum {string}
+             */
+            what: "house" | "houses_ruled" | "degree" | "d9" | "aspects" | "sign" | "nakshatra" | "dignity" | "retrograde";
         };
         /** ValidationError */
         ValidationError: {
@@ -462,6 +651,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inspect_chart_v1_profiles__profile_id__inspect__chart__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-none-match"?: string | null;
+            };
+            path: {
+                profile_id: string;
+                chart: "d1" | "d9";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionSet"];
                 };
             };
             /** @description Validation Error */
