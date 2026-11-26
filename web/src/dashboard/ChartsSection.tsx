@@ -18,6 +18,9 @@ import NorthChart, { type ChartPlanet } from "./NorthChart";
 
 export type ChartTab = "d1" | "d9" | "dasha";
 
+const cap = (x: string) => x[0].toUpperCase() + x.slice(1);
+const options = (v: string[]) => (v.length === 2 ? `${v[0]} or ${v[1]}` : `any of ${v.length} signs from ${v[0]} to ${v[v.length - 1]}`);
+
 export default function ChartsSection({ m, profileId, tab, setTab, selected, setSelected, onExpired, onAddTime, inspect = false }: {
   m: Master; profileId: string; tab: ChartTab; setTab(t: ChartTab): void; selected: string | null; setSelected(id: string | null): void;
   onExpired(): void; onAddTime(): void; inspect?: boolean;
@@ -92,10 +95,14 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
     if (strong9.length) notes.push(`Strong in D9: ${strong9.join(", ")}.`);
     const varg = m.d1.planets.filter((p) => p.vargottama).map((p) => p.id);
     if (varg.length) notes.push(`Same sign in D1 and D9 (vargottama): ${varg.join(", ")}.`);
-    const near = m.flags.near_boundary.map((f) => f.split(".")[0]).map((k) => (k === "lagna" ? "the rising sign" : k[0].toUpperCase() + k.slice(1)));
-    notes.push(near.length
-      ? `The D9 depends on the exact birth minute. Near a boundary: ${near.join(", ")}; a few minutes' difference could move ${near.length > 1 ? "them" : "it"}.`
-      : "The D9 depends on the exact birth minute, so it is only as precise as your birth time.");
+    // D83: the D9 is checked across the birth time's own margin by the engine; say exactly what could move
+    const win = m.flags.minute_window ?? 2, ms = m.flags.minute_sensitive ?? [];
+    const r9 = ms.find((x) => x.fact_id === "d9.lagna.sign");
+    const p9 = ms.filter((x) => x.fact_id.startsWith("d9.") && x.fact_id !== "d9.lagna.sign").map((x) => cap(x.fact_id.split(".")[1]));
+    notes.push(r9
+      ? `Within ±${win} minutes of your birth time, the D9 rising sign could be ${options(r9.values)}, which would move every D9 house.`
+      : `The D9 depends on the exact birth minute. Within ±${win} minutes of your birth time, its rising sign stays ${m.d9.lagna.sign}.`);
+    if (p9.length) notes.push(`Within that margin, the D9 sign could also change for ${p9.join(", ")}.`);
   } else if (known && m.d1.lagna) {
     const lg = m.d1.lagna;
     notes.push(`Rising sign ${lg.sign} at ${dm(lg.deg_in_sign)}, in ${lg.nakshatra} pada ${lg.pada}. House one is the top centre diamond; houses run anticlockwise.`);
@@ -103,6 +110,8 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
     if (strong.length) notes.push(`Strong placements: ${strong.join(", ")}.`);
     const varg = m.d1.planets.filter((p) => p.vargottama).map((p) => p.id);
     if (varg.length) notes.push(`Same sign in D1 and D9 (vargottama): ${varg.join(", ")}.`);
+    const r1 = (m.flags.minute_sensitive ?? []).find((x) => x.fact_id === "lagna.sign");
+    if (r1) notes.push(`Within ±${m.flags.minute_window ?? 2} minutes of your birth time, the rising sign could be ${options(r1.values)}, which would move every house.`);
   }
 
   return (

@@ -814,6 +814,16 @@
     }
   },
   "flags": {
+    "minute_sensitive": [
+      {
+        "fact_id": "d9.lagna.sign",
+        "values": [
+          "Virgo",
+          "Libra"
+        ]
+      }
+    ],
+    "minute_window": 2,
     "near_boundary": [],
     "time_sensitive": []
   },
@@ -892,7 +902,7 @@
         "version": 1
       }
     ],
-    "schema_version": "1.0.0",
+    "schema_version": "1.1.0",
     "swisseph_version": "2.10.03"
   },
   "nakshatra": {

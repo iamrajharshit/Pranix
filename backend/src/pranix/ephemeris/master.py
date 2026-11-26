@@ -5,13 +5,18 @@ days, elements, doshas, chakras, dasha, facts, flags.
 Unknown birth time follows the certain-only rule (D56): the chart is computed at the start
 (00:00:00) and end (23:59:59) of the local birth day; a value is published only when both
 agree. Signs and nakshatras that change are listed in flags.time_sensitive with both values.
+
+Known birth time, birth-minute honesty (D83): the D1 rising sign and every D9 sign (rising and
+planets) are also checked across the birth time's own margin: exact ±2 minutes, about five ±5,
+about thirty ±30, about an hour ±60. Any that differ are listed in flags.minute_sensitive (all
+options, in time order), and flags.minute_window holds the margin in minutes. Values are unchanged.
 """
 
 from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, time
+from datetime import UTC, date, datetime, time, timedelta
 from fractions import Fraction
 from typing import Any, Literal
 
@@ -20,9 +25,11 @@ from . import allies, angles, charts, dasha, facts, heuristics, swe
 from .ruleset import Ruleset, load_ruleset, load_table
 from .timeconv import julian_day_ut, to_utc
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"  # 1.1: flags.minute_window, flags.minute_sensitive (D83)
 NEAR_TOL = 0.01
 NEAR_TOL_LAGNA = 0.25
+# D83 (owner, 26 Nov 2026): the margin each stated accuracy gets; not stated counts as exact
+WINDOW_MIN: dict[str, int] = {"exact": 2, "approx_5m": 5, "approx_30m": 30, "approx_1h": 60}
 
 
 @dataclass(frozen=True)
@@ -130,6 +137,38 @@ def _near(snap: _Snapshot) -> list[str]:
     return out
 
 
+def window_minutes(inp: BirthInput) -> int:
+    return WINDOW_MIN[inp.time_accuracy or "exact"]
+
+
+def _minute_sensitive(rs: Ruleset, inp: BirthInput, snap: _Snapshot) -> list[dict[str, Any]]:
+    """D83: which D1-rising and D9 signs differ within the birth time's margin, with every option.
+
+    The rising degree moves about a degree every four minutes, so it is sampled each minute across
+    the margin. A planet moves far less than one navamsa (3°20′) in two hours, so its two ends
+    are enough: it can cross at most one edge."""
+    w = window_minutes(inp)
+    ascs = [swe.ascendant(julian_day_ut(snap.utc + timedelta(minutes=m)), inp.lat, inp.lon) for m in range(-w, w + 1)]
+    ends = [_snap_utc(inp, snap.utc - timedelta(minutes=w)), snap, _snap_utc(inp, snap.utc + timedelta(minutes=w))]
+    out: list[dict[str, Any]] = []
+
+    def add(fact_id: str, indices: list[int]) -> None:
+        values = list(dict.fromkeys(rs.signs[i] for i in indices))
+        if len(values) > 1:
+            out.append({"fact_id": fact_id, "values": values})
+
+    add("lagna.sign", [angles.sign_index(a) for a in ascs])  # moves every D1 house
+    add("d9.lagna.sign", [angles.d9_sign_index(a) for a in ascs])  # moves every D9 house
+    for i, b in enumerate(snap.bodies):
+        add(f"d9.{b.id.lower()}.sign", [angles.d9_sign_index(e.bodies[i].longitude) for e in ends])
+    return out
+
+
+def _snap_utc(inp: BirthInput, utc: datetime) -> _Snapshot:
+    jd = julian_day_ut(utc)
+    return _Snapshot(utc, jd, swe.bodies(jd), swe.ascendant(jd, inp.lat, inp.lon))
+
+
 def _identity(rs: Ruleset, moon: swe.Body, sun: swe.Body, lagna: float | None) -> dict[str, Any]:
     def part(lon: float, with_deg: bool) -> dict[str, Any]:
         s = angles.sign_index(lon)
@@ -175,7 +214,12 @@ def _known(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, An
         "doshas": heuristics.doshas(rs, snap.bodies, snap.asc),
         "chakras": heuristics.chakras(rs, snap.bodies),
         "dasha": {"as_of": as_of.isoformat(), "active_chain": _chain(rs, snap, as_of, dasha.MAX_DEPTH)},
-        "flags": {"near_boundary": _near(snap), "time_sensitive": []},
+        "flags": {
+            "near_boundary": _near(snap),
+            "time_sensitive": [],
+            "minute_window": window_minutes(inp),
+            "minute_sensitive": _minute_sensitive(rs, inp, snap),
+        },
     }
     m["facts"] = facts.build(m)
     return m
@@ -262,7 +306,7 @@ def _unknown(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, 
         "doshas": same(heuristics.doshas(rs, a.bodies, None), heuristics.doshas(rs, b.bodies, None)),
         "chakras": same(heuristics.chakras(rs, a.bodies), heuristics.chakras(rs, b.bodies)),
         "dasha": {"as_of": as_of.isoformat(), "active_chain": _chain(rs, noon, as_of, 2) if lords_same else None},
-        "flags": {"near_boundary": [], "time_sensitive": ts},
+        "flags": {"near_boundary": [], "time_sensitive": ts, "minute_window": None, "minute_sensitive": []},
     }
     m["facts"] = facts.build(m)
     return m

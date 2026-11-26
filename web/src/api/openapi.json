@@ -367,6 +367,35 @@
               }
             ]
           },
+          "lord_other_chart": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HouseLord"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "may_change": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MayChange"
+            },
+            "title": "May Change",
+            "type": "array"
+          },
+          "minute_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minute Note"
+          },
           "modifiers": {
             "default": [],
             "items": {
@@ -486,6 +515,36 @@
             "title": "Level",
             "type": "string"
           },
+          "may_change": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MayChange"
+            },
+            "title": "May Change",
+            "type": "array"
+          },
+          "minute_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minute Note"
+          },
+          "minute_window": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minute Window"
+          },
           "rules": {
             "$ref": "#/components/schemas/RulesetRef"
           },
@@ -501,6 +560,53 @@
           "bundles"
         ],
         "title": "InspectionSet",
+        "type": "object"
+      },
+      "MayChange": {
+        "additionalProperties": false,
+        "description": "D83: a sign that could differ within the birth time's own margin (the value shown is unchanged).",
+        "properties": {
+          "chart": {
+            "enum": [
+              "d1",
+              "d9"
+            ],
+            "title": "Chart",
+            "type": "string"
+          },
+          "options": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          },
+          "what": {
+            "enum": [
+              "rising",
+              "planet"
+            ],
+            "title": "What",
+            "type": "string"
+          }
+        },
+        "required": [
+          "what",
+          "chart",
+          "options"
+        ],
+        "title": "MayChange",
         "type": "object"
       },
       "OtherChart": {

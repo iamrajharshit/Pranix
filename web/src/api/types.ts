@@ -30,7 +30,12 @@ export interface Master {
   chakras: { id: string; planet: string; dignity: Dignity; class: "dominant" | "balanced" | "low_activity" }[] | null;
   dasha: { as_of: string; active_chain: DashaPeriod[] | null };
   facts: Record<string, Fact>;
-  flags: { near_boundary: string[]; time_sensitive: { fact_id: string; values: string[] }[] };
+  flags: {
+    near_boundary: string[];
+    time_sensitive: { fact_id: string; values: string[] }[];
+    minute_window?: number | null;                                 // D83: the birth time's margin in minutes
+    minute_sensitive?: { fact_id: string; values: string[] }[];    // D83: signs that could differ within it
+  };
 }
 
 export interface Profile { profile_id: string; expires_at: string; master: Master }

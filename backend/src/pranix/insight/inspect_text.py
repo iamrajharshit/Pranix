@@ -13,7 +13,7 @@ from typing import Any
 
 import yaml
 
-from ..jyotish.bundle import InspectionBundle, InspectionSet
+from ..jyotish.bundle import InspectionBundle, InspectionSet, MayChange
 
 
 @cache
@@ -72,12 +72,35 @@ def gloss(b: InspectionBundle, locale: str = "en") -> str | None:
     return str(g[b.placement.dignity]) if b.placement.dignity in g else None
 
 
+def _options(opts: list[str], c: dict[str, Any]) -> str:
+    m = c["minute"]
+    if len(opts) == 2:
+        return str(m["two"]).format(a=opts[0], b=opts[1])
+    return str(m["many"]).format(first=opts[0], last=opts[-1])
+
+
+def minute_note(changes: list[MayChange], locale: str = "en") -> str | None:
+    """D83: one calm sentence per sign that could differ within the birth time's margin."""
+    if not changes:
+        return None
+    c = _copy(locale)
+    m = c["minute"]
+    out = []
+    for ch in changes:
+        opts = _options(ch.options, c)
+        if ch.what == "rising":
+            out.append(str(m["rising_d1" if ch.chart == "d1" else "rising_d9"]).format(options=opts))
+        else:
+            out.append(str(m["planet_d9"]).format(planet=ch.ref, options=opts))
+    return " ".join(out)
+
+
 def with_text(s: InspectionSet, locale: str = "en") -> InspectionSet:
     def dress(b: InspectionBundle) -> InspectionBundle:
-        update: dict[str, object] = {"summary": summary(b, locale)}
+        update: dict[str, object] = {"summary": summary(b, locale), "minute_note": minute_note(b.may_change, locale)}
         if b.placement is not None:
             update["placement"] = b.placement.model_copy(update={"dignity_gloss": gloss(b, locale)})
         return b.model_copy(update=update)
 
     bundles = {k: dress(b) for k, b in s.bundles.items()}
-    return s.model_copy(update={"bundles": bundles})
+    return s.model_copy(update={"bundles": bundles, "minute_note": minute_note(s.may_change, locale)})

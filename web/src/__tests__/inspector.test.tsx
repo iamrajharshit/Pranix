@@ -93,10 +93,22 @@ describe("houses (I2)", () => {
   it("an empty house is read through its lord", () => {
     const g = toSnapshot(D1.bundles["house:7"]);
     expect(g[0].chips).toEqual([]);
-    expect(g[0].note).toContain("Empty house");
+    expect(g[0].note).toBe("Empty house: read it through its lord."); // nothing looks at house seven, so nothing is promised
+    expect(toSnapshot(D1.bundles["house:1"])[0].note).toBe("Empty house: read it through its lord and the planets that look at it.");
     expect(g[1].chips.map((c) => c.label)).toEqual(["Saturn", "House 3"]);
-    expect(g[1].note).toBe("Saturn rules Aquarius and sits in the 3rd house, in Libra (exalted).");
+    expect(g[1].note).toBe("Saturn rules Aquarius and sits in the 3rd house, in Libra (exalted). In your D9 it sits in the 9th house, in Gemini (friend's sign)."); // I4
     expect(D1.bundles["house:7"].summary).toBe("House seven is Aquarius. It is empty, so it is read through its lord.");
+  });
+  it("I4: every house names where its lord sits in the other chart", () => {
+    for (const h of houses) {
+      expect(toSnapshot(D1.bundles[`house:${h}`]).find((g) => g.id === "lord")?.note).toContain("In your D9 it sits in the");
+      expect(toSnapshot(D9.bundles[`house:${h}`]).find((g) => g.id === "lord")?.note).toContain("In your D1 it sits in the");
+    }
+  });
+  it("D83: the panel shows the server's birth-minute note, calmly, on every target of the set", async () => {
+    expect(D1.minute_window).toBe(2);
+    expect(D1.minute_note).toBe("Within your birth time's margin, your D9 rising sign could be Virgo or Libra, which would move the D9 houses.");
+    expect(U1.minute_note).toBeNull();   // no birth time: nothing to check within a margin
   });
   it("titles use words; house chips link to houses", () => {
     expect(titleOf(D1.bundles["house:1"], "house", 1)).toBe("House one · Leo");
@@ -131,6 +143,7 @@ describe("ChartsSection with the Inspector on", () => {
     expect(window.location.search).toBe("?inspect=d1.Jupiter");
     expect(await screen.findByText("Jupiter in your fifth house, in Sagittarius, its own sign.")).toBeTruthy();
     expect(screen.getByRole("region", { name: "Inspector" })).toBeTruthy();
+    expect(screen.getByRole("note").textContent).toContain("your D9 rising sign could be Virgo or Libra"); // D83
     fireEvent.click(screen.getByRole("button", { name: "Close inspector" }));
     expect(window.location.search).toBe("");
     expect(document.activeElement).toBe(ju);

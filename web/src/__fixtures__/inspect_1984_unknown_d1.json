@@ -31,6 +31,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -116,6 +119,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -199,6 +205,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -280,6 +289,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -362,6 +374,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -453,6 +468,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -533,6 +551,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -614,6 +635,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -694,6 +718,9 @@
       "houses_ruled": null,
       "level": "sign",
       "lord": null,
+      "lord_other_chart": null,
+      "may_change": [],
+      "minute_note": null,
       "modifiers": [],
       "other_chart": null,
       "placement": {
@@ -741,6 +768,9 @@
   },
   "chart": "d1",
   "level": "sign",
+  "may_change": [],
+  "minute_note": null,
+  "minute_window": null,
   "rules": {
     "hash": "176e1669ab5efc38",
     "id": "jyotish-core",

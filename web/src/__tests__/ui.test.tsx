@@ -182,7 +182,24 @@ describe("D9 caption fix", () => {
     render(<ChartsSection {...props} tab="d9" />);
     const text = document.body.textContent ?? "";
     expect(text).toContain("D9 rising sign Libra");
-    expect(text).toContain("depends on the exact birth minute");
+    expect(text).toContain("Within ±2 minutes of your birth time, the D9 rising sign could be Virgo or Libra"); // D83
     expect(text).not.toContain("Rising sign Leo");
+  });
+  it("D83: a steady D9 says so; an approximate time names every option, and the D1 rising sign too", () => {
+    const steady = { ...m, flags: { ...m.flags, minute_sensitive: [] } } as Master;
+    render(<ChartsSection {...props} m={steady} tab="d9" />);
+    expect(document.body.textContent).toContain("Within ±2 minutes of your birth time, its rising sign stays Libra.");
+    cleanup();
+    const hour = { ...m, flags: { ...m.flags, minute_window: 60, minute_sensitive: [
+      { fact_id: "lagna.sign", values: ["Leo", "Virgo"] },
+      { fact_id: "d9.lagna.sign", values: ["Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius"] },
+      { fact_id: "d9.moon.sign", values: ["Aries", "Taurus"] },
+    ] } } as Master;
+    render(<ChartsSection {...props} m={hour} tab="d9" />);
+    expect(document.body.textContent).toContain("could be any of 10 signs from Taurus to Aquarius");
+    expect(document.body.textContent).toContain("the D9 sign could also change for Moon.");
+    cleanup();
+    render(<ChartsSection {...props} m={hour} tab="d1" />);
+    expect(document.body.textContent).toContain("Within ±60 minutes of your birth time, the rising sign could be Leo or Virgo");
   });
 });
