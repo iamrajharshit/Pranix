@@ -29,7 +29,8 @@ def test_set_for_both_charts(c: TestClient) -> None:
     r = c.get(f"/v1/profiles/{pid}/inspect/d1")
     assert r.status_code == 200 and r.headers["etag"].startswith('"')
     s = r.json()
-    assert s["chart"] == "d1" and s["level"] == "house" and len(s["bundles"]) == 9
+    assert s["chart"] == "d1" and s["level"] == "house" and len(s["bundles"]) == 21  # nine planets, twelve houses
+    assert s["bundles"]["house:7"]["lord"]["planet"] == "Saturn" and s["bundles"]["house:7"]["house"]["occupants"] == []
     jup = s["bundles"]["planet:Jupiter"]
     assert jup["summary"] == "Jupiter in your fifth house, in Sagittarius, its own sign."
     assert [h["house"] for h in jup["houses_ruled"]] == [5, 8] and jup["sits_with"] == ["Mercury"]
@@ -51,6 +52,7 @@ def test_unknown_time(c: TestClient) -> None:
     pid = new(c, UNKNOWN)
     s = c.get(f"/v1/profiles/{pid}/inspect/d1").json()
     assert s["level"] == "sign" and s["bundles"]["planet:Moon"]["placement"]["house"] is None
+    assert len(s["bundles"]) == 9  # no houses without a birth time
     r = c.get(f"/v1/profiles/{pid}/inspect/d9")
     assert r.status_code == 422 and r.json()["code"] == "BIRTH_TIME_REQUIRED"
 

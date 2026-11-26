@@ -29,6 +29,7 @@ PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu
 def test_relations_match_the_verified_reference(chart: str, planet: str) -> None:
     b = build_set(KNOWN, chart, RS).bundles[f"planet:{planet}"]  # type: ignore[arg-type]
     r = REF[f"{chart}|planet|{planet}"]
+    assert b.placement is not None and b.dispositor is not None
     if planet in ("Rahu", "Ketu"):
         assert b.houses_ruled == [] and b.acts_through == r["Dispositor chain"][1]
     else:
@@ -40,6 +41,7 @@ def test_relations_match_the_verified_reference(chart: str, planet: str) -> None
         assert b.dispositor.cycle_members == r["members"]  # the whole loop (D81 §4.2)
     h = b.placement.house
     assert b.either_side is not None and h is not None
+    assert b.house is None and b.lord is None  # planet target
     assert [b.either_side.before.house, b.either_side.after.house] == [step(h, 12), step(h, 2)]
     assert b.aspects_out is None and b.aspects_in is None  # I3: waits for the jyotish-core@1 aspect table
 
@@ -69,9 +71,11 @@ def test_bridge_uses_engine_values() -> None:
 
 def test_unknown_time_is_sign_level_and_never_guesses() -> None:
     s = build_set(UNKNOWN, "d1", RS)
-    assert s.level == "sign" and len(s.bundles) == 9
+    assert s.level == "sign" and len(s.bundles) == 9  # planets only: houses need a birth time (D56)
+    assert not any(k.startswith("house:") for k in s.bundles)
     for b in s.bundles.values():
         p = b.placement
+        assert p is not None
         assert p.house is None and p.deg_in_sign is None and p.vargottama is None
         assert b.houses_ruled is None and b.other_chart is None and b.either_side is None
         assert {u.what for u in b.unavailable} >= {"house", "houses_ruled", "degree", "d9", "aspects"}
@@ -102,13 +106,15 @@ def test_wording_is_approved_and_digit_free() -> None:
             for b in with_text(build_set(master, chart, RS)).bundles.values():  # type: ignore[arg-type]
                 assert b.summary
                 check_text("summary", b.summary)  # NO_NUMERALS, fear and medical lists
-                if b.placement.dignity_gloss:
+                if b.placement and b.placement.dignity_gloss:
                     check_text("gloss", b.placement.dignity_gloss)
     s = with_text(build_set(KNOWN, "d1", RS))
     assert s.bundles["planet:Jupiter"].summary == "Jupiter in your fifth house, in Sagittarius, its own sign."
-    assert s.bundles["planet:Rahu"].placement.dignity_gloss == "Shadow node: read through the lord of its sign."
-    assert s.bundles["planet:Jupiter"].placement.dignity_gloss is None
-    mars9 = with_text(build_set(KNOWN, "d9", RS)).bundles["planet:Mars"].placement.dignity_gloss
+    rahu, jup = s.bundles["planet:Rahu"].placement, s.bundles["planet:Jupiter"].placement
+    assert rahu and rahu.dignity_gloss == "Shadow node: read through the lord of its sign."
+    assert jup and jup.dignity_gloss is None
+    mars_p = with_text(build_set(KNOWN, "d9", RS)).bundles["planet:Mars"].placement
+    mars9 = mars_p.dignity_gloss if mars_p else None
     assert mars9 and "alongside the D1" in mars9  # names the other chart
 
 
@@ -116,3 +122,37 @@ def test_deterministic_bytes_and_etag() -> None:
     a, b = build_set(KNOWN, "d1", RS), build_set(json.loads(json.dumps(KNOWN)), "d1", RS)
     assert canonical(a) == canonical(b) and a.etag() == b.etag()
     assert a.etag() != build_set(KNOWN, "d9", RS).etag()
+
+
+@pytest.mark.parametrize("chart", ["d1", "d9"])
+@pytest.mark.parametrize("house", range(1, 13))
+def test_house_panels_match_the_verified_reference(chart: str, house: int) -> None:
+    """I2: every house, empty ones too, is read through its occupants and its lord."""
+    s = build_set(KNOWN, chart, RS)  # type: ignore[arg-type]
+    b = s.bundles[f"house:{house}"]
+    r = REF[f"{chart}|house|{house}"]
+    assert b.placement is None and b.dispositor is None  # house target
+    assert b.house is not None and b.lord is not None and b.either_side is not None
+    assert (b.house.house, b.house.sign, b.house.occupants) == (house, r["sign"], r["Occupants"])
+    assert (b.lord.planet, b.lord.house) == (r["Its lord"][0], r["lordHouse"])
+    assert [b.either_side.before.house, b.either_side.after.house] == r["Either side"]
+    other = "d9" if chart == "d1" else "d1"
+    o = REF[f"{other}|house|{house}"]
+    assert b.same_house_other_chart and (b.same_house_other_chart.sign, b.same_house_other_chart.occupants) == (
+        o["sign"],
+        o["Occupants"],
+    )
+    assert b.aspects_in is None  # I3
+
+
+def test_house_wording() -> None:
+    s = with_text(build_set(KNOWN, "d1", RS))
+    assert (
+        s.bundles["house:1"].summary
+        == "Your rising sign. House one is Leo. It is empty, so it is read through its lord."
+    )
+    assert s.bundles["house:5"].summary == "House five is Sagittarius, with Mercury and Jupiter."
+    assert s.bundles["house:7"].summary == "House seven is Aquarius. It is empty, so it is read through its lord."
+    for b in s.bundles.values():
+        assert b.summary
+        check_text("summary", b.summary)

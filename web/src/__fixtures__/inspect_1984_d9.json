@@ -1,5 +1,736 @@
 {
   "bundles": {
+    "house:1": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 2,
+          "occupants": [],
+          "sign": "Scorpio"
+        },
+        "before": {
+          "house": 12,
+          "occupants": [],
+          "sign": "Virgo"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_1.occupants",
+        "d9.house_1.lord",
+        "d9.house_1.other_chart",
+        "d9.house_1.either_side"
+      ],
+      "house": {
+        "house": 1,
+        "occupants": [
+          "Jupiter"
+        ],
+        "sign": "Libra"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "friend",
+        "house": 5,
+        "planet": "Venus",
+        "sign": "Aquarius"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 1,
+        "occupants": [],
+        "sign": "Leo"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "Your rising sign. House one is Libra, with Jupiter.",
+      "target": {
+        "kind": "house",
+        "ref": "1"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:10": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 11,
+          "occupants": [],
+          "sign": "Leo"
+        },
+        "before": {
+          "house": 9,
+          "occupants": [
+            "Saturn"
+          ],
+          "sign": "Gemini"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_10.occupants",
+        "d9.house_10.lord",
+        "d9.house_10.other_chart",
+        "d9.house_10.either_side"
+      ],
+      "house": {
+        "house": 10,
+        "occupants": [
+          "Mars",
+          "Ketu"
+        ],
+        "sign": "Cancer"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "exalted",
+        "house": 8,
+        "planet": "Moon",
+        "sign": "Taurus"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 10,
+        "occupants": [
+          "Moon",
+          "Rahu"
+        ],
+        "sign": "Taurus"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House ten is Cancer, with Mars and Ketu.",
+      "target": {
+        "kind": "house",
+        "ref": "10"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:11": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 12,
+          "occupants": [],
+          "sign": "Virgo"
+        },
+        "before": {
+          "house": 10,
+          "occupants": [
+            "Mars",
+            "Ketu"
+          ],
+          "sign": "Cancer"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_11.occupants",
+        "d9.house_11.lord",
+        "d9.house_11.other_chart",
+        "d9.house_11.either_side"
+      ],
+      "house": {
+        "house": 11,
+        "occupants": [],
+        "sign": "Leo"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "enemy",
+        "house": 4,
+        "planet": "Sun",
+        "sign": "Capricorn"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 11,
+        "occupants": [],
+        "sign": "Gemini"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House eleven is Leo. It is empty, so it is read through its lord.",
+      "target": {
+        "kind": "house",
+        "ref": "11"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:12": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 1,
+          "occupants": [
+            "Jupiter"
+          ],
+          "sign": "Libra"
+        },
+        "before": {
+          "house": 11,
+          "occupants": [],
+          "sign": "Leo"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_12.occupants",
+        "d9.house_12.lord",
+        "d9.house_12.other_chart",
+        "d9.house_12.either_side"
+      ],
+      "house": {
+        "house": 12,
+        "occupants": [],
+        "sign": "Virgo"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "friend",
+        "house": 8,
+        "planet": "Mercury",
+        "sign": "Taurus"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 12,
+        "occupants": [],
+        "sign": "Cancer"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House twelve is Virgo. It is empty, so it is read through its lord.",
+      "target": {
+        "kind": "house",
+        "ref": "12"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:2": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 3,
+          "occupants": [],
+          "sign": "Sagittarius"
+        },
+        "before": {
+          "house": 1,
+          "occupants": [
+            "Jupiter"
+          ],
+          "sign": "Libra"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_2.occupants",
+        "d9.house_2.lord",
+        "d9.house_2.other_chart",
+        "d9.house_2.either_side"
+      ],
+      "house": {
+        "house": 2,
+        "occupants": [],
+        "sign": "Scorpio"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "debilitated",
+        "house": 10,
+        "planet": "Mars",
+        "sign": "Cancer"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 2,
+        "occupants": [],
+        "sign": "Virgo"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House two is Scorpio. It is empty, so it is read through its lord.",
+      "target": {
+        "kind": "house",
+        "ref": "2"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:3": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Rahu"
+          ],
+          "sign": "Capricorn"
+        },
+        "before": {
+          "house": 2,
+          "occupants": [],
+          "sign": "Scorpio"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_3.occupants",
+        "d9.house_3.lord",
+        "d9.house_3.other_chart",
+        "d9.house_3.either_side"
+      ],
+      "house": {
+        "house": 3,
+        "occupants": [],
+        "sign": "Sagittarius"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "enemy",
+        "house": 1,
+        "planet": "Jupiter",
+        "sign": "Libra"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 3,
+        "occupants": [
+          "Saturn"
+        ],
+        "sign": "Libra"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House three is Sagittarius. It is empty, so it is read through its lord.",
+      "target": {
+        "kind": "house",
+        "ref": "3"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:4": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 5,
+          "occupants": [
+            "Venus"
+          ],
+          "sign": "Aquarius"
+        },
+        "before": {
+          "house": 3,
+          "occupants": [],
+          "sign": "Sagittarius"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_4.occupants",
+        "d9.house_4.lord",
+        "d9.house_4.other_chart",
+        "d9.house_4.either_side"
+      ],
+      "house": {
+        "house": 4,
+        "occupants": [
+          "Sun",
+          "Rahu"
+        ],
+        "sign": "Capricorn"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "friend",
+        "house": 9,
+        "planet": "Saturn",
+        "sign": "Gemini"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 4,
+        "occupants": [
+          "Sun",
+          "Ketu"
+        ],
+        "sign": "Scorpio"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House four is Capricorn, with Sun and Rahu.",
+      "target": {
+        "kind": "house",
+        "ref": "4"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:5": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 6,
+          "occupants": [],
+          "sign": "Pisces"
+        },
+        "before": {
+          "house": 4,
+          "occupants": [
+            "Sun",
+            "Rahu"
+          ],
+          "sign": "Capricorn"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_5.occupants",
+        "d9.house_5.lord",
+        "d9.house_5.other_chart",
+        "d9.house_5.either_side"
+      ],
+      "house": {
+        "house": 5,
+        "occupants": [
+          "Venus"
+        ],
+        "sign": "Aquarius"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "friend",
+        "house": 9,
+        "planet": "Saturn",
+        "sign": "Gemini"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 5,
+        "occupants": [
+          "Mercury",
+          "Jupiter"
+        ],
+        "sign": "Sagittarius"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House five is Aquarius, with Venus.",
+      "target": {
+        "kind": "house",
+        "ref": "5"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:6": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 7,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        "before": {
+          "house": 5,
+          "occupants": [
+            "Venus"
+          ],
+          "sign": "Aquarius"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_6.occupants",
+        "d9.house_6.lord",
+        "d9.house_6.other_chart",
+        "d9.house_6.either_side"
+      ],
+      "house": {
+        "house": 6,
+        "occupants": [],
+        "sign": "Pisces"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "enemy",
+        "house": 1,
+        "planet": "Jupiter",
+        "sign": "Libra"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 6,
+        "occupants": [
+          "Mars",
+          "Venus"
+        ],
+        "sign": "Capricorn"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House six is Pisces. It is empty, so it is read through its lord.",
+      "target": {
+        "kind": "house",
+        "ref": "6"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:7": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 8,
+          "occupants": [
+            "Moon",
+            "Mercury"
+          ],
+          "sign": "Taurus"
+        },
+        "before": {
+          "house": 6,
+          "occupants": [],
+          "sign": "Pisces"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_7.occupants",
+        "d9.house_7.lord",
+        "d9.house_7.other_chart",
+        "d9.house_7.either_side"
+      ],
+      "house": {
+        "house": 7,
+        "occupants": [],
+        "sign": "Aries"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "debilitated",
+        "house": 10,
+        "planet": "Mars",
+        "sign": "Cancer"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 7,
+        "occupants": [],
+        "sign": "Aquarius"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House seven is Aries. It is empty, so it is read through its lord.",
+      "target": {
+        "kind": "house",
+        "ref": "7"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:8": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 9,
+          "occupants": [
+            "Saturn"
+          ],
+          "sign": "Gemini"
+        },
+        "before": {
+          "house": 7,
+          "occupants": [],
+          "sign": "Aries"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_8.occupants",
+        "d9.house_8.lord",
+        "d9.house_8.other_chart",
+        "d9.house_8.either_side"
+      ],
+      "house": {
+        "house": 8,
+        "occupants": [
+          "Moon",
+          "Mercury"
+        ],
+        "sign": "Taurus"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "friend",
+        "house": 5,
+        "planet": "Venus",
+        "sign": "Aquarius"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 8,
+        "occupants": [],
+        "sign": "Pisces"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House eight is Taurus, with Moon and Mercury.",
+      "target": {
+        "kind": "house",
+        "ref": "8"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
+    "house:9": {
+      "acts_through": null,
+      "aspects_in": null,
+      "aspects_out": null,
+      "chart": "d9",
+      "dispositor": null,
+      "either_side": {
+        "after": {
+          "house": 10,
+          "occupants": [
+            "Mars",
+            "Ketu"
+          ],
+          "sign": "Cancer"
+        },
+        "before": {
+          "house": 8,
+          "occupants": [
+            "Moon",
+            "Mercury"
+          ],
+          "sign": "Taurus"
+        },
+        "kartari": null
+      },
+      "fact_ids": [
+        "d9.house_9.occupants",
+        "d9.house_9.lord",
+        "d9.house_9.other_chart",
+        "d9.house_9.either_side"
+      ],
+      "house": {
+        "house": 9,
+        "occupants": [
+          "Saturn"
+        ],
+        "sign": "Gemini"
+      },
+      "houses_ruled": null,
+      "level": "house",
+      "lord": {
+        "dignity": "friend",
+        "house": 8,
+        "planet": "Mercury",
+        "sign": "Taurus"
+      },
+      "modifiers": [],
+      "other_chart": null,
+      "placement": null,
+      "same_house_other_chart": {
+        "house": 9,
+        "occupants": [],
+        "sign": "Aries"
+      },
+      "schema_version": "1",
+      "sits_with": [],
+      "summary": "House nine is Gemini, with Saturn.",
+      "target": {
+        "kind": "house",
+        "ref": "9"
+      },
+      "top_signals": [],
+      "unavailable": []
+    },
     "planet:Jupiter": {
       "acts_through": null,
       "aspects_in": null,
@@ -44,6 +775,7 @@
         "d9.jupiter.either_side",
         "d9.jupiter.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 3,
@@ -57,6 +789,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -77,6 +810,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [],
       "summary": "Jupiter in your first house, in Libra, an enemy's sign.",
@@ -134,8 +868,10 @@
         "d9.ketu.either_side",
         "d9.ketu.other_chart"
       ],
+      "house": null,
       "houses_ruled": [],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "none",
@@ -156,6 +892,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [
         "Mars"
@@ -215,6 +952,7 @@
         "d9.mars.either_side",
         "d9.mars.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 2,
@@ -228,6 +966,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -248,6 +987,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [
         "Ketu"
@@ -305,6 +1045,7 @@
         "d9.mercury.either_side",
         "d9.mercury.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 9,
@@ -320,6 +1061,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -340,6 +1082,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [
         "Moon"
@@ -398,6 +1141,7 @@
         "d9.moon.either_side",
         "d9.moon.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 10,
@@ -409,6 +1153,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "same",
@@ -429,6 +1174,7 @@
         "sign_options": null,
         "vargottama": true
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [
         "Mercury"
@@ -487,8 +1233,10 @@
         "d9.rahu.either_side",
         "d9.rahu.other_chart"
       ],
+      "house": null,
       "houses_ruled": [],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "none",
@@ -509,6 +1257,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [
         "Sun"
@@ -570,6 +1319,7 @@
         "d9.saturn.either_side",
         "d9.saturn.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 4,
@@ -588,6 +1338,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -608,6 +1359,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [],
       "summary": "Saturn in your ninth house, in Gemini, a friend's sign.",
@@ -664,6 +1416,7 @@
         "d9.sun.either_side",
         "d9.sun.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 11,
@@ -672,6 +1425,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "changed",
@@ -692,6 +1446,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [
         "Rahu"
@@ -750,6 +1505,7 @@
         "d9.venus.either_side",
         "d9.venus.other_chart"
       ],
+      "house": null,
       "houses_ruled": [
         {
           "house": 1,
@@ -768,6 +1524,7 @@
         }
       ],
       "level": "house",
+      "lord": null,
       "modifiers": [],
       "other_chart": {
         "change": "same",
@@ -788,6 +1545,7 @@
         "sign_options": null,
         "vargottama": false
       },
+      "same_house_other_chart": null,
       "schema_version": "1",
       "sits_with": [],
       "summary": "Venus in your fifth house, in Aquarius, a friend's sign.",

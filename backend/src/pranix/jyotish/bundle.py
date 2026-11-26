@@ -4,10 +4,11 @@
 Built by plain functions from the Master JSON and the approved vedic-core@1 tables (sign lords, dignity).
 Contract: docs/design/Inspector_data_contract_and_modules.md §4; order and labels per D81.
 
-I1 ships planet targets with: placement, houses ruled, sits with, the other chart, the dispositor chain and
-either side. Aspects (`aspects_out`, `aspects_in`) stay None until the jyotish-core@1 aspect table is
-approved (I3); houses as targets arrive in I2. None always means "not available", never "none" (an empty
-list means none).
+Planet targets (I1): placement, houses ruled, sits with, the other chart, the dispositor chain, either side.
+House targets (I2): the house with its occupants, its lord and where the lord sits, the same house in the
+other chart, either side. Houses exist only when the birth time is known (D56).
+Aspects (`aspects_out`, `aspects_in`) stay None until the jyotish-core@1 aspect table is approved (I3).
+None always means "not available", never "none" (an empty list means none).
 """
 
 from __future__ import annotations
@@ -77,6 +78,13 @@ class EitherSide(_Model):
     kartari: None = None  # reserved for V2 (D81 §5)
 
 
+class HouseLord(_Model):
+    planet: str
+    house: int
+    sign: str
+    dignity: Dignity | None
+
+
 class Unavailable(_Model):
     what: Literal["house", "houses_ruled", "degree", "d9", "aspects", "sign", "nakshatra", "dignity", "retrograde"]
     reason: Literal["BIRTH_TIME_REQUIRED", "CHANGES_DURING_DAY"]
@@ -88,14 +96,20 @@ class InspectionBundle(_Model):
     chart: Chart
     level: Level
     summary: str | None = None  # approved template, no numerals; added by insight.inspect_text
-    placement: Placement
-    houses_ruled: list[HouseRef] | None
-    acts_through: str | None
-    sits_with: list[str]
+    # planet targets (None on a house target)
+    placement: Placement | None = None
+    houses_ruled: list[HouseRef] | None = None
+    acts_through: str | None = None
+    sits_with: list[str] = []
     aspects_out: list[HouseRef] | None = None  # I3
     aspects_in: list[str] | None = None  # I3
-    other_chart: OtherChart | None
-    dispositor: Dispositor
+    other_chart: OtherChart | None = None
+    dispositor: Dispositor | None = None
+    # house targets (None on a planet target)
+    house: HouseRef | None = None
+    lord: HouseLord | None = None
+    same_house_other_chart: HouseRef | None = None
+    # both
     either_side: EitherSide | None
     top_signals: list[str] = []  # reserved for the I1+ resolver (D81 §5)
     modifiers: list[str] = []  # reserved for V2 (neechabhanga, combustion, ...)
@@ -113,7 +127,7 @@ class InspectionSet(_Model):
     chart: Chart
     level: Level
     ruleset: RulesetRef
-    bundles: dict[str, InspectionBundle]  # keys "planet:Jupiter" (and "house:7" from I2)
+    bundles: dict[str, InspectionBundle]  # keys "planet:Jupiter" and, with a birth time, "house:7"
 
     def etag(self) -> str:
         return '"' + hashlib.sha256(canonical(self).encode()).hexdigest()[:32] + '"'
@@ -237,6 +251,26 @@ def planet_bundle(ctx: ChartContext, other: ChartContext | None, d1_varg: bool |
     )
 
 
+def house_bundle(ctx: ChartContext, other: ChartContext, house: int) -> InspectionBundle:
+    """A house is read through its occupants, its lord and where that lord sits; empty houses too (plan §4.8)."""
+    sign = ctx.house_sign(house)
+    lord = ctx.lord_of(sign)
+    lf = ctx.planets[lord]
+    assert lf.house is not None and lf.sign is not None
+    key = f"{ctx.chart}.house_{house}"
+    return InspectionBundle(
+        target=Target(kind="house", ref=str(house)),
+        chart=ctx.chart,
+        level=ctx.level,
+        house=_house_ref(ctx, house),
+        lord=HouseLord(planet=lord, house=lf.house, sign=lf.sign, dignity=lf.dignity),  # type: ignore[arg-type]
+        same_house_other_chart=_house_ref(other, house),
+        either_side=EitherSide(before=_house_ref(ctx, step(house, 12)), after=_house_ref(ctx, step(house, 2))),
+        unavailable=[],
+        fact_ids=[f"{key}.occupants", f"{key}.lord", f"{key}.other_chart", f"{key}.either_side"],
+    )
+
+
 def build_set(master: Mapping[str, Any], chart: Chart, rs: Ruleset) -> InspectionSet:
     """Every target of one chart. Raises ValueError when the chart needs a birth time (D9, D56)."""
     ctx = ChartContext.from_master(master, chart, rs)
@@ -246,6 +280,8 @@ def build_set(master: Mapping[str, Any], chart: Chart, rs: Ruleset) -> Inspectio
         other = ChartContext.from_master(master, other_chart, rs)
     varg = {p["id"]: p.get("vargottama") for p in master["d1"]["planets"]}
     bundles = {f"planet:{p}": planet_bundle(ctx, other, varg.get(p), p) for p in ctx.order}
+    if other is not None:  # houses need a rising sign, so a birth time (D56)
+        bundles.update({f"house:{h}": house_bundle(ctx, other, h) for h in range(1, 13)})
     return InspectionSet(
         chart=chart, level=ctx.level, ruleset=RulesetRef(id=rs.id, version=rs.version, hash=rs.hash), bundles=bundles
     )

@@ -16,7 +16,12 @@ glosses:
   debilitated: "Debilitated: unfamiliar ground. Always read it alongside the {other} and its dispositor support."
   debilitated_sign_level: "Debilitated: unfamiliar ground. Always read it alongside its dispositor support."
   node: "Shadow node: read through the lord of its sign."
+house_words: [one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve]
 summary:
   house: "{planet} in your {ordinal} house, in {sign}{dignity}."
+  house_target: "{rising}House {word} is {sign}{occupants}."
+  house_target_rising: "Your rising sign. "
+  house_target_with: ", with {names}"
+  house_target_empty: ". It is empty, so it is read through its lord"
   sign: "{planet} in {sign}{dignity}."
   sign_uncertain: "{planet} in {options}, depending on the birth time."

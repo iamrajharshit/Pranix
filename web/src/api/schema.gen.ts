@@ -213,6 +213,17 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HouseLord */
+        HouseLord: {
+            /** Dignity */
+            dignity: ("exalted" | "own" | "friend" | "neutral" | "enemy" | "debilitated") | null;
+            /** House */
+            house: number;
+            /** Planet */
+            planet: string;
+            /** Sign */
+            sign: string;
+        };
         /** HouseRef */
         HouseRef: {
             /** House */
@@ -225,7 +236,7 @@ export interface components {
         /** InspectionBundle */
         InspectionBundle: {
             /** Acts Through */
-            acts_through: string | null;
+            acts_through?: string | null;
             /** Aspects In */
             aspects_in?: string[] | null;
             /** Aspects Out */
@@ -235,31 +246,37 @@ export interface components {
              * @enum {string}
              */
             chart: "d1" | "d9";
-            dispositor: components["schemas"]["Dispositor"];
+            dispositor?: components["schemas"]["Dispositor"] | null;
             either_side: components["schemas"]["EitherSide"] | null;
             /** Fact Ids */
             fact_ids: string[];
+            house?: components["schemas"]["HouseRef"] | null;
             /** Houses Ruled */
-            houses_ruled: components["schemas"]["HouseRef"][] | null;
+            houses_ruled?: components["schemas"]["HouseRef"][] | null;
             /**
              * Level
              * @enum {string}
              */
             level: "house" | "sign";
+            lord?: components["schemas"]["HouseLord"] | null;
             /**
              * Modifiers
              * @default []
              */
             modifiers: string[];
-            other_chart: components["schemas"]["OtherChart"] | null;
-            placement: components["schemas"]["Placement"];
+            other_chart?: components["schemas"]["OtherChart"] | null;
+            placement?: components["schemas"]["Placement"] | null;
+            same_house_other_chart?: components["schemas"]["HouseRef"] | null;
             /**
              * Schema Version
              * @default 1
              * @constant
              */
             schema_version: "1";
-            /** Sits With */
+            /**
+             * Sits With
+             * @default []
+             */
             sits_with: string[];
             /** Summary */
             summary?: string | null;

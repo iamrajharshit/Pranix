@@ -103,13 +103,21 @@ def test_inspection_set_invariants(dt: datetime, lat: float, lon_: float, known:
     m = compute(BirthInput(dt, "UTC", lat, lon_, birth_time_known=known), date(2026, 11, 14))
     for chart in ("d1", "d9") if known else ("d1",):
         s = with_text(build_set(m, chart, RS))  # type: ignore[arg-type]
-        assert len(s.bundles) == 9 and canonical(s) == canonical(with_text(build_set(m, chart, RS)))  # type: ignore[arg-type]
-        for b in s.bundles.values():
+        assert len(s.bundles) == (21 if known else 9)
+        assert canonical(s) == canonical(with_text(build_set(m, chart, RS)))  # type: ignore[arg-type]
+        for key, b in s.bundles.items():
+            assert b.summary and not any(ch.isdigit() for ch in b.summary.replace("D1", "").replace("D9", ""))
+            if key.startswith("house:"):
+                assert b.house and b.lord and 1 <= b.house.house <= 12 and 1 <= b.lord.house <= 12
+                # the house's occupants are exactly the planets whose own panels say they sit there
+                there = [x.target.ref for x in s.bundles.values() if x.placement and x.placement.house == b.house.house]
+                assert sorted(b.house.occupants) == sorted(there)
+                continue
             d = b.dispositor
+            assert d is not None and b.placement is not None
             assert 1 <= len(d.steps) <= 9 and d.end in ("final", "exchange", "cycle", "stops_uncertain")
             if d.end == "exchange":
                 assert d.cycle_members and len(d.cycle_members) == 2
-            assert b.summary and not any(ch.isdigit() for ch in b.summary.replace("D1", "").replace("D9", ""))
             if known:
                 assert b.placement.house is not None and 1 <= b.placement.house <= 12
                 houses = [h.house for h in b.houses_ruled or []]
