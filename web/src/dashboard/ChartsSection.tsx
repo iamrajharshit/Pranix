@@ -25,7 +25,18 @@ export default function ChartsSection({ m, profileId, tab, setTab, selected, set
   })) : [];
 
   const notes: string[] = [];
-  if (known && m.d1.lagna) {
+  if (known && tab === "d9" && m.d9) {
+    // D9 caption fix (plan §9, F4): on the D9 tab, describe the D9 chart, not the D1 rising sign.
+    notes.push(`D9 rising sign ${m.d9.lagna.sign}. House one is the top centre diamond; houses run anticlockwise.`);
+    const strong9 = m.d9.planets.filter((p) => p.dignity === "exalted" || p.dignity === "own").map((p) => `${p.id} (${p.dignity})`);
+    if (strong9.length) notes.push(`Strong in D9: ${strong9.join(", ")}.`);
+    const varg = m.d1.planets.filter((p) => p.vargottama).map((p) => p.id);
+    if (varg.length) notes.push(`Same sign in D1 and D9 (vargottama): ${varg.join(", ")}.`);
+    const near = m.flags.near_boundary.map((f) => f.split(".")[0]).map((k) => (k === "lagna" ? "the rising sign" : k[0].toUpperCase() + k.slice(1)));
+    notes.push(near.length
+      ? `The D9 depends on the exact birth minute. Near a boundary: ${near.join(", ")}; a few minutes' difference could move ${near.length > 1 ? "them" : "it"}.`
+      : "The D9 depends on the exact birth minute, so it is only as precise as your birth time.");
+  } else if (known && m.d1.lagna) {
     const lg = m.d1.lagna;
     notes.push(`Rising sign ${lg.sign} at ${dm(lg.deg_in_sign)}, in ${lg.nakshatra} pada ${lg.pada}. House one is the top centre diamond; houses run anticlockwise.`);
     const strong = m.d1.planets.filter((p) => p.dignity === "exalted" || p.dignity === "own").map((p) => `${p.id} (${p.dignity})`);
