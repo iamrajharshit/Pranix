@@ -47,7 +47,12 @@ export const api = {
     call<Profile>("/v1/profiles", { method: "POST", body: JSON.stringify(body), headers: { "x-age-confirmed": "true" } }),
   getProfile: (id: string) => call<Profile>(`/v1/profiles/${encodeURIComponent(id)}`),
   deleteProfile: (id: string) => call<void>(`/v1/profiles/${encodeURIComponent(id)}`, { method: "DELETE" }),
-  dasha: (id: string, path?: string) =>
-    call<DashaPeriod[]>(`/v1/profiles/${encodeURIComponent(id)}/dasha${path ? `?path=${encodeURIComponent(path)}` : ""}`),
+  dasha: (id: string, path?: string, cycle?: number) => {
+    const q = new URLSearchParams();
+    if (path) q.set("path", path);
+    if (cycle) q.set("cycle", String(cycle)); // D84: omitted means the run that contains today
+    const qs = q.toString();
+    return call<DashaPeriod[]>(`/v1/profiles/${encodeURIComponent(id)}/dasha${qs ? `?${qs}` : ""}`);
+  },
   cardImageUrl: (id: string, module: string) => `/v1/profiles/${encodeURIComponent(id)}/cards/${module}.png`,
 };

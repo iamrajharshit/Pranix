@@ -1349,7 +1349,7 @@
     },
     "/v1/profiles/{profile_id}/dasha": {
       "get": {
-        "description": "No path: the nine Mahadashas; path 'Ju>Ve': its nine children. Max depth five.",
+        "description": "No path: the nine Mahadashas; path 'Ju>Ve': its nine children. Max depth five.\ncycle: which run of the 120-year sequence (D84); by default the one that contains today.",
         "operationId": "dasha_periods_v1_profiles__profile_id__dasha_get",
         "parameters": [
           {
@@ -1376,6 +1376,24 @@
                 }
               ],
               "title": "Path"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cycle",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 6,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cycle"
             }
           }
         ],

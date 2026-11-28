@@ -96,3 +96,21 @@ def test_images_unavailable_without_fonts(tmp_path: Path) -> None:
         r = client.get(f"/v1/profiles/{pid}/cards/identity.png")
         assert r.status_code == 503 and r.json()["code"] == "SERVICE_NOT_READY"
         assert client.get("/readyz").status_code == 200  # images are optional
+
+
+def test_an_old_chart_lives_in_the_second_cycle(c: TestClient) -> None:
+    """D84: born 1905, so the first 120-year run has ended; the sequence starts again."""
+    place = {"lat": 18.5204, "lon": 73.8567}
+    body = {"place": place, "local_datetime": "1905-03-10T06:00:00", "birth_time_known": True}
+    r = c.post("/v1/profiles", json=body, headers={"X-Age-Confirmed": "true"})
+    assert r.status_code == 201
+    m, pid = r.json()["master"], r.json()["profile_id"]
+    chain = m["dasha"]["active_chain"]
+    assert chain and len(chain) == 5 and chain[0]["cycle"] == 2
+    now = c.get(f"/v1/profiles/{pid}/dasha").json()
+    assert len(now) == 9 and all(p["cycle"] == 2 for p in now) and sum(p["contains_now"] for p in now) == 1
+    first = c.get(f"/v1/profiles/{pid}/dasha", params={"cycle": 1}).json()
+    assert first[0].get("from_birth") and "cycle" not in first[0] and not any(p["contains_now"] for p in first)
+    kids = c.get(f"/v1/profiles/{pid}/dasha", params={"path": now[0]["path"], "cycle": 2}).json()
+    assert len(kids) == 9 and all(k["cycle"] == 2 for k in kids)
+    assert c.get(f"/v1/profiles/{pid}/dasha", params={"cycle": 99}).status_code == 422

@@ -41,3 +41,43 @@ def test_path_lookup() -> None:
     assert next(k.lord for k in kids) == "Venus" and kids[0].path == "Ju>Ve>Ve"
     with pytest.raises(ValueError):
         dasha.periods_at_path(RS, MOON, BIRTH, "Xx")
+
+
+# D84 (owner, 28 Nov): after 120 years the sequence starts again.
+
+
+def test_second_cycle_continues_the_first_exactly() -> None:
+    one = dasha.mahadashas(RS, MOON, BIRTH)
+    two = dasha.mahadashas(RS, MOON, BIRTH, 2)
+    assert [p.lord for p in two] == [p.lord for p in one]  # same order, from the birth star's lord
+    assert two[0].full_start == one[-1].end  # no gap, no overlap
+    assert two[0].start == two[0].full_start and not two[0].from_birth  # only cycle one is clipped
+    assert two[-1].end - two[0].start == dasha.cycle_seconds(RS) == 120 * dasha.year_seconds(RS)
+    assert all(p.cycle == 2 for p in two)
+
+
+@pytest.mark.parametrize("years", [0, 50, 99, 119, 121, 150, 240, 300])
+def test_there_is_always_a_current_period(years: int) -> None:
+    at = BIRTH + years * dasha.year_seconds(RS) + 1
+    chain = dasha.active_chain(RS, MOON, BIRTH, at)
+    assert len(chain) == dasha.MAX_DEPTH
+    assert all(p.start <= at < p.end for p in chain)
+
+
+def test_first_cycle_output_is_unchanged() -> None:
+    """Charts inside their first cycle get byte-identical answers: no 'cycle' key appears."""
+    for p in dasha.mahadashas(RS, MOON, BIRTH) + dasha.children(RS, dasha.mahadashas(RS, MOON, BIRTH)[0]):
+        assert "cycle" not in p.to_dict()
+    later = dasha.mahadashas(RS, MOON, BIRTH, 2)
+    assert later[0].to_dict()["cycle"] == 2
+    assert dasha.children(RS, later[0])[0].cycle == 2
+
+
+def test_cycle_at_and_paths_within_a_cycle() -> None:
+    end_of_one = dasha.mahadashas(RS, MOON, BIRTH)[-1].end
+    assert dasha.cycle_at(RS, MOON, BIRTH, end_of_one - 1) == 1
+    assert dasha.cycle_at(RS, MOON, BIRTH, end_of_one) == 2
+    kids = dasha.periods_at_path(RS, MOON, BIRTH, "Ju", 2)
+    assert kids[0].start >= end_of_one and kids[0].cycle == 2
+    with pytest.raises(ValueError):
+        dasha.mahadashas(RS, MOON, BIRTH, dasha.MAX_CYCLE + 1)

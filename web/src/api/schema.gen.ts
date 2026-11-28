@@ -104,6 +104,7 @@ export interface paths {
         /**
          * Dasha Periods
          * @description No path: the nine Mahadashas; path 'Ju>Ve': its nine children. Max depth five.
+         *     cycle: which run of the 120-year sequence (D84); by default the one that contains today.
          */
         get: operations["dasha_periods_v1_profiles__profile_id__dasha_get"];
         put?: never;
@@ -687,6 +688,7 @@ export interface operations {
         parameters: {
             query?: {
                 path?: string | null;
+                cycle?: number | null;
             };
             header?: never;
             path: {
