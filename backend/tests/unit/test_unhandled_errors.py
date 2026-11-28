@@ -13,7 +13,7 @@ from collections.abc import Iterator
 from typing import Any
 
 import pytest
-from fastapi.testclient import TestClient
+from spa_client import TestClient
 
 from pranix.gateway import routes_profiles
 from pranix.gateway.app import create_app

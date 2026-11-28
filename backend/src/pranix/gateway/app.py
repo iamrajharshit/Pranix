@@ -43,7 +43,32 @@ MAX_BODY_BYTES = 8_192
 _PLAIN = {
     413: ("PAYLOAD_TOO_LARGE", "Request is too large."),
     500: ("INTERNAL_ERROR", "Something went wrong on our side. Please try again."),
+    403: ("CSRF_REQUIRED", "This request must come from the Pranix page."),
 }
+
+CHANGING = {"POST", "PUT", "PATCH", "DELETE"}
+SPA_HEADER = (b"x-requested-with", b"pranix-spa")
+
+
+class Csrf:
+    """D85: a changing request under /v1 must come from our page.
+
+    It must carry X-Requested-With: pranix-spa (a cross-site page can't add a custom header without
+    a preflight, and we allow no cross-origin calls), and a browser that says Sec-Fetch-Site:
+    cross-site is refused even with the header. Reads (GET, HEAD, OPTIONS) need nothing."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] == "http" and scope["method"] in CHANGING and scope["path"].startswith("/v1/"):
+            headers = dict(scope.get("headers") or [])
+            ours = headers.get(SPA_HEADER[0]) == SPA_HEADER[1]
+            cross = headers.get(b"sec-fetch-site") == b"cross-site"
+            if not ours or cross:
+                await BodyLimit._refuse(send, 403)
+                return
+        await self.app(scope, receive, send)
 
 
 def _plain_problem(status: int = 413) -> dict[str, Any]:
@@ -178,6 +203,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             app.state.renderer = Renderer(settings.fonts_dir)
         except CardImageUnavailable as e:  # optional feature: the rest of the app works without it
             log.warning("cardimg.unavailable", reason=str(e))
+            app.state.renderer_problem = str(e)
         purged = app.state.cache.purge_expired()  # also hourly, from the cleanup timer (Data_model_v1 §4)
         log.info("cache.ready", kind=type(app.state.cache).__name__, entries=app.state.cache.size(), purged=purged)
         app.state.ready, app.state.failures = not failures, failures
@@ -196,7 +222,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if app.state.insights.rewording is not None:
             app.state.insights.rewording.stop()
 
-    app = FastAPI(title="Pranix API", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
+    # D86: no explorer pages anywhere, and no machine-readable API map in production. The frontend's
+    # types come from the committed schema.gen.ts; tools call app.openapi() directly.
+    openapi_url = None if settings.env == "prod" else "/openapi.json"
+    app = FastAPI(
+        title="Pranix API",
+        version=__version__,
+        lifespan=lifespan,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=openapi_url,
+    )
     app.state.settings = settings
     app.state.geo = None
     app.state.ready, app.state.failures = False, []
@@ -246,6 +282,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         return response
 
+    app.add_middleware(Csrf)
     app.add_middleware(BodyLimit)
 
     @app.get("/healthz", include_in_schema=False)

@@ -51,5 +51,5 @@ schema = schemathesis.openapi.from_asgi("/openapi.json", APP)
 @schema.exclude(path_regex=r"\.png$").parametrize()
 @settings(max_examples=25, deadline=None, suppress_health_check=list(HealthCheck))
 def test_no_input_causes_a_server_error(case: schemathesis.Case) -> None:
-    response = case.call()
+    response = case.call(headers={"X-Requested-With": "pranix-spa"})
     case.validate_response(response, checks=[not_a_server_error])

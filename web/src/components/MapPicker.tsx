@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// Map pin (D64, FR-UI-12a). Leaflet + OpenStreetMap tiles load only when this opens. The tile
-// server sees which area is viewed, never birth details; the nearest town and time zone come from
-// our own server (/v1/places/nearest).
+// Map pin (D64, FR-UI-12a). OpenStreetMap tiles load only after the person agrees (D86): the tile
+// server sees their IP address and which area they view, never birth details. The choice lasts for
+// this tab only. The nearest town and time zone come from our own server (/v1/places/nearest).
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -10,6 +10,11 @@ import type { Nearest } from "../api/types";
 import type { Draft } from "../lib/storage";
 
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const CONSENT = "pranix.mapConsent";
+
+function agreedBefore(): boolean {
+  try { return sessionStorage.getItem(CONSENT) === "1"; } catch { return false; }
+}
 
 export default function MapPicker({ onUse, onCoords, onClose }: {
   onUse(p: NonNullable<Draft["place"]>): void;
@@ -23,16 +28,17 @@ export default function MapPicker({ onUse, onCoords, onClose }: {
   const [near, setNear] = useState<Nearest | null>(null);
   const [msg, setMsg] = useState("No point yet. Tap the map, then fine-tune with the arrows.");
   const [failed, setFailed] = useState(false);
+  const [agreed, setAgreed] = useState(agreedBefore);
 
   useEffect(() => {
-    if (!el.current) return;
+    if (!agreed || !el.current) return;
     const m = L.map(el.current, { center: [20.5, 78.9], zoom: 4, worldCopyJump: true });
     L.tileLayer(TILES, { maxZoom: 18, attribution: "© OpenStreetMap contributors" }).addTo(m);
     m.on("click", (e: L.LeafletMouseEvent) => place(e.latlng.lat, e.latlng.lng));
     map.current = m;
     return () => { m.remove(); map.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [agreed]);
 
   const place = (lat: number, lon: number) => {
     const p = { lat: Math.round(Math.max(-90, Math.min(90, lat)) * 1e4) / 1e4, lon: Math.round((((lon + 540) % 360) - 180) * 1e4) / 1e4 };
@@ -64,8 +70,26 @@ export default function MapPicker({ onUse, onCoords, onClose }: {
       tz: near.tz, lat: pin.lat, lon: pin.lon });
   };
 
+  const box = { display: "flex", flexDirection: "column" as const, gap: 12, background: "#10102B", border: "1px solid rgba(244,197,102,.5)", borderRadius: 12, padding: 16 };
+  if (!agreed) {
+    const agree = () => { try { sessionStorage.setItem(CONSENT, "1"); } catch { /* private mode: ask again next time */ } setAgreed(true); };
+    return (
+      <div style={box} role="region" aria-labelledby="map-consent-title">
+        <strong id="map-consent-title" style={{ fontSize: 16, color: "#fff" }}>Load the map from OpenStreetMap?</strong>
+        <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55 }}>
+          The map pictures come from OpenStreetMap's servers. To send them, those servers see your IP address and which area you look at.
+          They never get your name, birth date or time. Search or coordinates work without the map.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button type="button" className="btn btn-gold btn-sm" onClick={agree}>Load the map</button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>Back to search</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12, background: "#10102B", border: "1px solid rgba(244,197,102,.5)", borderRadius: 12, padding: 16 }}>
+    <div style={box}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <strong style={{ fontSize: 16, color: "#fff" }}>Tap where you were born</strong>
         <span className="hint">Zoom in for accuracy; a nearby spot in the right town is enough.</span>
@@ -85,7 +109,7 @@ export default function MapPicker({ onUse, onCoords, onClose }: {
           : <button type="button" className="btn btn-gold btn-sm" aria-disabled={!near} onClick={use}>Use this point</button>}
         <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>Back to search</button>
       </div>
-      <span className="hint">The map comes from OpenStreetMap and loads only now. The map provider sees which area you look at, never your birth details.</span>
+      <span className="hint">Map © OpenStreetMap contributors. Their servers see your IP address and the area you view, never your birth details.</span>
     </div>
   );
 }
