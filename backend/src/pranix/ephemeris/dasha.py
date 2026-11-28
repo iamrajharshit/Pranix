@@ -40,6 +40,7 @@ class Period:
     path: str
     full_start: Fraction  # start before clipping to the birth instant
     from_birth: bool = False
+    cycle: int = 1  # D84: the 120-year sequence starts again; 2 = the second run, and so on
 
     @property
     def length(self) -> Fraction:
@@ -58,6 +59,8 @@ class Period:
         }
         if self.from_birth:
             d["from_birth"] = True
+        if self.cycle > 1:  # only then, so every first-cycle answer stays byte-identical
+            d["cycle"] = self.cycle
         if now is not None:
             d["contains_now"] = self.contains(now)
         return d
@@ -85,20 +88,39 @@ def _sequence_from(rs: Ruleset, lord: str) -> list[str]:
     return [rs.dasha_order[(i + k) % 9] for k in range(9)]
 
 
-def mahadashas(rs: Ruleset, moon_lon: float, birth: Fraction) -> list[Period]:
-    """The nine Mahadashas of the cycle running at birth; the first is clipped to birth."""
+MAX_CYCLE = 6  # births from 1800 to an as-of date before 2400 never need more
+
+
+def cycle_seconds(rs: Ruleset) -> Fraction:
+    return sum(rs.dasha_years.values()) * year_seconds(rs)  # 120 years, exactly
+
+
+def mahadashas(rs: Ruleset, moon_lon: float, birth: Fraction, cycle: int = 1) -> list[Period]:
+    """The nine Mahadashas of one run of the sequence. Cycle one is the run going on at birth (its
+    first period is clipped to birth); cycle k is the same run moved on by (k - 1) x 120 years (D84)."""
+    if not 1 <= cycle <= MAX_CYCLE:
+        raise ValueError("invalid cycle")
     q = Fraction(angles.normalize(moon_lon))
     n = int(q // angles.NAKSHATRA)
     elapsed_fraction = (q - n * angles.NAKSHATRA) / angles.NAKSHATRA
     first = rs.nakshatras[n].lord
     y = year_seconds(rs)
-    start = birth - elapsed_fraction * rs.dasha_years[first] * y
+    start = birth - elapsed_fraction * rs.dasha_years[first] * y + (cycle - 1) * cycle_seconds(rs)
     out: list[Period] = []
     for i, lord in enumerate(_sequence_from(rs, first)):
         end = start + rs.dasha_years[lord] * y
-        out.append(Period(lord, 1, birth if i == 0 else start, end, ABBR[lord], start, from_birth=(i == 0)))
+        clip = cycle == 1 and i == 0
+        out.append(Period(lord, 1, birth if clip else start, end, ABBR[lord], start, from_birth=clip, cycle=cycle))
         start = end
     return out
+
+
+def cycle_at(rs: Ruleset, moon_lon: float, birth: Fraction, at: Fraction) -> int:
+    """Which run of the sequence contains the instant `at` (1 before or during the first)."""
+    first = mahadashas(rs, moon_lon, birth)
+    if at < first[-1].end:
+        return 1
+    return min(MAX_CYCLE, 1 + int((at - first[0].full_start) // cycle_seconds(rs)))
 
 
 def children(rs: Ruleset, parent: Period) -> list[Period]:
@@ -110,14 +132,14 @@ def children(rs: Ruleset, parent: Period) -> list[Period]:
     out: list[Period] = []
     for lord in _sequence_from(rs, parent.lord):
         end = start + parent.length * Fraction(rs.dasha_years[lord], total)
-        out.append(Period(lord, parent.level + 1, start, end, f"{parent.path}>{ABBR[lord]}", start))
+        out.append(Period(lord, parent.level + 1, start, end, f"{parent.path}>{ABBR[lord]}", start, cycle=parent.cycle))
         start = end
     assert out[-1].end == parent.end  # exact by construction
     return out
 
 
 def active_chain(rs: Ruleset, moon_lon: float, birth: Fraction, at: Fraction, depth: int = MAX_DEPTH) -> list[Period]:
-    level = mahadashas(rs, moon_lon, birth)
+    level = mahadashas(rs, moon_lon, birth, cycle_at(rs, moon_lon, birth, at))
     chain: list[Period] = []
     while True:
         current = next((p for p in level if p.full_start <= at < p.end), None)
@@ -129,9 +151,9 @@ def active_chain(rs: Ruleset, moon_lon: float, birth: Fraction, at: Fraction, de
         level = children(rs, current)
 
 
-def periods_at_path(rs: Ruleset, moon_lon: float, birth: Fraction, path: str | None) -> list[Period]:
-    """Timeline endpoint (FR-DSH-03): no path -> Mahadashas; 'Ju>Ve' -> its nine children."""
-    level = mahadashas(rs, moon_lon, birth)
+def periods_at_path(rs: Ruleset, moon_lon: float, birth: Fraction, path: str | None, cycle: int = 1) -> list[Period]:
+    """Timeline endpoint (FR-DSH-03): no path -> Mahadashas; 'Ju>Ve' -> its nine children (in `cycle`)."""
+    level = mahadashas(rs, moon_lon, birth, cycle)
     if not path:
         return level
     parts = path.split(">")

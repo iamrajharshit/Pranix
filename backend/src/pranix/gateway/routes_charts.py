@@ -48,8 +48,10 @@ def dasha_periods(
     request: Request,
     profile_id: str,
     path: str | None = Query(default=None, pattern=r"^[A-Z][a-z](>[A-Z][a-z]){0,3}$"),
+    cycle: int | None = Query(default=None, ge=1, le=dasha.MAX_CYCLE),
 ) -> list[dict[str, Any]]:
-    """No path: the nine Mahadashas; path 'Ju>Ve': its nine children. Max depth five."""
+    """No path: the nine Mahadashas; path 'Ju>Ve': its nine children. Max depth five.
+    cycle: which run of the 120-year sequence (D84); by default the one that contains today."""
     item = _chart(request, profile_id)
     m = item.master
     if not m["meta"]["birth_time_known"]:
@@ -59,11 +61,12 @@ def dasha_periods(
     if item.seed is None:
         raise ProblemError(410, "CHART_EXPIRED", "This chart is no longer held on the server. It will be recalculated.")
     moon, birth = item.seed
+    rs = load_ruleset()
+    now = dasha.instant(datetime.now(UTC))
     try:
-        periods = dasha.periods_at_path(load_ruleset(), moon, birth, path)
+        periods = dasha.periods_at_path(rs, moon, birth, path, cycle or dasha.cycle_at(rs, moon, birth, now))
     except ValueError:
         raise ProblemError(422, "INVALID_REQUEST", "Some fields are missing or not valid: path") from None
-    now = dasha.instant(datetime.now(UTC))
     return [p.to_dict(now=now) for p in periods]
 
 

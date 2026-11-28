@@ -9,7 +9,7 @@ export interface Planet {
 export interface Lagna { longitude: number; sign: string; deg_in_sign: number; nakshatra: string; pada: number; vargottama: boolean }
 export interface House { house: number; sign: string }
 export interface D9Planet { id: string; sign: string; house: number; retrograde: boolean; dignity: Dignity }
-export interface DashaPeriod { lord: string; level: number; start: string; end: string; path: string; from_birth?: boolean; contains_now?: boolean }
+export interface DashaPeriod { lord: string; level: number; start: string; end: string; path: string; from_birth?: boolean; contains_now?: boolean; cycle?: number /* D84: absent means the first run */ }
 export interface Swatch { name: string; hex: string; planets: string[]; roles: string[]; kind: string; dark: boolean }
 export interface Syllable { pada: number; latin: string; deva: string }
 export interface Fact { label: string; target: { kind: string; ref: string; chart: "d1" | "d9" | "none" } }
