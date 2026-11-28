@@ -303,6 +303,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "schema_version": SCHEMA_VERSION,
             "ruleset": {"id": rs.id, "version": rs.version, "hash": rs.hash},
             "ephemeris_mode": swe.mode(),
+            # how charts are made (D86 A6): shown on How we calculate, moved here from every chart
+            "method": {"ayanamsa": "lahiri", "node_type": "mean", "house_system": "whole_sign"},
             "feature_flags": {
                 "chat": settings.feature_chat,
                 "inspect": settings.feature_inspect,

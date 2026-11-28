@@ -19,8 +19,9 @@ import json
 from collections.abc import Mapping
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
+from ..ephemeris.angles import to_arcminute
 from ..ephemeris.ruleset import Ruleset, Table, load_table
 from .context import Chart, ChartContext, Level, step
 
@@ -46,10 +47,14 @@ class Placement(_Model):
     dignity: Dignity | None
     dignity_gloss: str | None = None  # approved calm wording (D81 §3), added by insight.inspect_text
     vargottama: bool | None
-    deg_in_sign: float | None  # the engine's value; the UI truncates it with dm() (rule 6)
+    deg_in_sign: float | None  # sent truncated to the arcminute (D86 B1); the UI shows it with dm() (rule 6)
     nakshatra: str | None
     nakshatra_options: list[str] | None
     retrograde: bool | None
+
+    @field_serializer("deg_in_sign")
+    def _arcminute(self, v: float | None) -> float | None:
+        return to_arcminute(v)
 
 
 class HouseRef(_Model):
@@ -118,7 +123,8 @@ class Unavailable(_Model):
 
 
 class InspectionBundle(_Model):
-    schema_version: Literal["1"] = SCHEMA_VERSION
+    # D86 A7: kept inside the server, never sent (one schema_version on the set instead)
+    schema_version: Literal["1"] = Field(default=SCHEMA_VERSION, exclude=True)
     target: Target
     chart: Chart
     level: Level
@@ -142,10 +148,10 @@ class InspectionBundle(_Model):
     either_side: EitherSide | None
     about: HouseAbout | None = None  # I5: house targets; added by insight.inspect_text
     lines: list[Line] = []  # I5: approved library lines for this target; added by insight.inspect_text
-    may_change: list[MayChange] = []  # D83: this planet's own D9 sign, if it could differ
+    may_change: list[MayChange] = Field(default=[], exclude=True)  # D83; the screen reads minute_note (D86 A7)
     minute_note: str | None = None  # approved wording for may_change; added by insight.inspect_text
-    top_signals: list[str] = []  # reserved for the I1+ resolver (D81 §5)
-    modifiers: list[str] = []  # reserved for V2 (neechabhanga, combustion, ...)
+    top_signals: list[str] = Field(default=[], exclude=True)  # reserved for the I1+ resolver (D81 §5)
+    modifiers: list[str] = Field(default=[], exclude=True)  # reserved for V2 (neechabhanga, combustion, ...)
     unavailable: list[Unavailable]
     fact_ids: list[str]
 
@@ -157,12 +163,13 @@ class RulesetRef(_Model):
 
 
 class InspectionSet(_Model):
+    schema_version: Literal["1"] = SCHEMA_VERSION
     chart: Chart
     level: Level
     ruleset: RulesetRef
     rules: RulesetRef  # jyotish-core (the aspect table)
     minute_window: int | None = None  # D83: the birth time's margin in minutes; None without a birth time
-    may_change: list[MayChange] = []  # D83: rising signs (D1, D9) that could differ: every panel is affected
+    may_change: list[MayChange] = Field(default=[], exclude=True)  # D83; the screen reads minute_note (D86 A7)
     minute_note: str | None = None  # approved wording for may_change; added by insight.inspect_text
     bundles: dict[str, InspectionBundle]  # keys "planet:Jupiter" and, with a birth time, "house:7"
 

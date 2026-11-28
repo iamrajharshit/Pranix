@@ -21,6 +21,7 @@ from ..ephemeris.timeconv import MIN_YEAR, BirthTimeError
 from ..geo.tz import tz_at
 from .keys import chart_key, pepper
 from .problems import ProblemError
+from .public import public_master
 from .ratelimit import enforce
 from .routes_geo import geo_index
 
@@ -100,7 +101,8 @@ def create_profile(
         latency_ms=round((time.perf_counter() - started) * 1000, 1),
     )
     return JSONResponse(
-        {"profile_id": item.profile_id, "expires_at": item.expires_iso, "master": master}, status_code=201
+        {"profile_id": item.profile_id, "expires_at": item.expires_iso, "master": public_master(master)},
+        status_code=201,
     )
 
 
@@ -113,7 +115,7 @@ def get_profile(request: Request, profile_id: str) -> dict[str, Any]:
     item = request.app.state.guests.get(profile_id)
     if item is None:
         raise _expired()
-    return {"profile_id": item.profile_id, "expires_at": item.expires_iso, "master": item.master}
+    return {"profile_id": item.profile_id, "expires_at": item.expires_iso, "master": public_master(item.master)}
 
 
 @router.delete("/v1/profiles/{profile_id}", status_code=204)

@@ -92,12 +92,10 @@
         "dignity": "friend",
         "house": null,
         "id": "Sun",
-        "longitude": null,
         "nakshatra": "Jyeshtha",
         "pada": null,
         "retrograde": false,
         "sign": "Scorpio",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -105,12 +103,10 @@
         "dignity": "exalted",
         "house": null,
         "id": "Moon",
-        "longitude": null,
         "nakshatra": null,
         "pada": null,
         "retrograde": false,
         "sign": "Taurus",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -118,12 +114,10 @@
         "dignity": "exalted",
         "house": null,
         "id": "Mars",
-        "longitude": null,
         "nakshatra": null,
         "pada": null,
         "retrograde": false,
         "sign": "Capricorn",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -131,12 +125,10 @@
         "dignity": "neutral",
         "house": null,
         "id": "Mercury",
-        "longitude": null,
         "nakshatra": "Mula",
         "pada": null,
         "retrograde": true,
         "sign": "Sagittarius",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -144,12 +136,10 @@
         "dignity": "own",
         "house": null,
         "id": "Jupiter",
-        "longitude": null,
         "nakshatra": "Purva Ashadha",
         "pada": null,
         "retrograde": false,
         "sign": "Sagittarius",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -157,12 +147,10 @@
         "dignity": "friend",
         "house": null,
         "id": "Venus",
-        "longitude": null,
         "nakshatra": "Uttara Ashadha",
         "pada": null,
         "retrograde": false,
         "sign": "Capricorn",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -170,12 +158,10 @@
         "dignity": "exalted",
         "house": null,
         "id": "Saturn",
-        "longitude": null,
         "nakshatra": "Vishakha",
         "pada": null,
         "retrograde": false,
         "sign": "Libra",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -183,12 +169,10 @@
         "dignity": null,
         "house": null,
         "id": "Rahu",
-        "longitude": null,
         "nakshatra": "Krittika",
         "pada": null,
         "retrograde": true,
         "sign": "Taurus",
-        "speed": null,
         "vargottama": null
       },
       {
@@ -196,12 +180,10 @@
         "dignity": null,
         "house": null,
         "id": "Ketu",
-        "longitude": null,
         "nakshatra": "Vishakha",
         "pada": null,
         "retrograde": true,
         "sign": "Scorpio",
-        "speed": null,
         "vargottama": null
       }
     ]
@@ -254,85 +236,6 @@
     }
   },
   "elements": {
-    "contributions": [
-      {
-        "element": "Water",
-        "source": "Sun",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "friend",
-        "element": "Fire",
-        "source": "Sun",
-        "weight": "1/2"
-      },
-      {
-        "element": "Earth",
-        "source": "Moon",
-        "weight": "1"
-      },
-      {
-        "dignity": "exalted",
-        "element": "Water",
-        "source": "Moon",
-        "weight": "5/4"
-      },
-      {
-        "element": "Earth",
-        "source": "Mars",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "exalted",
-        "element": "Fire",
-        "source": "Mars",
-        "weight": "5/8"
-      },
-      {
-        "element": "Fire",
-        "source": "Mercury",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "neutral",
-        "element": "Earth",
-        "source": "Mercury",
-        "weight": "1/2"
-      },
-      {
-        "element": "Fire",
-        "source": "Jupiter",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "own",
-        "element": "Ether",
-        "source": "Jupiter",
-        "weight": "5/8"
-      },
-      {
-        "element": "Earth",
-        "source": "Venus",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "friend",
-        "element": "Water",
-        "source": "Venus",
-        "weight": "1/2"
-      },
-      {
-        "element": "Air",
-        "source": "Saturn",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "exalted",
-        "element": "Air",
-        "source": "Saturn",
-        "weight": "5/8"
-      }
-    ],
     "percent": {
       "Air": 13,
       "Earth": 29,
@@ -513,49 +416,22 @@
   "ishta_devta": null,
   "meta": {
     "ayanamsa": "lahiri",
-    "ayanamsa_value": 23.646668,
+    "ayanamsa_value": 23.633333,
     "birth_time_known": false,
     "dasha_year_days": 365.25,
-    "engine_version": "0.1.0",
     "ephemeris_mode": "swieph",
-    "house_system": "whole_sign",
-    "node_type": "mean",
     "ruleset": {
       "hash": "9541a10df5ca6ffd",
       "id": "vedic-core",
       "version": 1
     },
-    "rulesets": [
-      {
-        "hash": "142673efc677fa52",
-        "id": "ishta-core",
-        "version": 1
-      },
-      {
-        "hash": "4f16ef023c41fe46",
-        "id": "colors-core",
-        "version": 1
-      },
-      {
-        "hash": "41e89805132cfbce",
-        "id": "days-core",
-        "version": 1
-      },
-      {
-        "hash": "2991b148cfa9218a",
-        "id": "naming-core",
-        "version": 1
-      }
-    ],
-    "schema_version": "1.1.0",
-    "swisseph_version": "2.10.03"
+    "schema_version": "1.1.0"
   },
   "nakshatra": null,
   "naming": {
     "alternatives": [
       {
         "nakshatra": "Mrigashira",
-        "nakshatra_number": 5,
         "syllables": [
           {
             "deva": "वे",
@@ -581,7 +457,6 @@
       }
     ],
     "nakshatra": "Rohini",
-    "nakshatra_number": 4,
     "pada": null,
     "syllables": [
       {

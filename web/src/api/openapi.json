@@ -420,14 +420,6 @@
               }
             ]
           },
-          "may_change": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/MayChange"
-            },
-            "title": "May Change",
-            "type": "array"
-          },
           "minute_note": {
             "anyOf": [
               {
@@ -438,14 +430,6 @@
               }
             ],
             "title": "Minute Note"
-          },
-          "modifiers": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Modifiers",
-            "type": "array"
           },
           "other_chart": {
             "anyOf": [
@@ -477,12 +461,6 @@
               }
             ]
           },
-          "schema_version": {
-            "const": "1",
-            "default": "1",
-            "title": "Schema Version",
-            "type": "string"
-          },
           "sits_with": {
             "default": [],
             "items": {
@@ -504,14 +482,6 @@
           },
           "target": {
             "$ref": "#/components/schemas/Target"
-          },
-          "top_signals": {
-            "default": [],
-            "items": {
-              "type": "string"
-            },
-            "title": "Top Signals",
-            "type": "array"
           },
           "unavailable": {
             "items": {
@@ -558,14 +528,6 @@
             "title": "Level",
             "type": "string"
           },
-          "may_change": {
-            "default": [],
-            "items": {
-              "$ref": "#/components/schemas/MayChange"
-            },
-            "title": "May Change",
-            "type": "array"
-          },
           "minute_note": {
             "anyOf": [
               {
@@ -593,6 +555,12 @@
           },
           "ruleset": {
             "$ref": "#/components/schemas/RulesetRef"
+          },
+          "schema_version": {
+            "const": "1",
+            "default": "1",
+            "title": "Schema Version",
+            "type": "string"
           }
         },
         "required": [

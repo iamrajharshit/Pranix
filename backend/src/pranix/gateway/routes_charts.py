@@ -67,7 +67,7 @@ def dasha_periods(
         periods = dasha.periods_at_path(rs, moon, birth, path, cycle or dasha.cycle_at(rs, moon, birth, now))
     except ValueError:
         raise ProblemError(422, "INVALID_REQUEST", "Some fields are missing or not valid: path") from None
-    return [p.to_dict(now=now) for p in periods]
+    return [p.public_dict(now=now) for p in periods]  # D86 C1
 
 
 @router.get("/v1/profiles/{profile_id}/cards/{module_id}.png")

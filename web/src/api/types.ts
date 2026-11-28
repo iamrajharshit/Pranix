@@ -3,19 +3,24 @@
 
 export type Dignity = "exalted" | "own" | "friend" | "neutral" | "enemy" | "debilitated" | null;
 export interface Planet {
-  id: string; longitude: number | null; sign: string | null; deg_in_sign: number | null; house: number | null;
+  id: string; sign: string | null; deg_in_sign: number | null; house: number | null;
   retrograde: boolean | null; dignity: Dignity; nakshatra: string | null; pada: number | null; vargottama: boolean | null;
 }
-export interface Lagna { longitude: number; sign: string; deg_in_sign: number; nakshatra: string; pada: number; vargottama: boolean }
+export interface Lagna { sign: string; deg_in_sign: number; nakshatra: string; pada: number; vargottama: boolean }
 export interface House { house: number; sign: string }
 export interface D9Planet { id: string; sign: string; house: number; retrograde: boolean; dignity: Dignity }
-export interface DashaPeriod { lord: string; level: number; start: string; end: string; path: string; from_birth?: boolean; contains_now?: boolean; cycle?: number /* D84: absent means the first run */ }
+// start is null on the period running at birth (D86 C1: the birth instant never leaves the server);
+// period_start (when that period itself began) is only for drawing bars, never printed.
+export interface DashaPeriod { lord: string; level: number; start: string | null; end: string; path: string; from_birth?: boolean; period_start?: string; contains_now?: boolean; cycle?: number /* D84: absent means the first run */ }
+
+/** For drawing only: where a bar segment begins. */
+export const begins = (p: DashaPeriod): string => p.start ?? p.period_start ?? p.end;
 export interface Swatch { name: string; hex: string; planets: string[]; roles: string[]; kind: string; dark: boolean }
 export interface Syllable { pada: number; latin: string; deva: string }
 export interface Fact { label: string; target: { kind: string; ref: string; chart: "d1" | "d9" | "none" } }
 
 export interface Master {
-  meta: { birth_time_known: boolean; ayanamsa_value: number; ephemeris_mode: string; ruleset: { id: string; version: number }; dasha_year_days: number };
+  meta: { schema_version: string; birth_time_known: boolean; ayanamsa_value: number; ephemeris_mode: string; ruleset: { id: string; version: number }; dasha_year_days: number };
   identity: { lagna: { sign: string; lord: string; deg_in_sign: number } | null; moon: { sign: string } | null; sun: { sign: string } | null };
   nakshatra: { number: number; name: string; pada: number | null; lord: string; deity: string; symbol: string } | null;
   naming: { nakshatra: string; pada: number | null; syllables: Syllable[]; alternatives: { nakshatra: string; syllables: Syllable[] }[] };

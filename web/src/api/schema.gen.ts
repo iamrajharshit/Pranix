@@ -281,27 +281,11 @@ export interface components {
             lines: components["schemas"]["Line"][];
             lord?: components["schemas"]["HouseLord"] | null;
             lord_other_chart?: components["schemas"]["HouseLord"] | null;
-            /**
-             * May Change
-             * @default []
-             */
-            may_change: components["schemas"]["MayChange"][];
             /** Minute Note */
             minute_note?: string | null;
-            /**
-             * Modifiers
-             * @default []
-             */
-            modifiers: string[];
             other_chart?: components["schemas"]["OtherChart"] | null;
             placement?: components["schemas"]["Placement"] | null;
             same_house_other_chart?: components["schemas"]["HouseRef"] | null;
-            /**
-             * Schema Version
-             * @default 1
-             * @constant
-             */
-            schema_version: "1";
             /**
              * Sits With
              * @default []
@@ -310,11 +294,6 @@ export interface components {
             /** Summary */
             summary?: string | null;
             target: components["schemas"]["Target"];
-            /**
-             * Top Signals
-             * @default []
-             */
-            top_signals: string[];
             /** Unavailable */
             unavailable: components["schemas"]["Unavailable"][];
         };
@@ -334,17 +313,18 @@ export interface components {
              * @enum {string}
              */
             level: "house" | "sign";
-            /**
-             * May Change
-             * @default []
-             */
-            may_change: components["schemas"]["MayChange"][];
             /** Minute Note */
             minute_note?: string | null;
             /** Minute Window */
             minute_window?: number | null;
             rules: components["schemas"]["RulesetRef"];
             ruleset: components["schemas"]["RulesetRef"];
+            /**
+             * Schema Version
+             * @default 1
+             * @constant
+             */
+            schema_version: "1";
         };
         /**
          * Line

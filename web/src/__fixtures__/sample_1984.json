@@ -135,8 +135,7 @@
       }
     ],
     "lagna": {
-      "deg_in_sign": 20.295112,
-      "longitude": 140.295112,
+      "deg_in_sign": 20.283333,
       "nakshatra": "Purva Phalguni",
       "pada": 3,
       "sign": "Leo",
@@ -144,120 +143,102 @@
     },
     "planets": [
       {
-        "deg_in_sign": 22.219118,
+        "deg_in_sign": 22.216667,
         "dignity": "friend",
         "house": 4,
         "id": "Sun",
-        "longitude": 232.219118,
         "nakshatra": "Jyeshtha",
         "pada": 2,
         "retrograde": false,
         "sign": "Scorpio",
-        "speed": 1.015369,
         "vargottama": false
       },
       {
-        "deg_in_sign": 14.413999,
+        "deg_in_sign": 14.4,
         "dignity": "exalted",
         "house": 10,
         "id": "Moon",
-        "longitude": 44.413999,
         "nakshatra": "Rohini",
         "pada": 2,
         "retrograde": false,
         "sign": "Taurus",
-        "speed": 12.600278,
         "vargottama": true
       },
       {
-        "deg_in_sign": 23.007805,
+        "deg_in_sign": 23.0,
         "dignity": "exalted",
         "house": 6,
         "id": "Mars",
-        "longitude": 293.007805,
         "nakshatra": "Shravana",
         "pada": 4,
         "retrograde": false,
         "sign": "Capricorn",
-        "speed": 0.761164,
         "vargottama": false
       },
       {
-        "deg_in_sign": 6.423287,
+        "deg_in_sign": 6.416667,
         "dignity": "neutral",
         "house": 5,
         "id": "Mercury",
-        "longitude": 246.423287,
         "nakshatra": "Mula",
         "pada": 2,
         "retrograde": true,
         "sign": "Sagittarius",
-        "speed": -0.527409,
         "vargottama": false
       },
       {
-        "deg_in_sign": 22.351795,
+        "deg_in_sign": 22.35,
         "dignity": "own",
         "house": 5,
         "id": "Jupiter",
-        "longitude": 262.351795,
         "nakshatra": "Purva Ashadha",
         "pada": 3,
         "retrograde": false,
         "sign": "Sagittarius",
-        "speed": 0.216838,
         "vargottama": false
       },
       {
-        "deg_in_sign": 4.757248,
+        "deg_in_sign": 4.75,
         "dignity": "friend",
         "house": 6,
         "id": "Venus",
-        "longitude": 274.757248,
         "nakshatra": "Uttara Ashadha",
         "pada": 3,
         "retrograde": false,
         "sign": "Capricorn",
-        "speed": 1.179052,
         "vargottama": false
       },
       {
-        "deg_in_sign": 28.542972,
+        "deg_in_sign": 28.533333,
         "dignity": "exalted",
         "house": 3,
         "id": "Saturn",
-        "longitude": 208.542972,
         "nakshatra": "Vishakha",
         "pada": 3,
         "retrograde": false,
         "sign": "Libra",
-        "speed": 0.113041,
         "vargottama": false
       },
       {
-        "deg_in_sign": 2.787418,
+        "deg_in_sign": 2.783333,
         "dignity": null,
         "house": 10,
         "id": "Rahu",
-        "longitude": 32.787418,
         "nakshatra": "Krittika",
         "pada": 2,
         "retrograde": true,
         "sign": "Taurus",
-        "speed": -0.052992,
         "vargottama": false
       },
       {
-        "deg_in_sign": 2.787418,
+        "deg_in_sign": 2.783333,
         "dignity": null,
         "house": 4,
         "id": "Ketu",
-        "longitude": 212.787418,
         "nakshatra": "Vishakha",
         "pada": 4,
         "retrograde": true,
         "sign": "Scorpio",
-        "speed": -0.052992,
         "vargottama": false
       }
     ]
@@ -471,90 +452,6 @@
     }
   },
   "elements": {
-    "contributions": [
-      {
-        "element": "Fire",
-        "source": "lagna",
-        "weight": "2"
-      },
-      {
-        "element": "Water",
-        "source": "Sun",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "friend",
-        "element": "Fire",
-        "source": "Sun",
-        "weight": "1/2"
-      },
-      {
-        "element": "Earth",
-        "source": "Moon",
-        "weight": "1"
-      },
-      {
-        "dignity": "exalted",
-        "element": "Water",
-        "source": "Moon",
-        "weight": "5/4"
-      },
-      {
-        "element": "Earth",
-        "source": "Mars",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "exalted",
-        "element": "Fire",
-        "source": "Mars",
-        "weight": "5/8"
-      },
-      {
-        "element": "Fire",
-        "source": "Mercury",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "neutral",
-        "element": "Earth",
-        "source": "Mercury",
-        "weight": "1/2"
-      },
-      {
-        "element": "Fire",
-        "source": "Jupiter",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "own",
-        "element": "Ether",
-        "source": "Jupiter",
-        "weight": "5/8"
-      },
-      {
-        "element": "Earth",
-        "source": "Venus",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "friend",
-        "element": "Water",
-        "source": "Venus",
-        "weight": "1/2"
-      },
-      {
-        "element": "Air",
-        "source": "Saturn",
-        "weight": "1/2"
-      },
-      {
-        "dignity": "exalted",
-        "element": "Air",
-        "source": "Saturn",
-        "weight": "5/8"
-      }
-    ],
     "percent": {
       "Air": 11,
       "Earth": 23,
@@ -829,19 +726,19 @@
   },
   "identity": {
     "lagna": {
-      "deg_in_sign": 20.295112,
+      "deg_in_sign": 20.283333,
       "house": 1,
       "lord": "Sun",
       "sign": "Leo"
     },
     "moon": {
-      "deg_in_sign": 14.413999,
+      "deg_in_sign": 14.4,
       "house": 10,
       "lord": "Venus",
       "sign": "Taurus"
     },
     "sun": {
-      "deg_in_sign": 22.219118,
+      "deg_in_sign": 22.216667,
       "house": 4,
       "lord": "Mars",
       "sign": "Scorpio"
@@ -854,56 +751,20 @@
       "Krishna",
       "Lalita"
     ],
-    "time_sensitive": true,
-    "working": {
-      "atmakaraka": "Saturn",
-      "branch": "strongest_occupant",
-      "karakamsa": "Gemini",
-      "occupants": [
-        "Moon",
-        "Mercury"
-      ],
-      "twelfth": "Taurus"
-    }
+    "time_sensitive": true
   },
   "meta": {
     "ayanamsa": "lahiri",
-    "ayanamsa_value": 23.64665,
+    "ayanamsa_value": 23.633333,
     "birth_time_known": true,
     "dasha_year_days": 365.25,
-    "engine_version": "0.1.0",
     "ephemeris_mode": "swieph",
-    "house_system": "whole_sign",
-    "node_type": "mean",
     "ruleset": {
       "hash": "9541a10df5ca6ffd",
       "id": "vedic-core",
       "version": 1
     },
-    "rulesets": [
-      {
-        "hash": "142673efc677fa52",
-        "id": "ishta-core",
-        "version": 1
-      },
-      {
-        "hash": "4f16ef023c41fe46",
-        "id": "colors-core",
-        "version": 1
-      },
-      {
-        "hash": "41e89805132cfbce",
-        "id": "days-core",
-        "version": 1
-      },
-      {
-        "hash": "2991b148cfa9218a",
-        "id": "naming-core",
-        "version": 1
-      }
-    ],
-    "schema_version": "1.1.0",
-    "swisseph_version": "2.10.03"
+    "schema_version": "1.1.0"
   },
   "nakshatra": {
     "deity": "Brahma (Prajapati)",
@@ -916,7 +777,6 @@
   "naming": {
     "alternatives": [],
     "nakshatra": "Rohini",
-    "nakshatra_number": 4,
     "pada": 2,
     "syllables": [
       {
