@@ -3,8 +3,9 @@
 
 from __future__ import annotations
 
+import itertools
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Literal
 from zoneinfo import ZoneInfo
 
@@ -75,3 +76,46 @@ def julian_day_ut(utc: datetime) -> float:
     u = utc.astimezone(UTC)
     epoch = datetime(2000, 1, 1, 12, tzinfo=UTC)  # J2000.0 = JD 2451545.0
     return 2451545.0 + (u - epoch).total_seconds() / 86400.0
+
+
+def day_bounds_utc(day: date, tz: str) -> tuple[datetime, datetime]:
+    """The first and last second of a local calendar day, as UTC instants (bug bounty, 26 Nov).
+
+    Not simply local 00:00:00 and 23:59:59: where the clocks jump at midnight the day starts at the
+    jump, where they go back at midnight 23:59:59 happens twice, and some historic changes fell at
+    other times (23:30 in Toronto, 1919). So this finds every offset change near the day, to the
+    second, and intersects the day with each stretch of constant offset. Exact for any zone.
+    A day that never happened (Samoa, 30 Dec 2011) is NONEXISTENT_LOCAL_TIME."""
+    zone = ZoneInfo(tz)
+    one = timedelta(seconds=1)
+
+    def offset(u: datetime) -> timedelta:
+        return u.astimezone(zone).utcoffset() or timedelta(0)
+
+    midnight = datetime.combine(day, time(0, 0, 0), tzinfo=UTC)
+    lo, hi = midnight - _MARGIN, midnight + timedelta(days=1) + _MARGIN  # covers every offset ever used
+    cuts = [lo]
+    u = lo
+    while u < hi:
+        v = min(u + _STEP, hi)
+        if offset(u) != offset(v):  # a change inside (u, v]: find its first second
+            a, b = u, v
+            while b - a > one:
+                mid = a + timedelta(seconds=(b - a) // one // 2)
+                a, b = (mid, b) if offset(mid) == offset(a) else (a, mid)
+            cuts.append(b)
+        u = v
+    cuts.append(hi)
+    spans = []
+    for a, b in itertools.pairwise(cuts):
+        o = offset(a)
+        s, e = max(a, midnight - o), min(b, midnight + timedelta(days=1) - o)
+        if s < e:
+            spans.append((s, e - one))
+    if not spans:
+        raise BirthTimeError("NONEXISTENT_LOCAL_TIME")
+    return min(s for s, _ in spans), max(e for _, e in spans)
+
+
+_MARGIN = timedelta(hours=18)  # UTC offsets have ranged from about -16h (old Manila) to +15h
+_STEP = timedelta(minutes=30)  # no zone has had two changes within half an hour

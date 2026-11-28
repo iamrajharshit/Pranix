@@ -3,10 +3,15 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import time
+import traceback
+import uuid
 from collections.abc import AsyncIterator
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
 import structlog
@@ -33,6 +38,111 @@ from .ratelimit import TokenBucket
 log = structlog.get_logger()
 access = structlog.get_logger("pranix.access")
 MAX_BODY_BYTES = 8_192
+
+
+_PLAIN = {
+    413: ("PAYLOAD_TOO_LARGE", "Request is too large."),
+    500: ("INTERNAL_ERROR", "Something went wrong on our side. Please try again."),
+}
+
+
+def _plain_problem(status: int = 413) -> dict[str, Any]:
+    code, message = _PLAIN.get(status, ("INVALID_REQUEST", "Bad request."))
+    return {"code": code, "message": message, "retry_after": None, "reset_at": None, "request_id": "-"}
+
+
+class Guard:
+    """Catches an unexpected error before it leaves the app (bug bounty, 26 Nov).
+
+    Answers problem+json INTERNAL_ERROR with a request id, and logs one line with the same id, the
+    error type, the route pattern and file:line frames. Never the message or local values: messages
+    can carry input values (pydantic adds `input_value=`), and rule 3 keeps birth data out of logs.
+    The error is not re-raised, so the server's own error log (which prints messages) never sees it."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        started = False
+
+        async def watch(message: Any) -> None:
+            nonlocal started
+            started = started or message["type"] == "http.response.start"
+            await send(message)
+
+        try:
+            await self.app(scope, receive, watch)
+        except Exception as e:
+            rid = uuid.uuid4().hex[:16]
+            frames = [f"{Path(f.filename).name}:{f.lineno}:{f.name}" for f in traceback.extract_tb(e.__traceback__)]
+            route = getattr(scope.get("route"), "path", "unmatched")
+            log.error("http.unhandled", error=type(e).__name__, route=route, request_id=rid, frames=frames[-12:])
+            if started:  # a stream already under way: nothing more can be said, the connection just ends
+                return
+            body = json.dumps({**_plain_problem(500), "request_id": rid}).encode()
+            headers = [(b"content-type", b"application/problem+json"), (b"content-length", str(len(body)).encode())]
+            await send({"type": "http.response.start", "status": 500, "headers": headers})
+            await send({"type": "http.response.body", "body": body})
+
+
+class BodyLimit:
+    """Caps every request body at MAX_BODY_BYTES, however it arrives (bug bounty, 26 Nov).
+
+    The old check read only the Content-Length header, so a chunked upload (no header) or a header
+    that understated the body reached the route's JSON parser at any size. This counts the bytes
+    themselves. Our bodies are tiny, so it reads the whole body first, then replays it to the app;
+    later receive() calls go straight through, so streams still hear the client disconnect.
+    """
+
+    def __init__(self, app: Any, limit: int = MAX_BODY_BYTES) -> None:
+        self.app, self.limit = app, limit
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        length = dict(scope.get("headers") or []).get(b"content-length")
+        if length is not None:
+            if not length.isdigit():
+                await self._refuse(send, 400)
+                return
+            if int(length) > self.limit:
+                await self._refuse(send, 413)
+                return
+        parts: list[bytes] = []
+        size = 0
+        while True:
+            message = await receive()
+            if message["type"] != "http.request":  # client left before the body ended
+                return
+            chunk = message.get("body", b"")
+            size += len(chunk)
+            if size > self.limit:
+                await self._refuse(send, 413)
+                return
+            parts.append(chunk)
+            if not message.get("more_body", False):
+                break
+        replayed = False
+
+        async def replay() -> Any:
+            nonlocal replayed
+            if not replayed:
+                replayed = True
+                return {"type": "http.request", "body": b"".join(parts), "more_body": False}
+            return await receive()
+
+        await self.app(scope, replay, send)
+
+    @staticmethod
+    async def _refuse(send: Any, status: int) -> None:
+        body = json.dumps(_plain_problem(status)).encode()
+        headers = [(b"content-type", b"application/problem+json"), (b"content-length", str(len(body)).encode())]
+        await send({"type": "http.response.start", "status": status, "headers": headers})
+        await send({"type": "http.response.body", "body": body})
 
 
 PROVIDER_LABELS = {
@@ -82,6 +192,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         stop_purger = start_purger(app.state.cache)
         yield
         stop_purger()
+        app.state.card_pool.shutdown(wait=False, cancel_futures=True)
         if app.state.insights.rewording is not None:
             app.state.insights.rewording.stop()
 
@@ -90,6 +201,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.geo = None
     app.state.ready, app.state.failures = False, []
     app.state.guests = GuestStore(settings.guest_ttl_seconds, settings.guest_cache_max)
+    # One bounded pool for every card stream (bug bounty, 26 Nov): a pool per stream meant four threads per
+    # open dashboard, and the stream itself held one of the 40 request threads while it waited.
+    app.state.card_pool = ThreadPoolExecutor(max_workers=settings.card_workers, thread_name_prefix="cards")
     app.state.limits = {
         "places": TokenBucket(settings.rate_places_per_min),
         "profiles": TokenBucket(settings.rate_profiles_per_min),
@@ -111,12 +225,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         reword_gap_s=reword_gap_s(settings),
     )
     install(app)
+    app.add_middleware(Guard)  # innermost of ours, so the access log below still sees the 500
 
     @app.middleware("http")
     async def access_log(request: Request, call_next: Any) -> Any:
         # Route pattern only (e.g. /v1/places/nearest): never the query string, ids or bodies.
         start = time.perf_counter()
         response = await call_next(request)
+        # API answers carry someone's chart or place: never stored by a browser or proxy cache unless
+        # a route says otherwise (bug bounty, 26 Nov). The card stream, Inspector and images set their own.
+        if request.url.path.startswith("/v1/") and "cache-control" not in response.headers:
+            response.headers["Cache-Control"] = "private, no-store"
         route = request.scope.get("route")
         access.info(
             "http.request",
@@ -127,25 +246,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
         return response
 
-    @app.middleware("http")
-    async def limit_body(request: Request, call_next: Any) -> Any:
-        length = request.headers.get("content-length")
-        if length and length.isdigit() and int(length) > MAX_BODY_BYTES:
-            return JSONResponse(
-                {
-                    "code": "PAYLOAD_TOO_LARGE",
-                    "message": "Request is too large.",
-                    "retry_after": None,
-                    "reset_at": None,
-                    "request_id": "-",
-                },
-                status_code=413,
-                media_type="application/problem+json",
-            )
-        return await call_next(request)
+    app.add_middleware(BodyLimit)
 
     @app.get("/healthz", include_in_schema=False)
-    def healthz() -> dict[str, str]:
+    async def healthz() -> dict[str, str]:  # on the event loop: answers even when every worker thread is busy
         return {"status": "ok"}
 
     @app.get("/readyz", include_in_schema=False)

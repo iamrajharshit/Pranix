@@ -23,7 +23,7 @@ from typing import Any, Literal
 from .. import __version__
 from . import allies, angles, charts, dasha, facts, heuristics, swe
 from .ruleset import Ruleset, load_ruleset, load_table
-from .timeconv import julian_day_ut, to_utc
+from .timeconv import BirthTimeError, day_bounds_utc, julian_day_ut, to_utc
 
 SCHEMA_VERSION = "1.1.0"  # 1.1: flags.minute_window, flags.minute_sensitive (D83)
 NEAR_TOL = 0.01
@@ -164,6 +164,21 @@ def _minute_sensitive(rs: Ruleset, inp: BirthInput, snap: _Snapshot) -> list[dic
     return out
 
 
+def _noon(inp: BirthInput, start: _Snapshot, end: _Snapshot) -> _Snapshot:
+    """Unknown time: local noon, as always. On the few days when noon itself was skipped or came
+    twice (the US 'day of two noons', 18 Nov 1883) the middle of the real day is used instead."""
+    try:
+        return _snap(inp, inp.local_datetime)
+    except BirthTimeError:
+        middle = start.utc + timedelta(seconds=(end.utc - start.utc) // timedelta(seconds=1) // 2)
+        return _snap_utc(inp, middle)
+
+
+def _day_ends(inp: BirthInput, day: date) -> tuple[_Snapshot, _Snapshot]:
+    start, end = day_bounds_utc(day, inp.tz)
+    return _snap_utc(inp, start), _snap_utc(inp, end)
+
+
 def _snap_utc(inp: BirthInput, utc: datetime) -> _Snapshot:
     jd = julian_day_ut(utc)
     return _Snapshot(utc, jd, swe.bodies(jd), swe.ascendant(jd, inp.lat, inp.lon))
@@ -197,7 +212,7 @@ def _known(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, An
     ishta = allies.ishta_devta(rs, snap.bodies)
     # Deity depends on exact degrees: flag it if it differs at either end of the birth day (FR-CAL-05).
     day = inp.local_datetime.date()
-    ends = [_snap(inp, datetime.combine(day, t)) for t in (time(0, 0, 0), time(23, 59, 59))]
+    ends = _day_ends(inp, day)
     ishta["time_sensitive"] = any(allies.ishta_devta(rs, e.bodies)["main"] != ishta["main"] for e in ends)
     m = {
         "meta": _meta(rs, inp, snap, mode),
@@ -227,9 +242,8 @@ def _known(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, An
 
 def _unknown(rs: Ruleset, inp: BirthInput, as_of: date, mode: str) -> dict[str, Any]:
     day = inp.local_datetime.date()
-    a = _snap(inp, datetime.combine(day, time(0, 0, 0)))
-    b = _snap(inp, datetime.combine(day, time(23, 59, 59)))
-    noon = _snap(inp, inp.local_datetime)
+    a, b = _day_ends(inp, day)
+    noon = _noon(inp, a, b)
     ts: list[dict[str, Any]] = []
     planets = []
     for pa, pb in zip(a.bodies, b.bodies, strict=False):
