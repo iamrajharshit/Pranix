@@ -4,7 +4,7 @@
 
 Writes, from the running code (never by hand):
   web/src/api/openapi.json                 the app's OpenAPI document
-  web/src/__fixtures__/sample_1984.json    engine output for the invented sample chart
+  web/src/__fixtures__/sample_1984.json    the chart as the browser receives it, for the invented sample
   web/src/__fixtures__/sample_1984_unknown_time.json   the same birth with the time unknown
   web/src/__fixtures__/inspect_1984_{d1,d9,unknown_d1}.json   Chart Inspector sets for the same chart (I1)
 
@@ -52,6 +52,7 @@ def _dump(obj: object, quantize: bool = False) -> str:
 def outputs() -> dict[Path, str]:
     from pranix.ephemeris import swe
     from pranix.ephemeris.master import compute
+    from pranix.gateway.public import public_master
     from pranix.ephemeris.selftest import GOLDEN
     from pranix.gateway.app import create_app
 
@@ -71,8 +72,9 @@ def outputs() -> dict[Path, str]:
 
     return {
         web / "api" / "openapi.json": _dump(create_app().openapi()),
-        web / "__fixtures__" / "sample_1984.json": _dump(known, quantize=True),
-        web / "__fixtures__" / "sample_1984_unknown_time.json": _dump(unknown, quantize=True),
+        # what the browser receives: the public view (D86 item 3), not the engine's whole Master
+        web / "__fixtures__" / "sample_1984.json": _dump(public_master(known), quantize=True),
+        web / "__fixtures__" / "sample_1984_unknown_time.json": _dump(public_master(unknown), quantize=True),
         web / "__fixtures__" / "inspect_1984_d1.json": inspect(known, "d1"),
         web / "__fixtures__" / "inspect_1984_d9.json": inspect(known, "d9"),
         web / "__fixtures__" / "inspect_1984_unknown_d1.json": inspect(unknown, "d1"),

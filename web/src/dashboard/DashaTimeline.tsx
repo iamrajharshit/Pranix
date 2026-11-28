@@ -5,7 +5,7 @@
 // run (from birth) one tap away.
 import { useEffect, useState, type ReactElement } from "react";
 import { api, ApiError } from "../api/client";
-import type { DashaPeriod } from "../api/types";
+import { begins, type DashaPeriod } from "../api/types";
 import { ABBR, shortDate, span } from "../lib/format";
 import { PLANET_COLOR } from "./config";
 
@@ -59,7 +59,7 @@ export default function DashaTimeline({ profileId, onExpired }: { profileId: str
   if (err) return <p className="lead">{err}</p>;
   if (!top) return <div className="skel" style={{ width: "60%" }} />;
   const shown = top[0].cycle ?? 1;
-  const start = new Date(top[0].start).getTime(), end = new Date(top[8].end).getTime(), now = Date.now();
+  const start = new Date(begins(top[0])).getTime(), end = new Date(top[8].end).getTime(), now = Date.now();
   const nowPct = Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100));
   const chain: string[] = [];
   let level: DashaPeriod[] | undefined = top;
@@ -81,10 +81,10 @@ export default function DashaTimeline({ profileId, onExpired }: { profileId: str
             onClick={() => p.level < 5 && toggle(p)}>{isOpen ? "−" : "+"}</button>
           <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
             <span style={{ fontSize: 15, color: "#fff" }}><strong>{p.lord}</strong> <span style={{ color: "var(--muted)", fontSize: 13 }}>{LEVEL[p.level]}</span></span>
-            <span style={{ fontSize: 13, color: "var(--muted)" }}>{shortDate(p.start)} to {shortDate(p.end)}{p.from_birth ? " (from birth)" : ""}</span>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>{p.from_birth ? `From birth to ${shortDate(p.end)}` : `${shortDate(begins(p))} to ${shortDate(p.end)}`}</span>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <span style={{ fontSize: 13, color: "var(--text2)" }}>{span(p.start, p.end)}</span>
+            {!p.from_birth && <span style={{ fontSize: 13, color: "var(--text2)" }}>{span(begins(p), p.end)}</span>}
             {p.contains_now && <span className="badge" style={{ background: "var(--gold)", color: "#1A1226" }}>Now</span>}
           </div>
         </div>,
@@ -104,7 +104,7 @@ export default function DashaTimeline({ profileId, onExpired }: { profileId: str
         <div role="note" style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", justifyContent: "space-between", border: "1px solid rgba(244,197,102,.35)", borderRadius: 14, padding: "12px 16px" }}>
           <span style={{ fontSize: 14, lineHeight: 1.55, color: "var(--text2)" }}>
             {shown === currentCycle
-              ? `The nine periods last a hundred and twenty years in all. Your first run ended, so the sequence began again on ${shortDate(top[0].start)}. You are in its next run now.`
+              ? `The nine periods last a hundred and twenty years in all. Your first run ended, so the sequence began again on ${shortDate(begins(top[0]))}. You are in its next run now.`
               : "This is your first run of the sequence, from your birth."}
           </span>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setView(shown === currentCycle ? 1 : undefined)}>
@@ -113,10 +113,10 @@ export default function DashaTimeline({ profileId, onExpired }: { profileId: str
         </div>
       )}
       <div className="lifebar" role="img" aria-label={`Life periods from ${top[0].lord} to ${top[8].lord}; now in ${chain[0] ?? "none"}`}>
-        {top.map((p) => <span key={p.path} title={`${p.lord}: ${shortDate(p.start)} to ${shortDate(p.end)}`} style={{ width: `${((new Date(p.end).getTime() - new Date(p.start).getTime()) / (end - start)) * 100}%`, background: PLANET_COLOR[p.lord] }}>{ABBR[p.lord]}</span>)}
+        {top.map((p) => <span key={p.path} title={`${p.lord}: ${p.from_birth ? "from birth" : shortDate(begins(p))} to ${shortDate(p.end)}`} style={{ width: `${((new Date(p.end).getTime() - new Date(begins(p)).getTime()) / (end - start)) * 100}%`, background: PLANET_COLOR[p.lord] }}>{ABBR[p.lord]}</span>)}
         <span className="nowmark" style={{ left: `${nowPct}%` }} aria-hidden="true" />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--faint)" }}><span>{shortDate(top[0].start)}</span><span>Now: {shortDate(new Date().toISOString())}</span><span>{shortDate(top[8].end)}</span></div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--faint)" }}><span>{top[0].from_birth ? "" : shortDate(begins(top[0]))}</span><span>Now: {shortDate(new Date().toISOString())}</span><span>{shortDate(top[8].end)}</span></div>
       <div role="tree" aria-label="Dasha periods" style={{ display: "flex", flexDirection: "column", gap: 4 }}>{rows}</div>
       <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 6, fontSize: 14, lineHeight: 1.55, color: "var(--text2)" }}>
         {chain.length > 0 && <li>Your current chain: {chain.join(" → ")}.</li>}

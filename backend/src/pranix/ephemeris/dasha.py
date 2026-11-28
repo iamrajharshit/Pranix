@@ -49,6 +49,15 @@ class Period:
     def contains(self, t: Fraction) -> bool:
         return self.start <= t < self.end
 
+    def public_dict(self, now: Fraction | None = None) -> dict[str, Any]:
+        """For the browser (D86 C1): the period running at birth has no `start` (that would be the
+        birth instant); `period_start`, when that period itself began before birth, lets the
+        screen draw the life bar. It says nothing about the person."""
+        d = self.to_dict(now)
+        if self.from_birth:
+            d["start"] = None
+        return d
+
     def to_dict(self, now: Fraction | None = None) -> dict[str, Any]:
         d: dict[str, Any] = {
             "lord": self.lord,
@@ -59,6 +68,7 @@ class Period:
         }
         if self.from_birth:
             d["from_birth"] = True
+            d["period_start"] = iso(self.full_start)  # when the period itself began, before birth (D86 C1)
         if self.cycle > 1:  # only then, so every first-cycle answer stays byte-identical
             d["cycle"] = self.cycle
         if now is not None:

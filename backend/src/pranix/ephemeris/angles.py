@@ -7,6 +7,7 @@ mathematically on a boundary is classified by the half-open rule [start, end).
 
 from __future__ import annotations
 
+import math
 from fractions import Fraction
 
 SIGN = Fraction(30)
@@ -76,3 +77,11 @@ def near_boundary(lon: float, tolerance: float) -> bool:
         if r < tol or unit - r < tol:
             return True
     return False
+
+
+def to_arcminute(deg: float | None) -> float | None:
+    """Truncate (never round, rule 6) to a whole arcminute, for answers sent to the browser (D86).
+    The screen shows degrees and minutes; anything finer would only fingerprint the birth moment."""
+    if deg is None:
+        return None
+    return math.floor(deg * 60) / 60

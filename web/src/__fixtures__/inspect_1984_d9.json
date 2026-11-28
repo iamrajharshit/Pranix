@@ -73,9 +73,7 @@
         "planet": "Venus",
         "sign": "Capricorn"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -83,14 +81,12 @@
         "occupants": [],
         "sign": "Leo"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "Your rising sign. House one is Libra, with Jupiter.",
       "target": {
         "kind": "house",
         "ref": "1"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:10": {
@@ -170,9 +166,7 @@
         "planet": "Moon",
         "sign": "Taurus"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -183,14 +177,12 @@
         ],
         "sign": "Taurus"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House ten is Cancer, with Mars and Ketu.",
       "target": {
         "kind": "house",
         "ref": "10"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:11": {
@@ -273,9 +265,7 @@
         "planet": "Sun",
         "sign": "Scorpio"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -283,14 +273,12 @@
         "occupants": [],
         "sign": "Gemini"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House eleven is Leo. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "11"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:12": {
@@ -371,9 +359,7 @@
         "planet": "Mercury",
         "sign": "Sagittarius"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -381,14 +367,12 @@
         "occupants": [],
         "sign": "Cancer"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House twelve is Virgo. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "12"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:2": {
@@ -471,9 +455,7 @@
         "planet": "Mars",
         "sign": "Capricorn"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -481,14 +463,12 @@
         "occupants": [],
         "sign": "Virgo"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House two is Scorpio. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "2"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:3": {
@@ -570,9 +550,7 @@
         "planet": "Jupiter",
         "sign": "Sagittarius"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -582,14 +560,12 @@
         ],
         "sign": "Libra"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House three is Sagittarius. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "3"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:4": {
@@ -669,9 +645,7 @@
         "planet": "Saturn",
         "sign": "Libra"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -682,14 +656,12 @@
         ],
         "sign": "Scorpio"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House four is Capricorn, with Sun and Rahu.",
       "target": {
         "kind": "house",
         "ref": "4"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:5": {
@@ -769,9 +741,7 @@
         "planet": "Saturn",
         "sign": "Libra"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -782,14 +752,12 @@
         ],
         "sign": "Sagittarius"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House five is Aquarius, with Venus.",
       "target": {
         "kind": "house",
         "ref": "5"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:6": {
@@ -871,9 +839,7 @@
         "planet": "Jupiter",
         "sign": "Sagittarius"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -884,14 +850,12 @@
         ],
         "sign": "Capricorn"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House six is Pisces. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "6"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:7": {
@@ -973,9 +937,7 @@
         "planet": "Mars",
         "sign": "Capricorn"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -983,14 +945,12 @@
         "occupants": [],
         "sign": "Aquarius"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House seven is Aries. It is empty, so it is read through its lord and the planets that look at it.",
       "target": {
         "kind": "house",
         "ref": "7"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:8": {
@@ -1069,9 +1029,7 @@
         "planet": "Venus",
         "sign": "Capricorn"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -1079,14 +1037,12 @@
         "occupants": [],
         "sign": "Pisces"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House eight is Taurus, with Moon and Mercury.",
       "target": {
         "kind": "house",
         "ref": "8"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "house:9": {
@@ -1168,9 +1124,7 @@
         "planet": "Mercury",
         "sign": "Sagittarius"
       },
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": null,
       "placement": null,
       "same_house_other_chart": {
@@ -1178,14 +1132,12 @@
         "occupants": [],
         "sign": "Aries"
       },
-      "schema_version": "1",
       "sits_with": [],
       "summary": "House nine is Gemini, with Saturn.",
       "target": {
         "kind": "house",
         "ref": "9"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Jupiter": {
@@ -1285,9 +1237,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "changed",
         "chart": "d1",
@@ -1308,14 +1258,12 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [],
       "summary": "Jupiter in your first house, in Libra, an enemy's sign.",
       "target": {
         "kind": "planet",
         "ref": "Jupiter"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Ketu": {
@@ -1412,9 +1360,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "none",
         "chart": "d1",
@@ -1435,7 +1381,6 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [
         "Mars"
       ],
@@ -1444,7 +1389,6 @@
         "kind": "planet",
         "ref": "Ketu"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Mars": {
@@ -1556,9 +1500,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "changed",
         "chart": "d1",
@@ -1579,7 +1521,6 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [
         "Ketu"
       ],
@@ -1588,7 +1529,6 @@
         "kind": "planet",
         "ref": "Mars"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Mercury": {
@@ -1697,9 +1637,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "changed",
         "chart": "d1",
@@ -1720,7 +1658,6 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [
         "Moon"
       ],
@@ -1729,7 +1666,6 @@
         "kind": "planet",
         "ref": "Mercury"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Moon": {
@@ -1830,9 +1766,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "same",
         "chart": "d1",
@@ -1853,7 +1787,6 @@
         "vargottama": true
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [
         "Mercury"
       ],
@@ -1862,7 +1795,6 @@
         "kind": "planet",
         "ref": "Moon"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Rahu": {
@@ -1961,9 +1893,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "none",
         "chart": "d1",
@@ -1984,7 +1914,6 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [
         "Sun"
       ],
@@ -1993,7 +1922,6 @@
         "kind": "planet",
         "ref": "Rahu"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Saturn": {
@@ -2109,9 +2037,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "changed",
         "chart": "d1",
@@ -2132,14 +2058,12 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [],
       "summary": "Saturn in your ninth house, in Gemini, a friend's sign.",
       "target": {
         "kind": "planet",
         "ref": "Saturn"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Sun": {
@@ -2231,9 +2155,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "changed",
         "chart": "d1",
@@ -2254,7 +2176,6 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [
         "Rahu"
       ],
@@ -2263,7 +2184,6 @@
         "kind": "planet",
         "ref": "Sun"
       },
-      "top_signals": [],
       "unavailable": []
     },
     "planet:Venus": {
@@ -2372,9 +2292,7 @@
       ],
       "lord": null,
       "lord_other_chart": null,
-      "may_change": [],
       "minute_note": null,
-      "modifiers": [],
       "other_chart": {
         "change": "same",
         "chart": "d1",
@@ -2395,30 +2313,17 @@
         "vargottama": false
       },
       "same_house_other_chart": null,
-      "schema_version": "1",
       "sits_with": [],
       "summary": "Venus in your fifth house, in Aquarius, a friend's sign.",
       "target": {
         "kind": "planet",
         "ref": "Venus"
       },
-      "top_signals": [],
       "unavailable": []
     }
   },
   "chart": "d9",
   "level": "house",
-  "may_change": [
-    {
-      "chart": "d9",
-      "options": [
-        "Virgo",
-        "Libra"
-      ],
-      "ref": null,
-      "what": "rising"
-    }
-  ],
   "minute_note": "Within your birth time's margin, your D9 rising sign could be Virgo or Libra, which would move the D9 houses.",
   "minute_window": 2,
   "rules": {
@@ -2430,5 +2335,6 @@
     "hash": "9541a10df5ca6ffd",
     "id": "vedic-core",
     "version": 1
-  }
+  },
+  "schema_version": "1"
 }

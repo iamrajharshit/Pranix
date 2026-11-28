@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Card visuals come from the Master JSON, never from text (QA-13): numbers on screen are engine output.
-import type { Master } from "../api/types";
+import { begins, type Master } from "../api/types";
 import { DeitySymbol, StarGlyph } from "../components/Art";
 import { DOSHA_COLOR, ELEMENT_COLOR } from "./config";
 
@@ -113,11 +113,11 @@ export default function CardVisual({ id, m, name }: { id: string; m: Master; nam
         <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
           <span style={{ fontSize: 11, color: "var(--faint)", alignSelf: "flex-end" }}>As of {new Date(m.dasha.as_of).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</span>
           {ch.slice(0, 2).map((p) => {
-            const s = new Date(p.start).getTime(), e = new Date(p.end).getTime();
+            const s = new Date(begins(p)).getTime(), e = new Date(p.end).getTime();
             return (
               <div key={p.path} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: "#fff", fontWeight: 600 }}>{p.lord}</span>
-                  <span style={{ color: "var(--muted)" }}>{new Date(p.start).getFullYear()} to {new Date(p.end).getFullYear()}</span></div>
+                  <span style={{ color: "var(--muted)" }}>{p.from_birth ? "Birth" : new Date(begins(p)).getFullYear()} to {new Date(p.end).getFullYear()}</span></div>
                 <div className="bar"><span style={{ width: `${Math.min(100, Math.max(0, ((now - s) / (e - s)) * 100))}%`, background: "#A99CFF" }} /></div>
               </div>
             );
