@@ -16,6 +16,7 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
+import weakref
 from collections.abc import Callable, Mapping
 from importlib import resources
 from typing import Any
@@ -61,7 +62,9 @@ class InsightService:
     ) -> None:
         self.lib, self.chain, self.locale = lib, chain, locale
         self.cache: CacheStore = cache if cache is not None else MemoryCacheStore()
-        self._flights: dict[str, threading.Lock] = {}
+        # One lock per key while someone needs it: a weak map, so finished keys don't pile up for ever
+        # (bug bounty, 26 Nov: a plain dict kept a lock for every card meaning ever asked for).
+        self._flights: weakref.WeakValueDictionary[str, Any] = weakref.WeakValueDictionary()
         self._flights_lock = threading.Lock()
         # Optional hook for tools (llm bench): told why an AI answer was rejected. Never given the text.
         self.on_reject: Callable[[str, str, str], None] | None = None
@@ -127,9 +130,12 @@ class InsightService:
             self.on_reject(module, rule, where)
         return False
 
-    def _flight(self, key: str) -> threading.Lock:
+    def _flight(self, key: str) -> Any:
         with self._flights_lock:
-            return self._flights.setdefault(key, threading.Lock())
+            lock = self._flights.get(key)
+            if lock is None:
+                lock = self._flights[key] = _KeyLock()
+            return lock
 
     def _job(self, module: str, key: str, master: Mapping[str, Any], curated: dict[str, Any]) -> Job:
         """Everything one AI attempt needs, already de-identified, so it can also run later (D77)."""
@@ -169,3 +175,16 @@ class InsightService:
 
         result = chain.generate(SYSTEM_PROMPT, job.user, module=module, accept=accept, task=TASKS["card_reading"])
         return out if result is not None else None
+
+
+class _KeyLock:
+    """A lock that a weak map can hold (threading.Lock itself can't be weakly referenced)."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+
+    def __enter__(self) -> bool:
+        return self._lock.acquire()
+
+    def __exit__(self, *exc: object) -> None:
+        self._lock.release()

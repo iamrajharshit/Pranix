@@ -160,3 +160,40 @@ test("the birth form says which box is wrong, as soon as you leave it (owner, 26
   await page.getByRole("button", { name: "Reveal my chart" }).click();
   await expect(page.getByRole("link", { name: /birthplace/ })).toBeVisible();
 });
+
+test("a guest chart that expires while the page is open is re-created silently (FR-DASH-19)", async ({ page }) => {
+  // The server forgets the first chart: its stream and its GET answer 410, as after the 24-hour limit.
+  let first: string | null = null;
+  const gone = { status: 410, contentType: "application/problem+json",
+    body: JSON.stringify({ code: "CHART_EXPIRED", message: "Expired.", retry_after: null, reset_at: null, request_id: "-" }) };
+  await page.route(/\/v1\/profiles\/[^/]+\/insights/, (route) => {
+    const id = new URL(route.request().url()).pathname.split("/")[3];
+    first ??= id;
+    return id === first ? route.fulfill(gone) : route.continue();
+  });
+  await page.route(/\/v1\/profiles\/[^/?]+$/, (route) => {
+    const id = new URL(route.request().url()).pathname.split("/")[3];
+    return route.request().method() === "GET" && id === first ? route.fulfill(gone) : route.continue();
+  });
+
+  await page.goto("/");
+  await page.getByRole("checkbox").first().check();
+  await page.getByRole("button", { name: "Start as guest" }).click();
+  await page.locator("#dd").fill("08");
+  await page.locator("#mm").fill("12");
+  await page.locator("#yy").fill("1984");
+  await page.locator("#hh").fill("12");
+  await page.locator("#mi").fill("20");
+  await page.locator("#ap").selectOption("AM");
+  await page.locator("#place").fill("Pune");
+  await page.locator("#places").getByRole("option", { name: /Pune/ }).click();
+  await page.getByRole("button", { name: "Reveal my chart" }).click();
+
+  await expect(page).toHaveURL(/dashboard/, { timeout: 30_000 });
+  await expect(page.locator("article.card")).toHaveCount(12, { timeout: 30_000 });
+  await expect(page.getByText("Refreshing your chart")).toBeVisible({ timeout: 30_000 });
+  // every card ends up ready from the new chart, none left in error
+  await expect(page.getByRole("button", { name: "Try this card again" })).toHaveCount(0, { timeout: 30_000 });
+  await expect(page.locator("#more-birthstar")).toBeVisible({ timeout: 30_000 });
+  expect(first).not.toBeNull();
+});

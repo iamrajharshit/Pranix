@@ -75,3 +75,22 @@ def test_missing_geo_index_means_not_ready(monkeypatch: pytest.MonkeyPatch) -> N
     finally:
         monkeypatch.undo()
         get_settings.cache_clear()
+
+
+def test_personal_responses_are_never_stored_by_a_cache(c: TestClient) -> None:
+    """Bug bounty, 26 Nov: chart responses carried no Cache-Control, so a browser could keep someone's
+    chart in its disk cache. The API defaults to private, no-store; routes with their own rule keep it."""
+    body = {"place": {"place_id": "geonames:100001"}, "local_datetime": "1984-12-08T00:20:00", "birth_time_known": True}
+    r = c.post("/v1/profiles", json=body, headers={"X-Age-Confirmed": "true"})
+    pid = r.json()["profile_id"]
+    for resp in (
+        r,
+        c.get(f"/v1/profiles/{pid}"),
+        c.get(f"/v1/profiles/{pid}/dasha"),
+        c.get("/v1/places/nearest", params={"lat": 18.55, "lon": 73.85}),
+        c.get("/v1/places", params={"q": "pun"}),
+        c.get("/v1/profiles/not-a-chart"),  # errors too
+    ):
+        assert resp.headers.get("cache-control") == "private, no-store", resp.request.url.path
+    stream = c.get(f"/v1/profiles/{pid}/insights")
+    assert stream.headers["cache-control"] == "no-store"  # its own rule is kept
