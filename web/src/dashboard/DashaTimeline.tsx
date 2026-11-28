@@ -33,6 +33,7 @@ export default function DashaTimeline({ profileId, onExpired }: { profileId: str
       setTop(null); setKids({}); setOpen(new Set());
       const t = await load(undefined, view);
       if (!t) return;
+      if (t.length === 0) { setErr("We could not load the timeline just now."); return; } // never from our server, but don't crash
       setTop(t);
       if (view === undefined) setCurrentCycle(t[0].cycle ?? 1);
       // Open the current chain, level by level.
