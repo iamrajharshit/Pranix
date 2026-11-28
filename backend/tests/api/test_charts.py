@@ -6,7 +6,7 @@ from itertools import pairwise
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
+from spa_client import TestClient
 
 from pranix.cardimg.render import CardImageUnavailable, Renderer
 from pranix.config.settings import Settings, get_settings

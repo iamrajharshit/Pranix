@@ -16,6 +16,7 @@ import random
 from locust import HttpUser, between, task
 
 AGE = {"X-Age-Confirmed": "true"}
+SPA = {"X-Requested-With": "pranix-spa"}  # D85: changing calls must come from our page
 RNG = random.Random(1984)
 # 200 invented births: random dates, times and fixture-index places (no real people).
 PLACES = [{"lat": 18.5204, "lon": 73.8567}, {"lat": 19.076, "lon": 72.8777}, {"lat": 28.6139, "lon": 77.209},
@@ -40,7 +41,7 @@ class Guest(HttpUser):
     def dashboard(self) -> None:
         self.client.get("/v1/places", params={"q": random.choice(["pune", "mumbai", "delhi"])}, name="/v1/places")
         birth = random.choice(BIRTHS)
-        r = self.client.post("/v1/profiles", json=birth, headers=AGE, name="/v1/profiles")
+        r = self.client.post("/v1/profiles", json=birth, headers={**AGE, **SPA}, name="/v1/profiles")
         if r.status_code != 201:
             return
         pid = r.json()["profile_id"]
@@ -55,7 +56,7 @@ class Guest(HttpUser):
             if d.status_code == 422 and not birth["birth_time_known"]:
                 d.success()  # expected: the dasha needs a birth time (D56)
         if random.random() < 0.3:
-            self.client.delete(f"/v1/profiles/{pid}", name="/v1/profiles/[id] DELETE")
+            self.client.delete(f"/v1/profiles/{pid}", headers=SPA, name="/v1/profiles/[id] DELETE")
 
     @task(1)
     def health(self) -> None:

@@ -197,3 +197,40 @@ test("a guest chart that expires while the page is open is re-created silently (
   await expect(page.locator("#more-birthstar")).toBeVisible({ timeout: 30_000 });
   expect(first).not.toBeNull();
 });
+
+test("no third party is contacted, and the map asks before it loads (D86)", async ({ page, baseURL }) => {
+  // Every request the page makes is recorded. Only our own origin is allowed, except OpenStreetMap
+  // tiles after the person says yes. Fonts are self-hosted; no pixels, replay or chat widgets.
+  const ours = new URL(baseURL ?? "http://127.0.0.1").origin;
+  const outside: string[] = [];
+  page.on("request", (r) => { const o = new URL(r.url()).origin; if (o !== ours && !r.url().startsWith("data:")) outside.push(o); });
+  await page.route("https://tile.openstreetmap.org/**", (route) => route.abort()); // no network in CI; we only count attempts
+
+  await page.goto("/");
+  await page.getByRole("checkbox").first().check();
+  await page.getByRole("button", { name: "Start as guest" }).click();
+  await page.locator("#dd").fill("08");
+  await page.locator("#mm").fill("12");
+  await page.locator("#yy").fill("1984");
+  await page.locator("#hh").fill("12");
+  await page.locator("#mi").fill("20");
+  await page.locator("#ap").selectOption("AM");
+
+  await page.locator("#place").fill("Zzqx"); // no match offers "Pick on a map"
+  await page.getByRole("button", { name: "Pick on a map" }).first().click();
+  await expect(page.getByRole("button", { name: "Load the map" })).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(outside).toEqual([]); // asking costs nothing: no tile request yet
+  await page.getByRole("button", { name: "Load the map" }).click();
+  await expect.poll(() => outside.filter((o) => o === "https://tile.openstreetmap.org").length).toBeGreaterThan(0);
+  await page.getByRole("button", { name: "Back to search" }).click();
+
+  const before = outside.length;
+  await page.locator("#place").fill("Pune");
+  await page.locator("#places").getByRole("option", { name: /Pune/ }).click();
+  await page.getByRole("button", { name: "Reveal my chart" }).click();
+  await expect(page.locator("article.card")).toHaveCount(12, { timeout: 30_000 });
+  await page.waitForTimeout(500);
+  expect(outside.slice(before)).toEqual([]); // the whole dashboard: our origin only
+  expect(new Set(outside)).toEqual(new Set(["https://tile.openstreetmap.org"]));
+});

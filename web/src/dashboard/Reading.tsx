@@ -37,7 +37,8 @@ export default function Reading({ card, m, profileId, name, readyIds, onClose, o
           <button type="button" className="navbtn" onClick={onClose}><span aria-hidden="true">←</span> Back to your map</button>
           <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{ fontSize: 14, color: "var(--muted)" }}>Card {pos + 1} of {readyIds.length}</span>
-            <button type="button" className="navbtn" onClick={() => setImg(true)}><span aria-hidden="true">⤓</span> Save as image</button>
+            {(card.state === "ready" || card.state === "fallback") && /* a card without content has no image (the server answers 404) */
+              <button type="button" className="navbtn" onClick={() => setImg(true)}><span aria-hidden="true">⤓</span> Save as image</button>}
           </div>
         </div>
 
@@ -127,7 +128,14 @@ export default function Reading({ card, m, profileId, name, readyIds, onClose, o
 function SaveImage({ url, module, onClose }: { url: string; module: string; onClose(): void }) {
   const [state, setState] = useState<"loading" | "ok" | "error">("loading");
   const [note, setNote] = useState("");
+  const [why, setWhy] = useState("Card images are not available on this server right now.");
   const title = useRef<HTMLHeadingElement>(null);
+  // An <img> can't read the error body, so ask once more for the server's own message. While
+  // developing it names what is missing (runbook §6.2); in production it stays generic (D86).
+  const failed = () => {
+    setState("error");
+    fetch(url).then((r) => r.json()).then((p: { message?: string }) => { if (p.message) setWhy(p.message); }).catch(() => {});
+  };
   useEffect(() => { title.current?.focus(); }, []);
   const share = async () => {
     try {
@@ -144,9 +152,9 @@ function SaveImage({ url, module, onClose }: { url: string; module: string; onCl
         <h2 id="im-t" ref={title} tabIndex={-1} style={{ margin: 0, font: "600 28px var(--serif)", color: "#fff", outline: "none" }}>Save this card as an image</h2>
         <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "var(--text2)" }}>Our server draws a clean portrait image, sized for phones and stories. It shows this card only. Your name, birth date, time and place are never on it.</p>
         <div style={{ alignSelf: "center", width: "100%", maxWidth: 320, aspectRatio: "4/5", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,.15)", background: "#0A0A1E", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {state !== "error" && <img src={url} alt="Preview of your card image" style={{ width: "100%", height: "100%", objectFit: "cover", display: state === "ok" ? "block" : "none" }} onLoad={() => setState("ok")} onError={() => setState("error")} />}
+          {state !== "error" && <img src={url} alt="Preview of your card image" style={{ width: "100%", height: "100%", objectFit: "cover", display: state === "ok" ? "block" : "none" }} onLoad={() => setState("ok")} onError={failed} />}
           {state === "loading" && <div className="skel" style={{ width: "60%" }} />}
-          {state === "error" && <p className="hint" style={{ padding: 16, textAlign: "center" }}>Card images are not available on this server right now.</p>}
+          {state === "error" && <p className="hint" role="status" style={{ padding: 16, textAlign: "center" }}>{why}</p>}
         </div>
         {note && <p role="status" className="hint">{note}</p>}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>

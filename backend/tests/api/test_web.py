@@ -3,7 +3,7 @@
 
 from pathlib import Path
 
-from fastapi.testclient import TestClient
+from spa_client import TestClient
 
 from pranix.config.settings import get_settings
 from pranix.gateway.app import create_app

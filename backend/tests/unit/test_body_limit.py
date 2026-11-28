@@ -11,7 +11,7 @@ from collections.abc import Iterator
 from typing import Any
 
 import pytest
-from fastapi.testclient import TestClient
+from spa_client import TestClient
 
 from pranix.gateway.app import MAX_BODY_BYTES, BodyLimit, create_app
 

@@ -74,7 +74,11 @@ def card_image(request: Request, profile_id: str, module_id: str) -> Response:
         raise ProblemError(404, "CARD_NOT_AVAILABLE", "That card is not available as an image.")
     renderer = request.app.state.renderer
     if renderer is None:
-        raise ProblemError(503, "SERVICE_NOT_READY", "Card images are not available on this server.", retry_after=60)
+        msg = "Card images are not available on this server."
+        why = getattr(request.app.state, "renderer_problem", None)
+        if why and request.app.state.settings.env != "prod":  # say what's missing while developing (runbook §6.2)
+            msg += f" Missing here: {why}."
+        raise ProblemError(503, "SERVICE_NOT_READY", msg, retry_after=60)
     item = _chart(request, profile_id)
     card = request.app.state.insights.cached_card(module_id, item.master)
     if card["state"] != "ready":

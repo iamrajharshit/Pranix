@@ -147,7 +147,7 @@ jobs:
           curl -fs "localhost:8000/v1/places?q=pune" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r[0]); assert r[0]['tz']=='Asia/Kolkata'"
           curl -fs "localhost:8000/v1/places/nearest?lat=18.55&lon=73.85"
           echo "smoke: places ok"
-          curl -fs -X POST localhost:8000/v1/profiles -H "content-type: application/json" -H "X-Age-Confirmed: true" \
+          curl -fs -X POST localhost:8000/v1/profiles -H "content-type: application/json" -H "X-Age-Confirmed: true" -H "X-Requested-With: pranix-spa" \
             -d '{"place":{"lat":18.5204,"lon":73.8567},"local_datetime":"1984-12-08T00:20:00","birth_time_known":true}' \
             | tee /tmp/p.json | python3 -c "import json,sys; m=json.load(sys.stdin)['master']; print(m['d1']['lagna']['sign'], m['nakshatra']['name']); assert m['d1']['lagna']['sign']=='Leo'"
           pid=$(python3 -c "import json; print(json.load(open('/tmp/p.json'))['profile_id'])")
